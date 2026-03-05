@@ -40,7 +40,7 @@ function App() {
 	if (loading && !currentUser) return <MessageLoading />;
 
 	return (
-		<div className="shadow-2xl w-[100vw] h-[100vh] ">
+		<div className="min-h-dvh">
 			<Routes>
 				<Route
 					path="/"

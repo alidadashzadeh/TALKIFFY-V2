@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { Avatar } from "@mui/material";
 
 import { useContactContext } from "../contexts/ContactContext";
 import { useSocketContext } from "../contexts/SocketContext";
@@ -11,13 +10,13 @@ function ContactListItem({ contact }) {
 	const { unseenMessages, setUnseenMessages } = useMessagesContext();
 	const isOnline = onlineUsers.includes(contact._id);
 	const hasUnseenMessage = unseenMessages?.some(
-		(message) => message.senderId === contact._id
+		(message) => message.senderId === contact._id,
 	);
 
 	const handleClick = () => {
 		setCurrentContactId(contact._id);
 		setUnseenMessages((unseenMessages) =>
-			unseenMessages?.filter((message) => message?.senderId !== contact._id)
+			unseenMessages?.filter((message) => message?.senderId !== contact._id),
 		);
 	};
 
@@ -30,14 +29,14 @@ function ContactListItem({ contact }) {
 				handleClick();
 			}}
 		>
-			<Avatar
+			{/* <Avatar
 				alt={contact.username}
 				src={
 					import.meta.env.MODE === "development"
 						? `http://localhost:5001/avatars/${contact.avatar}`
 						: `https://talkiffy.onrender.com/avatars/${contact.avatar}`
 				}
-			/>
+			/> */}
 			<div className="flex-col hidden sm:flex ">
 				<p className=" font-bold text-text__primary lg:hidden">
 					{contact.username.length < 6

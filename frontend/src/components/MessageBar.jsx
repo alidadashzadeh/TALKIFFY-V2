@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { Send } from "lucide-react";
 
-import { LuSend } from "react-icons/lu";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 import useSendMessage from "../hooks/useSendMessage";
 
@@ -19,27 +21,32 @@ function MessageBar({ loading }) {
 	const onSubmit = (data) => {
 		sendMessage(data);
 		reset();
+		inputRef.current?.focus();
 	};
 
 	return (
-		<div className="flex gap-2 px-4 my-2 ">
+		<div className="flex gap-2 px-4 my-2">
 			<form
-				className="flex gap-2 w-full items-center  "
+				className="flex gap-2 w-full items-center"
 				onSubmit={handleSubmit(onSubmit)}
 			>
-				<input
-					className="w-full text-text__primary bg-background__secondary outline-none border-2 border-brand rounded-full pl-4 h-12"
+				<Input
 					ref={inputRef}
 					autoComplete="off"
 					disabled={loading}
-					placeholder="Send a Message ..."
-					{...register("message", {
-						required: "A message cannot be empty",
-					})}
+					placeholder="Send a message..."
+					className="h-12 rounded-full pl-4"
+					{...register("message", { required: "A message cannot be empty" })}
 				/>
-				<button type="submit">
-					<LuSend className="text-3xl text-text__primary " disabled={loading} />
-				</button>
+
+				<Button
+					type="submit"
+					disabled={loading}
+					className="h-12 w-12 rounded-full p-0"
+					aria-label="Send message"
+				>
+					<Send className="h-5 w-5" />
+				</Button>
 			</form>
 		</div>
 	);

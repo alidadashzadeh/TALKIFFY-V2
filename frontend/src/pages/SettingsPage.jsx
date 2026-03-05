@@ -1,24 +1,25 @@
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft, PlayCircle } from "lucide-react";
 
-import { Button } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { useSettingContext } from "../contexts/SettingContext";
 
 function SettingsPage() {
 	const { theme, setTheme, sounds, notifSound, setNotifSound } =
 		useSettingContext();
+
 	const navigate = useNavigate();
 
-	const handleChange = () => {
-		setTheme((theme) => (theme === "dark" ? "light" : "dark"));
+	const handleThemeToggle = () => {
+		setTheme((t) => (t === "dark" ? "light" : "dark"));
 	};
 
-	const handleSoundChange = (event) => {
-		setNotifSound(event.target.value);
-		localStorage.setItem("notificationSound", event.target.value);
+	const handleSoundChange = (value) => {
+		setNotifSound(value);
+		localStorage.setItem("notificationSound", value);
 	};
 
 	const previewSound = (soundRef) => {
@@ -26,69 +27,69 @@ function SettingsPage() {
 	};
 
 	return (
-		<div className="flex justify-center items-center h-full bg-background__primary ">
-			<div className="flex flex-col gap-2 bg-background__secondary p-8 rounded-xl ">
+		<div className="flex justify-center items-center h-full bg-background__primary">
+			<div className="flex flex-col gap-4 bg-background__secondary p-8 rounded-xl w-[90%] max-w-[520px]">
 				<p className="text-2xl p-2 font-bold text-text__primary border-b-2">
 					SETTINGS
 				</p>
-				<div className="flex gap-4 items-center   ">
+
+				{/* Theme */}
+				<div className="flex gap-4 items-center">
 					<div className="text-text__primary font-bold">
 						{theme === "dark" ? "Switch to Light mode" : "Switch to Dark mode"}
 					</div>
-					<Switch checked={theme === "dark"} onChange={handleChange} />
+					<Switch
+						checked={theme === "dark"}
+						onCheckedChange={handleThemeToggle}
+					/>
 				</div>
 
-				<div className="flex flex-col gap-2">
+				{/* Notification Sound */}
+				<div className="flex flex-col gap-3">
 					<p className="text-2xl p-2 font-bold text-text__primary border-b-2">
 						Select Notification Sound
 					</p>
 
-					<label className="flex gap-2 text-text__primary">
-						<input
-							type="radio"
-							value="notif1"
-							checked={notifSound === "notif1"}
-							onChange={handleSoundChange}
-						/>
-						Notification 1
-						<button onClick={() => previewSound("notif1")}>
-							{<PlayCircleIcon />}
-						</button>
-					</label>
-					<label className="flex gap-2 text-text__primary">
-						<input
-							type="radio"
-							value="notif2"
-							checked={notifSound === "notif2"}
-							onChange={handleSoundChange}
-						/>
-						Notification 2
-						<button onClick={() => previewSound("notif2")}>
-							{<PlayCircleIcon />}
-						</button>
-					</label>
-					<label className="flex gap-2 text-text__primary">
-						<input
-							type="radio"
-							value="notif3"
-							checked={notifSound === "notif3"}
-							onChange={handleSoundChange}
-						/>
-						Notification 3
-						<button onClick={() => previewSound("notif3")}>
-							{<PlayCircleIcon />}
-						</button>
-					</label>
+					<RadioGroup
+						value={notifSound}
+						onValueChange={handleSoundChange}
+						className="gap-3"
+					>
+						{["notif1", "notif2", "notif3"].map((key, idx) => (
+							<div
+								key={key}
+								className="flex items-center justify-between rounded-lg border border-border px-3 py-2"
+							>
+								<label
+									htmlFor={key}
+									className="flex items-center gap-3 text-text__primary cursor-pointer"
+								>
+									<RadioGroupItem id={key} value={key} />
+									<span>{`Notification ${idx + 1}`}</span>
+								</label>
+
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									onClick={() => previewSound(key)}
+									aria-label={`Preview ${key}`}
+								>
+									<PlayCircle className="h-5 w-5" />
+								</Button>
+							</div>
+						))}
+					</RadioGroup>
 				</div>
 
+				{/* Back */}
 				<Button
-					variant="outlined"
+					type="button"
+					variant="outline"
 					className="text-text__primary"
-					startIcon={<ArrowBackIcon />}
-					onClick={() => {
-						navigate("/");
-					}}
+					onClick={() => navigate("/")}
 				>
+					<ArrowLeft className="mr-2 h-4 w-4" />
 					Back
 				</Button>
 			</div>

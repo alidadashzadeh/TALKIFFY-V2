@@ -2,19 +2,24 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { useContactContext } from "../contexts/ContactContext";
 import { useAuthContext } from "../contexts/AuthContext";
-import { useSettingContext } from "../contexts/SettingContext";
-
 import useAddNewContact from "../hooks/useAddNewContact";
 
 function AddContactModal() {
 	const { openAddContactModal, setOpenAddContactModal } = useContactContext();
 	const { currentUser } = useAuthContext();
 	const { loading, addNewContact, isContactAdded } = useAddNewContact();
-	const { theme } = useSettingContext();
 
 	const {
 		register,
@@ -30,6 +35,11 @@ function AddContactModal() {
 		}
 	}, [isContactAdded, setOpenAddContactModal, reset]);
 
+	const close = () => {
+		reset();
+		setOpenAddContactModal(false);
+	};
+
 	const onSubmit = async (data) => {
 		if (data.email === currentUser.email)
 			return toast.error("Wrong User selected!");
@@ -37,56 +47,24 @@ function AddContactModal() {
 	};
 
 	return (
-		<>
-			<Modal
-				open={openAddContactModal}
-				onClose={() => {
-					reset();
-					setOpenAddContactModal(false);
-				}}
-				aria-labelledby="child-modal-title"
-				aria-describedby="child-modal-description"
-			>
-				<Box
-					sx={{
-						position: "absolute",
-						top: "50%",
-						left: "50%",
-						transform: "translate(-50%, -50%)",
-						width: 376,
-						bgcolor: theme === "dark" ? "#3A3A3A" : "#f4f4f4",
-						borderRadius: "10px",
-						boxShadow: 24,
-						pt: 2,
-						px: 4,
-						pb: 3,
-						display: "flex",
-						flexDirection: "column",
-						gap: "1rem",
-					}}
-				>
-					<Typography
-						variant="h6"
-						id="child-modal-title"
-						sx={{
-							color: theme === "dark" ? "#d5d5d5" : "#0f0f0f",
-						}}
-					>
-						Add new Contact
-					</Typography>
-
-					<form
-						style={{ display: "flex", flexDirection: "column", gap: "8px" }}
-						onSubmit={handleSubmit(onSubmit)}
-					>
-						<TextField
-							type="email"
+		<Dialog
+			open={openAddContactModal}
+			onOpenChange={(open) => !open && close()}
+		>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Add new Contact</DialogTitle>
+				</DialogHeader>
+				content
+				<form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
+					<div className="grid gap-2">
+						<Label htmlFor="email">Email</Label>
+						<Input
 							id="email"
-							label="Email"
-							variant="outlined"
-							error={errors.email ? true : false}
+							type="email"
+							placeholder="name@example.com"
 							disabled={loading}
-							helperText={errors?.email?.message}
+							aria-invalid={!!errors.email}
 							{...register("email", {
 								required: "Email is required",
 								pattern: {
@@ -94,28 +72,20 @@ function AddContactModal() {
 									message: "Please enter a valid email address",
 								},
 							})}
-							slotProps={{
-								inputLabel: {
-									sx: {
-										color: theme === "dark" ? "#d5d5d5" : "#0f0f0f",
-									},
-								},
-								input: {
-									sx: {
-										color: theme === "dark" ? "#d5d5d5" : "#0f0f0f",
-									},
-								},
-							}}
 						/>
-						<Box>
-							<Button type="submit" variant="contained" disabled={loading}>
-								{loading ? "Adding Contact..." : "Add contact"}
-							</Button>
-						</Box>
-					</form>
-				</Box>
-			</Modal>
-		</>
+						{errors?.email?.message && (
+							<p className="text-sm text-destructive">{errors.email.message}</p>
+						)}
+					</div>
+
+					<div className="flex justify-end">
+						<Button type="submit" disabled={loading}>
+							{loading ? "Adding Contact..." : "Add contact"}
+						</Button>
+					</div>
+				</form>
+			</DialogContent>
+		</Dialog>
 	);
 }
 

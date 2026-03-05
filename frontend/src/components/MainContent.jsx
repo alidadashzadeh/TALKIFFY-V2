@@ -39,38 +39,39 @@ function MainContent() {
 	if (loading) return <MessageLoading />;
 
 	return (
-		<div className=" flex flex-col justify-between items-center w-full h-full bg-background__secondary">
-			{!currentContactId && (
-				<div className="w-full h-full flex justify-center items-center text-xl font-bold text-text__primary">
-					Select a contact to start talking!
-				</div>
-			)}
-			{currentContactId && (
-				<>
-					<div className=" w-full">
-						<MessageHeader />
-					</div>
+		// <div className=" flex flex-col justify-between items-center w-full h-full bg-background__secondary">
+		// 	{!currentContactId && (
+		// 		<div className="w-full h-full flex justify-center items-center text-xl font-bold text-text__primary">
+		// 			Select a contact to start talking!
+		// 		</div>
+		// 	)}
+		// 	{currentContactId && (
+		// 		<>
+		// 			<div className=" w-full">
+		// 				<MessageHeader />
+		// 			</div>
 
-					<div
-						className="w-full overflow-y-scroll h-full p-2"
-						ref={chatContainerRef}
-					>
-						{messages?.length === 0 ? (
-							<div className="w-full h-full flex justify-center text-xl text-text__primary pt-8">
-								No message yet! say Hi 👋
-							</div>
-						) : (
-							messages?.map((message) => (
-								<MessageItem message={message} key={message._id} />
-							))
-						)}
-					</div>
-					<div className="w-full  ">
-						<MessageBar loading={loading} />
-					</div>
-				</>
-			)}
-		</div>
+		// 			<div
+		// 				className="w-full overflow-y-scroll h-full p-2"
+		// 				ref={chatContainerRef}
+		// 			>
+		// 				{messages?.length === 0 ? (
+		// 					<div className="w-full h-full flex justify-center text-xl text-text__primary pt-8">
+		// 						No message yet! say Hi 👋
+		// 					</div>
+		// 				) : (
+		// 					messages?.map((message) => (
+		// 						<MessageItem message={message} key={message._id} />
+		// 					))
+		// 				)}
+		// 			</div>
+		// 			<div className="w-full  ">
+		// 				<MessageBar loading={loading} />
+		// 			</div>
+		// 		</>
+		// 	)}
+		// </div>
+		<div>main</div>
 	);
 }
 
