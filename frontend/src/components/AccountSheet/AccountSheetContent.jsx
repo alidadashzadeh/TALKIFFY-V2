@@ -2,15 +2,18 @@ import { Button } from "@/components/ui/button";
 import { SheetContent } from "../ui/sheet";
 import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
-import ProfileModal from "../modals/ProfileModal";
+import ProfileModal from "../profile/ProfileModal";
 import { LogOut } from "lucide-react";
-import SettingsModal from "../modals/SettingsModal";
+import SettingsModal from "../settings/SettingsModal";
 import NewGroupModal from "../modals/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
 import ContactsModal from "../modals/ContactsModal";
+import useLogout from "@/hooks/useLogout";
 
 function AccountSheetContent() {
+	const { logout } = useLogout();
+
 	return (
 		<SheetContent
 			side="left"
@@ -23,17 +26,15 @@ function AccountSheetContent() {
 				<div className="grid gap-2 p-4">
 					{/* If these render buttons inside, great.
                 If they render triggers, they still align nicely in this stack. */}
+					<ProfileModal />
 					<ContactsModal />
 					<NewGroupModal />
-					<ProfileModal />
 					<SettingsModal />
 
 					<Button
 						variant="ghost"
 						className="w-full justify-start gap-2"
-						onClick={() => {
-							// TODO: wire logout handler
-						}}
+						onClick={logout}
 					>
 						<LogOut className="h-4 w-4" />
 						<span>Logout</span>
