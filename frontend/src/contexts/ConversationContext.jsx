@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
+
 import { createContext, useContext, useMemo, useState } from "react";
 
 const ConversationContext = createContext();
@@ -22,6 +23,10 @@ export const ConversationContextProvider = ({ children }) => {
 
 	const currentConversationId = currentConversation?._id || null;
 
+	const selectConversation = (conversation) => {
+		setCurrentConversation(conversation);
+	};
+
 	const clearCurrentConversation = () => {
 		setCurrentConversation(null);
 	};
@@ -29,8 +34,8 @@ export const ConversationContextProvider = ({ children }) => {
 	const value = useMemo(
 		() => ({
 			currentConversation,
-			setCurrentConversation,
 			currentConversationId,
+			selectConversation,
 			clearCurrentConversation,
 			conversations,
 			setConversations,

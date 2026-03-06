@@ -25,26 +25,39 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-export const getMessages = async (req, res) => {
-	try {
-		const myId = req.user._id;
-		const contactId = req.params.id;
+// export const getMessages = async (req, res) => {
+// 	try {
+// 		const myId = req.user._id;
+// 		const contactId = req.params.id;
 
-		const messages = await Message.find({
-			$or: [
-				{ receiverId: myId, senderId: contactId },
-				{ senderId: myId, receiverId: contactId },
-			],
-		});
+// 		const messages = await Message.find({
+// 			$or: [
+// 				{ receiverId: myId, senderId: contactId },
+// 				{ senderId: myId, receiverId: contactId },
+// 			],
+// 		});
 
-		res.status(200).json({
-			status: "success",
-			results: messages.length,
-			data: { messages },
-		});
-	} catch (error) {
-		res.status(400).json({ status: "fail", message: error.message });
-	}
+// 		res.status(200).json({
+// 			status: "success",
+// 			results: messages.length,
+// 			data: { messages },
+// 		});
+// 	} catch (error) {
+// 		res.status(400).json({ status: "fail", message: error.message });
+// 	}
+// };
+
+export const getMessages = async (req, res, next) => {
+	const { conversationId } = req.params;
+
+	const messages = await Message.find({ conversationId })
+		.populate("senderId", "username avatar")
+		.sort({ createdAt: 1 });
+
+	res.status(200).json({
+		status: "success",
+		data: { messages },
+	});
 };
 
 export const updateDeliverMessages = async (req, res) => {
@@ -59,13 +72,13 @@ export const updateDeliverMessages = async (req, res) => {
 		if (messages.length > 0) {
 			const results = await Message.updateMany(
 				{ receiverId: receiverId, isDelivered: false },
-				{ $set: { isDelivered: true } }
+				{ $set: { isDelivered: true } },
 			);
 
 			messages.forEach((message) =>
 				io
 					.to(getReceiverSocketId(message?.senderId))
-					.emit("getDeliveredOnLogin", message)
+					.emit("getDeliveredOnLogin", message),
 			);
 		}
 
@@ -93,11 +106,11 @@ export const updateSeenMessages = async (req, res) => {
 		if (messages.length > 0) {
 			const results = await Message.updateMany(
 				{ receiverId, senderId, isSeen: false },
-				{ $set: { isSeen: true, isDelivered: true } }
+				{ $set: { isSeen: true, isDelivered: true } },
 			);
 
 			messages.forEach((message) =>
-				io.to(getReceiverSocketId(message?.senderId)).emit("getSeen", message)
+				io.to(getReceiverSocketId(message?.senderId)).emit("getSeen", message),
 			);
 		}
 

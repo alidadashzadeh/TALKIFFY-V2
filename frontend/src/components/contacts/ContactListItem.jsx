@@ -1,31 +1,39 @@
 /* eslint-disable react/prop-types */
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useContactContext } from "@/contexts/ContactContext";
 import { useSocketContext } from "@/contexts/SocketContext";
-import { useMessagesContext } from "@/contexts/MessagesContext";
 import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { MessageSquare } from "lucide-react";
+import { Separator } from "../ui/separator";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import { Spinner } from "../ui/spinner";
+import useGetOrCreatePrivateConversation from "@/hooks/conversation/useGetOrCreatePrivateConversation";
+import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 
 function ContactListItem({ contact }) {
-	const { currentContactId, setCurrentContactId } = useContactContext();
+	const { setAccountSheetOpen, setContactModalOpen } = useSheetModalContext();
+
 	const { onlineUsers } = useSocketContext();
-	const { unseenMessages, setUnseenMessages } = useMessagesContext();
+	const { selectConversation } = useConversationContext();
 
-	const isActive = currentContactId === contact._id;
-	const isOnline = onlineUsers.includes(contact._id);
+	const { getOrCreatePrivateConversation, loading } =
+		useGetOrCreatePrivateConversation();
 
-	const unseenCount =
-		unseenMessages?.filter((message) => message.senderId === contact._id)
-			.length || 0;
+	const handleMessageClick = async () => {
+		try {
+			const conversation = await getOrCreatePrivateConversation(contact._id);
+			setAccountSheetOpen(false);
+			setContactModalOpen(false);
 
-	const hasUnseenMessage = unseenCount > 0;
-
-	const handleClick = () => {
-		setCurrentContactId(contact._id);
-		setUnseenMessages((prev) =>
-			prev?.filter((message) => message?.senderId !== contact._id),
-		);
+			if (conversation?.data?.conversation?._id) {
+				selectConversation(conversation);
+			}
+		} catch (error) {
+			console.error("Failed to get or create conversation:", error);
+		}
 	};
+	const isOnline = onlineUsers.includes(contact._id);
 
 	const avatarSrc =
 		import.meta.env.MODE === "development"
@@ -33,49 +41,51 @@ function ContactListItem({ contact }) {
 			: `https://talkiffy.onrender.com/avatars/${contact.avatar}`;
 
 	return (
-		<button
-			type="button"
-			onClick={handleClick}
-			className={cn(
-				"relative flex w-full items-center gap-3 rounded-xl border px-3 py-3 text-left transition-all",
-				"hover:bg-accent hover:text-accent-foreground",
-				isActive
-					? "border-primary/30 bg-accent shadow-sm"
-					: "border-transparent",
-			)}
-		>
-			<div className="relative shrink-0">
-				<Avatar className="h-11 w-11">
-					<AvatarImage src={avatarSrc} alt={contact.username} />
-					<AvatarFallback>
-						{contact.username?.slice(0, 2)?.toUpperCase()}
-					</AvatarFallback>
-				</Avatar>
+		<>
+			<div
+				className={cn(
+					"relative flex w-full items-center gap-3 rounded-lg  px-3 py-3 text-left transition-all",
+					"",
+				)}
+			>
+				<div className="relative shrink-0">
+					<Avatar className="h-11 w-11">
+						<AvatarImage src={avatarSrc} alt={contact.username} />
+						<AvatarFallback>
+							{contact.username?.slice(0, 2)?.toUpperCase()}
+						</AvatarFallback>
+					</Avatar>
 
-				<span
-					className={cn(
-						"absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-background",
-						isOnline ? "bg-green-500" : "bg-muted",
-					)}
-				/>
-			</div>
-
-			<div className="min-w-0 flex-1">
-				<div className="flex items-center justify-between gap-2">
-					<p className="truncate font-medium">{contact.username}</p>
-
-					{hasUnseenMessage && (
-						<span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-primary px-2 text-xs font-semibold text-primary-foreground">
-							{unseenCount}
-						</span>
-					)}
+					<span
+						className={cn(
+							"absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-background",
+							isOnline ? "bg-green-500" : "bg-muted",
+						)}
+					/>
 				</div>
 
-				<p className="truncate text-sm text-muted-foreground">
-					{contact.email}
-				</p>
+				<div className="min-w-0 flex-1">
+					<div className="flex items-center justify-between gap-2">
+						<p className="truncate font-medium">{contact.username}</p>
+					</div>
+
+					<p className="truncate text-sm text-muted-foreground">
+						{contact.email}
+					</p>
+				</div>
+				<Button
+					type="button"
+					size="icon"
+					variant="ghost"
+					onClick={handleMessageClick}
+					// disabled={loading}
+					aria-label={`Message ${contact.username}`}
+				>
+					{loading ? <Spinner /> : <MessageSquare className="h-5 w-5" />}
+				</Button>
 			</div>
-		</button>
+			<Separator />
+		</>
 	);
 }
 

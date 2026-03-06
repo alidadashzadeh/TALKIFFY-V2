@@ -8,10 +8,13 @@ import ChatMessages from "./chat/ChatMessages";
 import ChatHeader from "./chat/ChatHeader";
 import ChatMessageBar from "./chat/ChatMessageBar";
 import ChatLoading from "./chat/ChatLoading";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 function MainContent() {
 	const { currentContactId, setCurrentContactId } = useContactContext();
 	const { loading, getMessages } = useGetMessages();
+
+	const { currentConversationId } = useConversationContext();
 
 	useEffect(() => {
 		if (!currentContactId) return;
@@ -28,7 +31,7 @@ function MainContent() {
 
 	return (
 		<main className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
-			{!currentContactId ? (
+			{!currentConversationId ? (
 				<ChatEmptyState />
 			) : (
 				<>

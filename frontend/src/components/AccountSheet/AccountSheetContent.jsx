@@ -24,8 +24,6 @@ function AccountSheetContent() {
 
 			<ScrollArea className="flex-1">
 				<div className="grid gap-2 p-4">
-					{/* If these render buttons inside, great.
-                If they render triggers, they still align nicely in this stack. */}
 					<ProfileModal />
 					<ContactsModal />
 					<NewGroupModal />

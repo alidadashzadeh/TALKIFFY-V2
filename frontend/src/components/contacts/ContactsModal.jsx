@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Contact, Search } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -11,26 +9,17 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
 import { useContactContext } from "@/contexts/ContactContext";
-
 import AddContactModal from "./AddContactModal";
 import ContactsList from "./ContactsList";
+import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 
 function ContactsModal() {
-	const [open, setOpen] = useState(false);
+	const { contactModalOpen, setContactModalOpen } = useSheetModalContext();
 	const { filteredBy, setFilteredBy } = useContactContext();
 
-	const handleOpenChange = (value) => {
-		setOpen(value);
-
-		if (!value) {
-			setFilteredBy("");
-		}
-	};
-
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
+		<Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
 			<DialogTrigger asChild>
 				<Button variant="ghost" className="flex justify-start">
 					<Contact className="mr-2 h-4 w-4" />
@@ -61,7 +50,7 @@ function ContactsModal() {
 						<AddContactModal />
 					</div>
 
-					<div className="h-[350px] overflow-hidden rounded-xl border">
+					<div className="h-[350px] overflow-hidden rounded-xl ">
 						<ContactsList />
 					</div>
 				</div>

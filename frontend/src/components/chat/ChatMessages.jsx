@@ -1,18 +1,33 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { useConversationContext } from "@/contexts/ConversationContext";
 import { useMessagesContext } from "@/contexts/MessagesContext";
 
 import MessageItem from "./ChatMessageItem";
 import ChatNoMessages from "./ChatNoMessages";
 import ChatDateSeparator from "./ChatDateSeparator";
+
 import { isSameCalendarDay } from "@/lib/utils";
+import useGetMessages from "@/hooks/useGetMessages";
 
 function ChatMessages() {
-	const { messages } = useMessagesContext();
+	const { currentConversationId } = useConversationContext();
+	const { messages, setMessages } = useMessagesContext();
+
 	const chatContainerRef = useRef(null);
+	const { messages: fetchedMessages, loading } = useGetMessages(
+		currentConversationId,
+	);
+
+	useEffect(() => {
+		if (fetchedMessages) {
+			setMessages(fetchedMessages);
+		}
+	}, [fetchedMessages, setMessages]);
 
 	useEffect(() => {
 		const container = chatContainerRef.current;
+
 		if (container) {
 			container.scrollTop = container.scrollHeight;
 		}
@@ -55,6 +70,18 @@ function ChatMessages() {
 
 		return result;
 	}, [messages]);
+
+	if (!currentConversationId) {
+		return <ChatNoMessages />;
+	}
+
+	if (loading) {
+		return (
+			<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+				Loading messages...
+			</div>
+		);
+	}
 
 	return (
 		<div

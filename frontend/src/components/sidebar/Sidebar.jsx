@@ -1,4 +1,4 @@
-import ContactsList from "../contacts/ContactsList";
+import ConversationList from "../conversation/ConversationList";
 import SidebarHeader from "./SidebarHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -12,7 +12,7 @@ function Sidebar() {
 
 				<ScrollArea className="flex-1">
 					<div className="p-2">
-						<ContactsList />
+						<ConversationList />
 					</div>
 				</ScrollArea>
 			</div>

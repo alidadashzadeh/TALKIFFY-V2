@@ -27,6 +27,8 @@ router.route("/check-unseen-messages").get(protect, checkUnseenMessagesOnLogin);
 router.route("/getMessages/:id").get(protect, getMessages);
 
 router.route("/").get(getAllMessages).post(createMessage);
+router.route("/api/messages/:conversationId").get(getAllMessages);
+
 router
 	.route("/:id")
 	.get(getSingleMessage)

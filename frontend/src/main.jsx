@@ -12,6 +12,7 @@ import { MessagesContextProvider } from "./contexts/MessagesContext.jsx";
 import { SettingContextProvider } from "./contexts/SettingContext.jsx";
 import { SocketContextProvider } from "./contexts/SocketContext.jsx";
 import { ConversationContextProvider } from "./contexts/ConversationContext";
+import { SheetModalProvider } from "./contexts/SheetModalProvider";
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
@@ -22,7 +23,9 @@ createRoot(document.getElementById("root")).render(
 						<MessagesContextProvider>
 							<SettingContextProvider>
 								<SocketContextProvider>
-									<App />
+									<SheetModalProvider>
+										<App />
+									</SheetModalProvider>
 								</SocketContextProvider>
 							</SettingContextProvider>
 						</MessagesContextProvider>
