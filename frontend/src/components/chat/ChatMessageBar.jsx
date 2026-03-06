@@ -1,22 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Send } from "lucide-react";
+import { Paperclip, Send, Smile, Mic, X } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 
+import EmojiPicker from "emoji-picker-react";
 import useSendMessage from "@/hooks/useSendMessage";
 
 // eslint-disable-next-line react/prop-types
 function ChatMessageBar({ loading }) {
-	const { register, handleSubmit, reset } = useForm({
-		defaultValues: {
-			message: "",
-		},
+	const { register, handleSubmit, reset, setValue, watch } = useForm({
+		defaultValues: { message: "" },
 	});
-	const { sendMessage } = useSendMessage();
 
+	const { sendMessage } = useSendMessage();
 	const inputRef = useRef(null);
+
+	const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
+	const [showVoicePreview, setShowVoicePreview] = useState(false);
+
+	const message = watch("message");
+	const hasText = !!message?.trim();
 
 	useEffect(() => {
 		inputRef.current?.focus();
@@ -24,7 +34,6 @@ function ChatMessageBar({ loading }) {
 
 	const onSubmit = (data) => {
 		const trimmedMessage = data.message?.trim();
-
 		if (!trimmedMessage) return;
 
 		sendMessage({ message: trimmedMessage });
@@ -32,35 +41,66 @@ function ChatMessageBar({ loading }) {
 		inputRef.current?.focus();
 	};
 
-	return (
-		<div className="w-full">
-			<form
-				className="flex w-full items-center gap-2 rounded-2xl border bg-background p-2 shadow-sm"
-				onSubmit={handleSubmit(onSubmit)}
-			>
-				<Input
-					ref={inputRef}
-					autoComplete="off"
-					disabled={loading}
-					placeholder="Type a message..."
-					className="h-11 border-0 bg-transparent px-3 shadow-none focus-visible:ring-0"
-					{...register("message", {
-						validate: (value) =>
-							value.trim().length > 0 || "A message cannot be empty",
-					})}
-				/>
+	const onEmojiClick = (emojiData) => {
+		setValue("message", `${message || ""}${emojiData.emoji}`);
+		inputRef.current?.focus();
+	};
 
-				<Button
-					type="submit"
-					disabled={loading}
-					size="icon"
-					className="h-11 w-11 shrink-0 rounded-full"
-					aria-label="Send message"
-				>
+	return (
+		<form
+			className="flex w-full items-center gap-2 p-2"
+			onSubmit={handleSubmit(onSubmit)}
+		>
+			{/* Emoji */}
+			<Popover>
+				<PopoverTrigger asChild>
+					<Button type="button" size="icon" variant="ghost">
+						<Smile className="h-5 w-5 text-muted-foreground" />
+					</Button>
+				</PopoverTrigger>
+
+				<PopoverContent className="p-0 border-none w-fit">
+					<EmojiPicker onEmojiClick={onEmojiClick} />
+				</PopoverContent>
+			</Popover>
+
+			{/* Attachment */}
+			<Button
+				type="button"
+				size="icon"
+				variant="ghost"
+				onClick={() => setShowAttachmentPreview(true)}
+			>
+				<Paperclip className="h-5 w-5 text-muted-foreground" />
+			</Button>
+
+			{/* Input */}
+			<Input
+				ref={inputRef}
+				autoComplete="off"
+				disabled={loading}
+				placeholder="Type a message..."
+				className="h-11 flex-1 rounded-full border px-4"
+				{...register("message")}
+			/>
+
+			{/* Send / Mic */}
+			{hasText ? (
+				<Button type="submit" size="icon" className="h-11 w-11 rounded-full">
 					<Send className="h-5 w-5" />
 				</Button>
-			</form>
-		</div>
+			) : (
+				<Button
+					type="button"
+					size="icon"
+					variant="ghost"
+					className="h-11 w-11 rounded-full"
+					onClick={() => setShowVoicePreview(true)}
+				>
+					<Mic className="h-5 w-5 text-muted-foreground" />
+				</Button>
+			)}
+		</form>
 	);
 }
 

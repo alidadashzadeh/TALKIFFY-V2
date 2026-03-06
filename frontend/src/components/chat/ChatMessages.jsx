@@ -5,17 +5,7 @@ import { useMessagesContext } from "@/contexts/MessagesContext";
 import MessageItem from "./ChatMessageItem";
 import ChatNoMessages from "./ChatNoMessages";
 import ChatDateSeparator from "./ChatDateSeparator";
-
-function isSameCalendarDay(dateA, dateB) {
-	const a = new Date(dateA);
-	const b = new Date(dateB);
-
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	);
-}
+import { isSameCalendarDay } from "@/lib/utils";
 
 function ChatMessages() {
 	const { messages } = useMessagesContext();
@@ -35,6 +25,7 @@ function ChatMessages() {
 
 		messages.forEach((message, index) => {
 			const prevMessage = messages[index - 1];
+
 			const showDateSeparator =
 				!prevMessage ||
 				!isSameCalendarDay(prevMessage.createdAt, message.createdAt);
@@ -47,10 +38,18 @@ function ChatMessages() {
 				});
 			}
 
+			const isGrouped =
+				!!prevMessage &&
+				isSameCalendarDay(prevMessage.createdAt, message.createdAt) &&
+				prevMessage.senderId === message.senderId &&
+				new Date(message.createdAt) - new Date(prevMessage.createdAt) <
+					5 * 60 * 1000;
+
 			result.push({
 				type: "message",
 				id: message._id,
 				message,
+				isGrouped,
 			});
 		});
 
@@ -71,7 +70,13 @@ function ChatMessages() {
 							return <ChatDateSeparator key={item.id} date={item.date} />;
 						}
 
-						return <MessageItem key={item.id} message={item.message} />;
+						return (
+							<MessageItem
+								key={item.id}
+								message={item.message}
+								isGrouped={item.isGrouped}
+							/>
+						);
 					})}
 				</div>
 			)}

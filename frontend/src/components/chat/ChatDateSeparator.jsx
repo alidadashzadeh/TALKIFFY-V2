@@ -1,4 +1,4 @@
-import { formatSeparatorDate } from "@/utils/utils";
+import { formatSeparatorDate } from "@/lib/utils";
 
 function ChatDateSeparator({ date }) {
 	return (

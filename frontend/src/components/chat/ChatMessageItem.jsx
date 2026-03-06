@@ -6,7 +6,7 @@ import { useContactContext } from "@/contexts/ContactContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
-function MessageItem({ message }) {
+function MessageItem({ message, isGrouped = false }) {
 	const { currentUser } = useAuthContext();
 	const { currentContactId } = useContactContext();
 
@@ -31,23 +31,28 @@ function MessageItem({ message }) {
 	return (
 		<div
 			className={cn(
-				"flex w-full py-1.5",
+				"flex w-full",
+				isGrouped ? "py-0.5" : "py-1.5",
 				isMe ? "justify-end" : "justify-start",
 			)}
 		>
 			<div
 				className={cn(
-					"flex max-w-[85%] items-end gap-2 sm:max-w-[75%] lg:max-w-[65%]",
+					"flex max-w-[85%] items-baseline gap-2 sm:max-w-[75%] lg:max-w-[65%]",
 					isMe ? "flex-row-reverse" : "flex-row",
 				)}
 			>
-				{avatarFile ? (
-					<Avatar className="h-8 w-8 shrink-0">
-						<AvatarImage src={avatarUrl} alt={name} />
-						<AvatarFallback>{initials}</AvatarFallback>
-					</Avatar>
+				{!isGrouped ? (
+					avatarFile ? (
+						<Avatar className="h-8 w-8 shrink-0 self-baseline ">
+							<AvatarImage src={avatarUrl} alt={name} />
+							<AvatarFallback>{initials}</AvatarFallback>
+						</Avatar>
+					) : (
+						<UserCircle2 className="h-8 w-8 shrink-0 self-baseline text-muted-foreground" />
+					)
 				) : (
-					<UserCircle2 className="h-8 w-8 shrink-0 text-muted-foreground" />
+					<div className="w-8 shrink-0" />
 				)}
 
 				<div
@@ -58,7 +63,7 @@ function MessageItem({ message }) {
 				>
 					<div
 						className={cn(
-							"inline-flex items-end gap-2 rounded-2xl px-4 py-2.5 text-sm shadow-sm break-words",
+							"inline-flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm break-words",
 							isMe
 								? "rounded-br-md bg-primary text-primary-foreground"
 								: "rounded-bl-md border bg-background text-foreground",
@@ -73,9 +78,9 @@ function MessageItem({ message }) {
 								{message?.isDelivered ? (
 									<CheckCheck
 										className={cn(
-											"h-4 w-4",
+											"h-3.5 w-3.5 stroke-[2.6]",
 											message?.isSeen
-												? "text-blue-300"
+												? "text-blue-600"
 												: "text-primary-foreground/70",
 										)}
 									/>

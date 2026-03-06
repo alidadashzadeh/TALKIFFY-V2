@@ -40,7 +40,7 @@ function MainContent() {
 						<ChatMessages />
 					</div>
 
-					<div className="shrink-0 border-t bg-background p-3 sm:p-4">
+					<div className="shrink-0 p-3 sm:p-4">
 						<div className="mx-auto w-full max-w-4xl">
 							<ChatMessageBar loading={loading} />
 						</div>

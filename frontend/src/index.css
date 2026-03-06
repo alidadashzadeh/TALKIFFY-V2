@@ -362,7 +362,7 @@ body[data-scroll-locked] {
 
 ::view-transition-new(root) {
 	clip-path: circle(var(--vt-from) at var(--vt-x) var(--vt-y));
-	animation: theme-expand 500ms ease forwards;
+	animation: theme-expand 700ms ease forwards;
 }
 
 @keyframes theme-expand {
