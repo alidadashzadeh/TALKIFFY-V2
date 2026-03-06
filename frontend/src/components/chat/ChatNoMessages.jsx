@@ -1,0 +1,14 @@
+function ChatNoMessages() {
+	return (
+		<div className="flex h-full items-start justify-center pt-10 text-center">
+			<div className="space-y-2">
+				<h3 className="text-lg font-medium">No messages yet</h3>
+				<p className="text-sm text-muted-foreground">
+					Say hi and start the conversation 👋
+				</p>
+			</div>
+		</div>
+	);
+}
+
+export default ChatNoMessages;

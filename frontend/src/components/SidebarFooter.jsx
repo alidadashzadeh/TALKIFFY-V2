@@ -87,18 +87,6 @@ function SidebarFooter() {
 						<span>Logout</span>
 					</DropdownMenuItem>
 				</DropdownMenuContent>
-
-				{/* <DropdownMenuContent align="start" side="top" className="w-56">
-					<DropdownMenuItem onClick={() => navigate("/settings")}>
-						<Settings />
-						Settings
-					</DropdownMenuItem>
-
-					<DropdownMenuItem onClick={logout}>
-						<LogOut />
-						Logout
-					</DropdownMenuItem>
-				</DropdownMenuContent> */}
 			</DropdownMenu>
 		</div>
 	);

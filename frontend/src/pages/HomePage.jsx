@@ -1,16 +1,16 @@
-import MainContent from "../components/MainContent";
-import Sidebar from "../components/sidebar/Sidebar";
+import MainContent from "@/components/MainContent";
+import Sidebar from "@/components/Sidebar/Sidebar";
 
 function HomePage() {
 	return (
-		<div className="flex ">
-			<aside className="w-80">
+		<div className="flex h-screen overflow-hidden bg-background">
+			<div className="w-[320px] shrink-0 border-r">
 				<Sidebar />
-			</aside>
+			</div>
 
-			<main className="flex-1 min-h-dvh">
+			<div className="min-w-0 flex-1">
 				<MainContent />
-			</main>
+			</div>
 		</div>
 	);
 }

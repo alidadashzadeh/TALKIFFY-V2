@@ -1,12 +1,13 @@
 import { Search } from "lucide-react";
-import { useContactContext } from "../../contexts/ContactContext";
+import { useContactContext } from "@/contexts/ContactContext";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import AccountSheet from "../Accountheet";
-function Sidebarheader() {
+import AccountSheet from "../AccountSheet/Accountheet";
+
+function SidebarHeader() {
 	const { setFilteredBy } = useContactContext();
 	const handleChange = (e) => {
 		setFilteredBy(e.target.value);
@@ -25,4 +26,4 @@ function Sidebarheader() {
 	);
 }
 
-export default Sidebarheader;
+export default SidebarHeader;

@@ -9,7 +9,7 @@ import LoginPage from "./pages/LoginPage";
 import useCheckCurrentUser from "./hooks/useCheckingCurrentUser.js";
 import SettingsPage from "./pages/SettingsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
-import MessageLoading from "./components/MessageLoading.jsx";
+import MessageLoading from "./components/chat/ChatLoading.jsx";
 
 import useListenContacts from "./hooks/useListenContacts.js";
 import useListenMessages from "./hooks/useListenSingleMessages.js";

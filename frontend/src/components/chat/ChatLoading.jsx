@@ -1,4 +1,4 @@
-function MessageLoading() {
+function ChatLoading() {
 	return (
 		<div className="h-screen w-screen bg-background__primary flex flex-col gap-4 justify-center items-center">
 			<div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
@@ -7,4 +7,4 @@ function MessageLoading() {
 	);
 }
 
-export default MessageLoading;
+export default ChatLoading;

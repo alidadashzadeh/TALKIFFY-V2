@@ -1,17 +1,22 @@
-import ContactsList from "../ContactsList";
-
+import ContactsList from "./ContactsList";
+import SidebarHeader from "./SidebarHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Sidebarheader from "./Sidebarheader";
 
 function Sidebar() {
 	return (
-		<div className="h-full flex flex-col">
-			<Sidebarheader />
+		<aside className="h-full w-full border-r bg-background">
+			<div className="flex h-full flex-col">
+				<div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+					<SidebarHeader />
+				</div>
 
-			<ScrollArea className="flex-1">
-				<ContactsList />
-			</ScrollArea>
-		</div>
+				<ScrollArea className="flex-1">
+					<div className="p-2">
+						<ContactsList />
+					</div>
+				</ScrollArea>
+			</div>
+		</aside>
 	);
 }
 
