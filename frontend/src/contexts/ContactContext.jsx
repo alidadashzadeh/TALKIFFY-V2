@@ -11,7 +11,7 @@ export const useContactContext = () => {
 export const ContactContextProvider = ({ children }) => {
 	const [openAddContactModal, setOpenAddContactModal] = useState(false);
 	const [currentContactId, setCurrentContactId] = useState(null);
-	const [filteredBy, setFilteredBy] = useState();
+	const [filteredBy, setFilteredBy] = useState("");
 
 	return (
 		<ContactContext.Provider

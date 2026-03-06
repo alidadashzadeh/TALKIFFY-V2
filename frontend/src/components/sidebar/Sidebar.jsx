@@ -1,4 +1,4 @@
-import ContactsList from "./ContactsList";
+import ContactsList from "../contacts/ContactsList";
 import SidebarHeader from "./SidebarHeader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

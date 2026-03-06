@@ -11,20 +11,23 @@ import { ContactContextProvider } from "./contexts/ContactContext.jsx";
 import { MessagesContextProvider } from "./contexts/MessagesContext.jsx";
 import { SettingContextProvider } from "./contexts/SettingContext.jsx";
 import { SocketContextProvider } from "./contexts/SocketContext.jsx";
+import { ConversationContextProvider } from "./contexts/ConversationContext";
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<BrowserRouter>
 			<AuthContextProvider>
-				<ContactContextProvider>
-					<MessagesContextProvider>
-						<SettingContextProvider>
-							<SocketContextProvider>
-								<App />
-							</SocketContextProvider>
-						</SettingContextProvider>
-					</MessagesContextProvider>
-				</ContactContextProvider>
+				<ConversationContextProvider>
+					<ContactContextProvider>
+						<MessagesContextProvider>
+							<SettingContextProvider>
+								<SocketContextProvider>
+									<App />
+								</SocketContextProvider>
+							</SettingContextProvider>
+						</MessagesContextProvider>
+					</ContactContextProvider>
+				</ConversationContextProvider>
 			</AuthContextProvider>
 
 			<Toaster />

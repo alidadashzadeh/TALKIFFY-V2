@@ -8,7 +8,7 @@ import SettingsModal from "../settings/SettingsModal";
 import NewGroupModal from "../modals/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
-import ContactsModal from "../modals/ContactsModal";
+import ContactsModal from "../contacts/ContactsModal";
 import useLogout from "@/hooks/useLogout";
 
 function AccountSheetContent() {

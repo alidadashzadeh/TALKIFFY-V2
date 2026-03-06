@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
+import conversationRouter from "./routes/conversationRoutes.js";
 
 dotenv.config();
 
@@ -24,13 +25,13 @@ app.use(
 				? "https://talkiffy-frontend.onrender.com"
 				: "http://localhost:5173",
 		credentials: true,
-	})
+	}),
 );
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/conversations", conversationRouter);
 
-// app.use("/public", express.static(path.join(__dirname, "../frontend/public")));
 app.use("/avatars", express.static(path.join(__dirname, "/avatars")));
 
 mongoose
