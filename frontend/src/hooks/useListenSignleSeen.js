@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useMessagesContext } from "../contexts/MessagesContext";
 
-import { handleErrorToast } from "../utils/errorHandler";
+import { handleErrorToast } from "../lib/errorHandler";
 
 function useListenSeen() {
 	const { socket } = useSocketContext();
@@ -17,8 +17,8 @@ function useListenSeen() {
 						messages?.map((message) =>
 							message._id === lastMessage._id
 								? { ...message, isSeen: true }
-								: message
-						)
+								: message,
+						),
 					);
 				} catch (error) {
 					handleErrorToast(error);

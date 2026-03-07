@@ -1,39 +1,92 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useMessagesContext } from "../../contexts/MessagesContext.jsx";
-import { useSocketContext } from "../../contexts/SocketContext.jsx";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import { useSocketContext } from "@/contexts/SocketContext";
 
-import { axiosInstance } from "../../utils/axios.js";
-import { handleErrorToast } from "../../utils/errorHandler.js";
-import { useConversationContext } from "@/contexts/ConversationContext.jsx";
+import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
 
 function useSendMessage() {
-	const [loading, setLoading] = useState(false);
-	const { messages, setMessages } = useMessagesContext();
-	const { socket, onlineUsers } = useSocketContext();
-	const { currentConversation } = useConversationContext();
+	const queryClient = useQueryClient();
 
-	const sendMessage = async ({ message: messageContent }) => {
-		setLoading(true);
+	const { currentUser } = useAuthContext();
+	const { currentConversationId } = useConversationContext();
+	const { socket } = useSocketContext();
 
-		try {
+	const mutation = useMutation({
+		mutationFn: async ({ message: messageContent }) => {
 			const { data } = await axiosInstance.post(
-				`/messages/conversation/${currentConversation._id}`,
+				`/messages/conversation/${currentConversationId}`,
 				{ content: messageContent },
 			);
-			setMessages([...messages, data?.data.newMessage]);
 
-			// if (onlineUsers.includes(currentContactId)) {
-			// 	socket.emit("setMessage", data?.data?.newMessage);
-			// }
-		} catch (error) {
+			return data?.data?.newMessage;
+		},
+
+		onMutate: async ({ message: messageContent }) => {
+			if (!currentConversationId) return {};
+
+			const queryKey = ["messages", currentConversationId];
+
+			await queryClient.cancelQueries({ queryKey });
+
+			const previousMessages = queryClient.getQueryData(queryKey) || [];
+
+			const optimisticMessage = {
+				_id: `temp-${Date.now()}`,
+				content: messageContent,
+				conversationId: currentConversationId,
+				senderId: {
+					_id: currentUser?._id,
+					username: currentUser?.username,
+					avatar: currentUser?.avatar,
+				},
+				createdAt: new Date().toISOString(),
+				optimistic: true,
+			};
+
+			queryClient.setQueryData(queryKey, (old = []) => [
+				...old,
+				optimisticMessage,
+			]);
+
+			return { previousMessages, optimisticMessage, queryKey };
+		},
+
+		onSuccess: (newMessage, _variables, context) => {
+			if (!context?.queryKey) return;
+
+			queryClient.setQueryData(context.queryKey, (old = []) =>
+				old.map((message) =>
+					message._id === context.optimisticMessage._id ? newMessage : message,
+				),
+			);
+
+			// socket.emit("setMessage", newMessage);
+		},
+
+		onError: (error, _variables, context) => {
+			if (context?.queryKey && context?.previousMessages) {
+				queryClient.setQueryData(context.queryKey, context.previousMessages);
+			}
+
 			handleErrorToast(error);
-		} finally {
-			setLoading(false);
-		}
-	};
+		},
 
-	return { loading, sendMessage };
+		onSettled: (_data, _error, _variables, context) => {
+			if (!context?.queryKey) return;
+
+			queryClient.invalidateQueries({
+				queryKey: context.queryKey,
+			});
+		},
+	});
+
+	return {
+		loading: mutation.isPending,
+		sendMessage: mutation.mutateAsync,
+	};
 }
 
 export default useSendMessage;

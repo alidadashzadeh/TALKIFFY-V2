@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useContactContext } from "../contexts/ContactContext";
 import { useSocketContext } from "../contexts/SocketContext";
 
-import { axiosInstance } from "../utils/axios";
+import { axiosInstance } from "../lib/axios";
 
 function useSeenMessagesOnClick() {
 	const { currentContactId } = useContactContext();

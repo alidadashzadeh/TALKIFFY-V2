@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useSocketContext } from "@/contexts/SocketContext";
-import { axiosInstance } from "@/utils/axios";
-import { handleErrorToast } from "@/utils/errorHandler";
+import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
 import { useState } from "react";
 import toast from "react-hot-toast";
 

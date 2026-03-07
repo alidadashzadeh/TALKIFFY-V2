@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { useMessagesContext } from "../contexts/MessagesContext";
 import { useAuthContext } from "../contexts/AuthContext";
 
-import { handleErrorToast } from "../utils/errorHandler";
-import { axiosInstance } from "../utils/axios";
+import { handleErrorToast } from "../lib/errorHandler";
+import { axiosInstance } from "../lib/axios";
 
 function useGetUnseenMessagesOnLogin() {
 	const { setUnseenMessages } = useMessagesContext();
@@ -16,7 +16,7 @@ function useGetUnseenMessagesOnLogin() {
 		const deliverMessage = async () => {
 			try {
 				const { data } = await axiosInstance.get(
-					"/messages/check-unseen-messages"
+					"/messages/check-unseen-messages",
 				);
 
 				if (data.status === "success") setUnseenMessages(data.data.messages);

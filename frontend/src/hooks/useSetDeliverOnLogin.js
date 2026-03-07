@@ -2,8 +2,8 @@ import { useEffect } from "react";
 
 import { useAuthContext } from "../contexts/AuthContext";
 
-import { axiosInstance } from "../utils/axios";
-import { handleErrorToast } from "../utils/errorHandler";
+import { axiosInstance } from "../lib/axios";
+import { handleErrorToast } from "../lib/errorHandler";
 
 function useSetDeliverOnLogin() {
 	const { currentUser } = useAuthContext();

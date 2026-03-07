@@ -13,26 +13,28 @@ import { SettingContextProvider } from "./contexts/SettingContext.jsx";
 import { SocketContextProvider } from "./contexts/SocketContext.jsx";
 import { ConversationContextProvider } from "./contexts/ConversationContext";
 import { SheetModalProvider } from "./contexts/SheetModalProvider";
+import { QueryProvider } from "./lib/reactQuery";
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<BrowserRouter>
-			<AuthContextProvider>
-				<ConversationContextProvider>
-					<ContactContextProvider>
-						<MessagesContextProvider>
-							<SettingContextProvider>
-								<SocketContextProvider>
-									<SheetModalProvider>
-										<App />
-									</SheetModalProvider>
-								</SocketContextProvider>
-							</SettingContextProvider>
-						</MessagesContextProvider>
-					</ContactContextProvider>
-				</ConversationContextProvider>
-			</AuthContextProvider>
-
+			<QueryProvider>
+				<AuthContextProvider>
+					<ConversationContextProvider>
+						<ContactContextProvider>
+							<MessagesContextProvider>
+								<SettingContextProvider>
+									<SocketContextProvider>
+										<SheetModalProvider>
+											<App />
+										</SheetModalProvider>
+									</SocketContextProvider>
+								</SettingContextProvider>
+							</MessagesContextProvider>
+						</ContactContextProvider>
+					</ConversationContextProvider>
+				</AuthContextProvider>
+			</QueryProvider>
 			<Toaster />
 		</BrowserRouter>
 	</StrictMode>,

@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { useSocketContext } from "../contexts/SocketContext";
 import { useMessagesContext } from "../contexts/MessagesContext";
 
-import { handleErrorToast } from "../utils/errorHandler";
-import { axiosInstance } from "../utils/axios";
+import { handleErrorToast } from "../lib/errorHandler";
+import { axiosInstance } from "../lib/axios";
 
 function useListenDeliver() {
 	const { socket } = useSocketContext();
@@ -16,7 +16,7 @@ function useListenDeliver() {
 				try {
 					const { data } = await axiosInstance.patch(
 						`/messages/${lastMessage._id}`,
-						{ isDelivered: true }
+						{ isDelivered: true },
 					);
 
 					if (data.status === "success") {
@@ -24,8 +24,8 @@ function useListenDeliver() {
 							messages?.map((message) =>
 								message._id === lastMessage._id
 									? { ...message, isDelivered: true }
-									: message
-							)
+									: message,
+							),
 						);
 					}
 				} catch (error) {

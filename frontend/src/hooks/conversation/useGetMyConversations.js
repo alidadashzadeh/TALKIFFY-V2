@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { axiosInstance } from "@/utils/axios";
-import { handleErrorToast } from "@/utils/errorHandler";
+import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useGetMyConversations() {

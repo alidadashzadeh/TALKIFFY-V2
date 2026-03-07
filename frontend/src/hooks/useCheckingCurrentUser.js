@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
 
 import { useAuthContext } from "./../contexts/AuthContext.jsx";
-import { axiosInstance } from "../utils/axios.js";
-import { handleErrorToast } from "../utils/errorHandler.js";
+import { axiosInstance } from "../lib/axios.js";
+import { handleErrorToast } from "../lib/errorHandler.js";
 
 function useCheckCurrentUser() {
 	const [loading, setLoading] = useState(true);

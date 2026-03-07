@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Paperclip, Send, Smile, Mic, X } from "lucide-react";
+import { Paperclip, Send, Smile, Mic } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,12 @@ import {
 import EmojiPicker from "emoji-picker-react";
 import useSendMessage from "@/hooks/messages/useSendMessage";
 
-// eslint-disable-next-line react/prop-types
-function ChatMessageBar({ loading }) {
+function ChatMessageBar() {
 	const { register, handleSubmit, reset, setValue, watch } = useForm({
 		defaultValues: { message: "" },
 	});
 
-	const { sendMessage } = useSendMessage();
+	const { sendMessage, loading } = useSendMessage();
 	const inputRef = useRef(null);
 
 	const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
@@ -32,17 +31,23 @@ function ChatMessageBar({ loading }) {
 		inputRef.current?.focus();
 	}, []);
 
-	const onSubmit = (data) => {
+	const onSubmit = async (data) => {
 		const trimmedMessage = data.message?.trim();
-		if (!trimmedMessage) return;
+		if (!trimmedMessage || loading) return;
 
-		sendMessage({ message: trimmedMessage });
-		reset();
-		inputRef.current?.focus();
+		try {
+			await sendMessage({ message: trimmedMessage });
+			reset();
+			inputRef.current?.focus();
+		} catch {
+			// error already handled in mutation hook
+		}
 	};
 
 	const onEmojiClick = (emojiData) => {
-		setValue("message", `${message || ""}${emojiData.emoji}`);
+		setValue("message", `${message || ""}${emojiData.emoji}`, {
+			shouldDirty: true,
+		});
 		inputRef.current?.focus();
 	};
 
@@ -51,30 +56,28 @@ function ChatMessageBar({ loading }) {
 			className="flex w-full items-center gap-2 p-2"
 			onSubmit={handleSubmit(onSubmit)}
 		>
-			{/* Emoji */}
 			<Popover>
 				<PopoverTrigger asChild>
-					<Button type="button" size="icon" variant="ghost">
+					<Button type="button" size="icon" variant="ghost" disabled={loading}>
 						<Smile className="h-5 w-5 text-muted-foreground" />
 					</Button>
 				</PopoverTrigger>
 
-				<PopoverContent className="p-0 border-none w-fit">
+				<PopoverContent className="w-fit border-none p-0">
 					<EmojiPicker onEmojiClick={onEmojiClick} />
 				</PopoverContent>
 			</Popover>
 
-			{/* Attachment */}
 			<Button
 				type="button"
 				size="icon"
 				variant="ghost"
+				disabled={loading}
 				onClick={() => setShowAttachmentPreview(true)}
 			>
 				<Paperclip className="h-5 w-5 text-muted-foreground" />
 			</Button>
 
-			{/* Input */}
 			<Input
 				ref={inputRef}
 				autoComplete="off"
@@ -84,9 +87,13 @@ function ChatMessageBar({ loading }) {
 				{...register("message")}
 			/>
 
-			{/* Send / Mic */}
 			{hasText ? (
-				<Button type="submit" size="icon" className="h-11 w-11 rounded-full">
+				<Button
+					type="submit"
+					size="icon"
+					className="h-11 w-11 rounded-full"
+					disabled={loading}
+				>
 					<Send className="h-5 w-5" />
 				</Button>
 			) : (
@@ -95,6 +102,7 @@ function ChatMessageBar({ loading }) {
 					size="icon"
 					variant="ghost"
 					className="h-11 w-11 rounded-full"
+					disabled={loading}
 					onClick={() => setShowVoicePreview(true)}
 				>
 					<Mic className="h-5 w-5 text-muted-foreground" />

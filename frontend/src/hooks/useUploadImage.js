@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { useAuthContext } from "./../contexts/AuthContext.jsx";
-import { axiosInstance } from "../utils/axios.js";
+import { axiosInstance } from "../lib/axios.js";
 import { useState } from "react";
 
 function useUploadImage() {
@@ -22,7 +22,7 @@ function useUploadImage() {
 						"Content-Type": "multipart/form-data",
 					},
 					withCredentials: true,
-				}
+				},
 			);
 			if (data.status === "success")
 				toast.success("Avatar updated successfully!");

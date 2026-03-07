@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { handleErrorToast } from "../utils/errorHandler";
+import { handleErrorToast } from "../lib/errorHandler";
 import { useAuthContext } from "../contexts/AuthContext";
 
-import { axiosInstance } from "../utils/axios";
+import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
 function useLogout() {

@@ -1,32 +1,5 @@
-// import { useState } from "react";
-// import { axiosInstance } from "@/utils/axios";
-
-// function useGetOrCreatePrivateConversation() {
-// 	const [loading, setLoading] = useState(false);
-
-// 	const getOrCreatePrivateConversation = async (contactId) => {
-// 		setLoading(true);
-// 		try {
-// 			const { data } = await axiosInstance.get(
-// 				`conversations/private/${contactId}`,
-// 				{
-// 					withCredentials: true,
-// 				},
-// 			);
-
-// 			return data;
-// 		} finally {
-// 			setLoading(false);
-// 		}
-// 	};
-
-// 	return { getOrCreatePrivateConversation, loading };
-// }
-
-// export default useGetOrCreatePrivateConversation;
-
 import { useState } from "react";
-import { axiosInstance } from "@/utils/axios";
+import { axiosInstance } from "@/lib/axios";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useGetOrCreatePrivateConversation() {

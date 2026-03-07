@@ -4,7 +4,7 @@ import { useSocketContext } from "../contexts/SocketContext";
 import { useMessagesContext } from "../contexts/MessagesContext";
 import { useContactContext } from "../contexts/ContactContext";
 
-import { axiosInstance } from "../utils/axios";
+import { axiosInstance } from "../lib/axios";
 import { useSettingContext } from "../contexts/SettingContext";
 
 function useListenMessages() {
