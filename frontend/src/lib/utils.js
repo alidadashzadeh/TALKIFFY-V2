@@ -37,3 +37,20 @@ export function isSameCalendarDay(dateA, dateB) {
 		a.getDate() === b.getDate()
 	);
 }
+
+export const getAvatarUrl = (avatar) => {
+	if (!avatar) return "";
+
+	if (avatar.startsWith("http")) return avatar;
+
+	const baseURL =
+		import.meta.env.MODE === "development"
+			? "http://localhost:5001"
+			: "https://talkiffy.onrender.com";
+
+	return `${baseURL}/avatars/${avatar}`;
+};
+
+export const getInitials = (text = "") => {
+	return text.trim().slice(0, 2).toUpperCase();
+};

@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSocketContext } from "@/contexts/SocketContext";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
@@ -10,6 +9,7 @@ import { useConversationContext } from "@/contexts/ConversationContext";
 import { Spinner } from "../ui/spinner";
 import useGetOrCreatePrivateConversation from "@/hooks/conversation/useGetOrCreatePrivateConversation";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
+import AvatarGenerator from "../AvatarGenerator";
 
 function ContactListItem({ contact }) {
 	const { setAccountSheetOpen, setContactModalOpen } = useSheetModalContext();
@@ -35,11 +35,6 @@ function ContactListItem({ contact }) {
 	};
 	const isOnline = onlineUsers.includes(contact._id);
 
-	const avatarSrc =
-		import.meta.env.MODE === "development"
-			? `http://localhost:5001/avatars/${contact.avatar}`
-			: `https://talkiffy.onrender.com/avatars/${contact.avatar}`;
-
 	return (
 		<>
 			<div
@@ -49,13 +44,7 @@ function ContactListItem({ contact }) {
 				)}
 			>
 				<div className="relative shrink-0">
-					<Avatar className="h-11 w-11">
-						<AvatarImage src={avatarSrc} alt={contact.username} />
-						<AvatarFallback>
-							{contact.username?.slice(0, 2)?.toUpperCase()}
-						</AvatarFallback>
-					</Avatar>
-
+					<AvatarGenerator avatar={contact.avatar} name={contact.username} />
 					<span
 						className={cn(
 							"absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-background",

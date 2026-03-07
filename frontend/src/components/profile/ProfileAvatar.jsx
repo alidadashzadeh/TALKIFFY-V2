@@ -1,31 +1,20 @@
+/* eslint-disable react/prop-types */
 import { Camera } from "lucide-react";
-import { useMemo } from "react";
-
+import {} from "react";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
 import useUploadImage from "@/hooks/useUploadImage";
+import AvatarGenerator from "../AvatarGenerator";
 
 function ProfileAvatar({ currentUser }) {
 	const { loading, handleImageUpload } = useUploadImage();
 
-	const avatarSrc = useMemo(() => {
-		if (!currentUser?.avatar) return "";
-
-		return import.meta.env.MODE === "development"
-			? `http://localhost:5001/avatars/${currentUser.avatar}`
-			: `https://talkiffy.onrender.com/avatars/${currentUser.avatar}`;
-	}, [currentUser?.avatar]);
-
-	const initials = currentUser?.username?.slice(0, 2).toUpperCase() || "U";
-
 	return (
 		<div className="relative flex items-center justify-center py-4">
-			<Avatar className="h-32 w-32 border-4 border-border">
-				<AvatarImage src={avatarSrc} alt="profile" />
-				<AvatarFallback>{initials}</AvatarFallback>
-			</Avatar>
-
+			<AvatarGenerator
+				avatar={currentUser?.avatar}
+				name={currentUser?.username}
+				size="w-24 h-24"
+			/>
 			<Button
 				type="button"
 				size="icon"
