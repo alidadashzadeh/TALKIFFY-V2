@@ -1,3 +1,4 @@
+import { useAuthContext } from "@/contexts/AuthContext";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -54,3 +55,31 @@ export const getAvatarUrl = (avatar) => {
 export const getInitials = (text = "") => {
 	return text.trim().slice(0, 2).toUpperCase();
 };
+
+export function getOtherUser(conversation, currentUserId) {
+	if (conversation?.type !== "private") return null;
+
+	return (
+		conversation.participants?.find((user) => user._id !== currentUserId) ??
+		null
+	);
+}
+
+export function getMessageSenderId(senderId) {
+	if (!senderId) return null;
+	return typeof senderId === "string" ? senderId : senderId._id;
+}
+
+export function isMyMessage(message, currentUserId) {
+	return getMessageSenderId(message?.senderId) === currentUserId;
+}
+
+export function getMessageDisplayData(message, currentUser, currentContact) {
+	const isMe = isMyMessage(message, currentUser?._id);
+
+	return {
+		isMe,
+		username: isMe ? currentUser?.username : currentContact?.username,
+		avatarFile: isMe ? currentUser?.avatar : currentContact?.avatar,
+	};
+}

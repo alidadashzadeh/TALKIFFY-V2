@@ -3,41 +3,39 @@ import { Check, CheckCheck } from "lucide-react";
 
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useContactContext } from "@/contexts/ContactContext";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { cn, getMessageDisplayData } from "@/lib/utils";
+import AvatarGenerator from "../AvatarGenerator";
 
-function MessageItem({ message }) {
+function MessageItem({ message, isGroup }) {
 	const { currentUser } = useAuthContext();
-	const { currentContactId } = useContactContext();
+	const { currentContact } = useContactContext();
 
-	const currentContact = currentUser?.contacts?.find(
-		(contact) => contact?._id === currentContactId,
+	const { isMe, username, avatarFile } = getMessageDisplayData(
+		message,
+		currentUser,
+		currentContact,
 	);
 
-	const isMe = message?.senderId?._id === currentUser?._id;
-	const username = isMe ? currentUser?.username : currentContact?.username;
-	const avatarFile = isMe ? currentUser?.avatar : currentContact?.avatar;
-
-	const avatarUrl = avatarFile
-		? import.meta.env.MODE === "development"
-			? `http://localhost:5001/avatars/${avatarFile}`
-			: `https://talkiffy.onrender.com/avatars/${avatarFile}`
-		: "";
-	const initials =
-		(username?.[0] || "?").toUpperCase() + (username?.[1] || "").toUpperCase();
-
 	return (
-		<div className={cn("flex w-full", isMe ? "justify-end" : "justify-start")}>
+		<div
+			className={cn(
+				"flex w-full ",
+				isMe ? "justify-end" : "justify-start",
+				isGroup ? "mt-1" : "mt-4",
+			)}
+		>
 			<div
 				className={cn(
-					"flex max-w-[85%] items-baseline gap-2 sm:max-w-[75%] lg:max-w-[65%]",
-					isMe ? "flex-row-reverse" : "flex-row",
+					"flex max-w-[85%] items-start gap-2 sm:max-w-[75%] lg:max-w-[65%] ",
+					isMe ? "flex-row-reverse" : "flex-row gap-4",
 				)}
 			>
-				<Avatar className="h-10 w-10">
-					<AvatarImage src={avatarUrl} alt={username} />
-					<AvatarFallback>{initials}</AvatarFallback>
-				</Avatar>
+				{/* avatar */}
+				<div className="w-8 h-8 shrink-0">
+					{!isGroup ? (
+						<AvatarGenerator avatar={avatarFile} name={username} />
+					) : null}
+				</div>
 
 				<div
 					className={cn(
@@ -47,10 +45,18 @@ function MessageItem({ message }) {
 				>
 					<div
 						className={cn(
-							"inline-flex items-end gap-2 rounded-2xl px-3.5 py-2 text-sm shadow-sm break-words",
+							"inline-flex items-end gap-2 px-3.5 py-2 text-sm shadow-sm break-words",
 							isMe
-								? "rounded-br-md bg-primary text-primary-foreground"
-								: "rounded-bl-md border bg-background text-foreground",
+								? "bg-primary text-primary-foreground"
+								: "border bg-background text-foreground",
+
+							isMe
+								? isGroup
+									? "rounded-l-2xl rounded-tr-2xl rounded-br-sm"
+									: "rounded-2xl rounded-br-md"
+								: isGroup
+									? "rounded-r-2xl rounded-tl-2xl rounded-bl-sm"
+									: "rounded-2xl rounded-bl-md",
 						)}
 					>
 						<p className="whitespace-pre-wrap break-words">

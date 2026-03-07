@@ -50,7 +50,6 @@ function ChatMessageBar() {
 		});
 		inputRef.current?.focus();
 	};
-
 	return (
 		<form
 			className="flex w-full items-center gap-2 p-2"
@@ -58,7 +57,7 @@ function ChatMessageBar() {
 		>
 			<Popover>
 				<PopoverTrigger asChild>
-					<Button type="button" size="icon" variant="ghost" disabled={loading}>
+					<Button type="button" size="icon" variant="ghost">
 						<Smile className="h-5 w-5 text-muted-foreground" />
 					</Button>
 				</PopoverTrigger>
@@ -72,7 +71,6 @@ function ChatMessageBar() {
 				type="button"
 				size="icon"
 				variant="ghost"
-				disabled={loading}
 				onClick={() => setShowAttachmentPreview(true)}
 			>
 				<Paperclip className="h-5 w-5 text-muted-foreground" />
@@ -80,20 +78,13 @@ function ChatMessageBar() {
 
 			<Input
 				ref={inputRef}
-				autoComplete="off"
-				disabled={loading}
 				placeholder="Type a message..."
 				className="h-11 flex-1 rounded-full border px-4"
 				{...register("message")}
 			/>
 
 			{hasText ? (
-				<Button
-					type="submit"
-					size="icon"
-					className="h-11 w-11 rounded-full"
-					disabled={loading}
-				>
+				<Button type="submit" size="icon" className="h-11 w-11 rounded-full">
 					<Send className="h-5 w-5" />
 				</Button>
 			) : (
@@ -102,7 +93,6 @@ function ChatMessageBar() {
 					size="icon"
 					variant="ghost"
 					className="h-11 w-11 rounded-full"
-					disabled={loading}
 					onClick={() => setShowVoicePreview(true)}
 				>
 					<Mic className="h-5 w-5 text-muted-foreground" />

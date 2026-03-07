@@ -9,7 +9,6 @@ import { handleErrorToast } from "@/lib/errorHandler";
 
 function useSendMessage() {
 	const queryClient = useQueryClient();
-
 	const { currentUser } = useAuthContext();
 	const { currentConversationId } = useConversationContext();
 	const { socket } = useSocketContext();

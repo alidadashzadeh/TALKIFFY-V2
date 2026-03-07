@@ -1,9 +1,7 @@
 /* eslint-disable react/prop-types */
 
-import { useMemo } from "react";
-
 import { useAuthContext } from "@/contexts/AuthContext";
-import { cn } from "@/lib/utils";
+import { cn, getOtherUser } from "@/lib/utils";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
@@ -13,18 +11,15 @@ function ConversationListItem({ conversation, isActive = false }) {
 	const { currentUser } = useAuthContext();
 	const { selectConversation } = useConversationContext();
 
-	const otherUser = useMemo(() => {
-		if (conversation.type === "group") return null;
-
-		return conversation.participants?.find(
-			(user) => user._id !== currentUser?._id,
-		);
-	}, [conversation, currentUser]);
+	const otherUser = getOtherUser(conversation, currentUser?._id);
+	const handleSelectConversation = () => {
+		selectConversation(conversation);
+	};
 
 	return (
 		<button
 			type="button"
-			onClick={() => selectConversation(conversation)}
+			onClick={handleSelectConversation}
 			className={cn(
 				"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent",
 				isActive && "bg-accent",

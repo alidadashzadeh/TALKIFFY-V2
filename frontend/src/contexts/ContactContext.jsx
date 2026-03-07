@@ -1,6 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useConversationContext } from "./ConversationContext";
+import { useAuthContext } from "./AuthContext";
+import { getOtherUser } from "@/lib/utils";
 
 const ContactContext = createContext();
 
@@ -11,7 +14,17 @@ export const useContactContext = () => {
 export const ContactContextProvider = ({ children }) => {
 	const [openAddContactModal, setOpenAddContactModal] = useState(false);
 	const [currentContactId, setCurrentContactId] = useState(null);
+	const [currentContact, setCurrentContact] = useState(null);
 	const [filteredBy, setFilteredBy] = useState("");
+
+	const { currentUser } = useAuthContext();
+	const { currentConversation } = useConversationContext();
+
+	useEffect(() => {
+		const otherUser = getOtherUser(currentConversation, currentUser?._id);
+		setCurrentContact(otherUser);
+		setCurrentContactId(otherUser?._id);
+	}, [currentConversation, currentUser]);
 
 	return (
 		<ContactContext.Provider
@@ -22,6 +35,8 @@ export const ContactContextProvider = ({ children }) => {
 				setCurrentContactId,
 				filteredBy,
 				setFilteredBy,
+				currentContact,
+				setCurrentContact,
 			}}
 		>
 			{children}
