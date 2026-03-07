@@ -52,7 +52,7 @@ function ChatMessageBar() {
 	};
 	return (
 		<form
-			className="flex w-full items-center gap-2 p-2"
+			className="flex w-full items-center gap-2 p-2 max-w-4xl mx-auto"
 			onSubmit={handleSubmit(onSubmit)}
 		>
 			<Popover>

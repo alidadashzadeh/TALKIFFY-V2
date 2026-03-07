@@ -29,7 +29,7 @@ function ChatMessages() {
 			{!messages?.length ? (
 				<ChatNoMessages />
 			) : (
-				<div className="mx-auto flex w-full max-w-4xl flex-col">
+				<div className="px-16 flex w-full  flex-col">
 					{messages.map((message, index) => {
 						const prev = messages[index - 1];
 

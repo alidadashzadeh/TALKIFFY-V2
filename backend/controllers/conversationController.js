@@ -66,3 +66,45 @@ export const getMyConversations = async (req, res, next) => {
 		next(err);
 	}
 };
+
+export const createGroupConversation = async (req, res) => {
+	try {
+		const currentUserId = req.user._id; // assuming auth middleware sets req.user
+		const { name, avatar } = req.body;
+
+		if (!name || !name.trim()) {
+			return res.status(400).json({
+				success: false,
+				message: "Group name is required",
+			});
+		}
+
+		const newConversation = await Conversation.create({
+			type: "group",
+			name: name.trim(),
+			avatar: avatar || "",
+			participants: [currentUserId],
+			admins: [currentUserId],
+			lastMessageId: null,
+			lastMessageAt: new Date(),
+		});
+
+		const populatedConversation = await Conversation.findById(
+			newConversation._id,
+		)
+			.populate("participants", "_id fullName username profilePic")
+			.populate("admins", "_id fullName username profilePic");
+
+		return res.status(201).json({
+			success: true,
+			message: "Group created successfully",
+			conversation: populatedConversation,
+		});
+	} catch (error) {
+		console.error("createGroupConversation error:", error);
+		return res.status(500).json({
+			success: false,
+			message: "Internal server error",
+		});
+	}
+};

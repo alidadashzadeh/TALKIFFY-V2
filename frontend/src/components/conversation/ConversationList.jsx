@@ -7,10 +7,9 @@ import ConversationLoader from "./ConversationLoader";
 
 function ConversationList() {
 	const { currentConversationId } = useConversationContext();
+	const { data: conversations, isLoading } = useGetMyConversations();
 
-	const { conversations, loading } = useGetMyConversations();
-
-	if (loading) {
+	if (isLoading) {
 		return <ConversationLoader />;
 	}
 

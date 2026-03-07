@@ -1,4 +1,3 @@
-import { useAuthContext } from "@/contexts/AuthContext";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -63,6 +62,29 @@ export function getOtherUser(conversation, currentUserId) {
 		conversation.participants?.find((user) => user._id !== currentUserId) ??
 		null
 	);
+}
+export function getConversationDisplayData(conversation, currentUserId) {
+	if (!conversation) return null;
+
+	if (conversation.type === "group") {
+		return {
+			name: conversation.name || "Unnamed Group",
+			avatar: conversation.avatar || "",
+			email: "",
+			isGroup: true,
+		};
+	}
+
+	const otherUser =
+		conversation.participants?.find((user) => user._id !== currentUserId) ??
+		null;
+
+	return {
+		name: otherUser?.username || "",
+		avatar: otherUser?.avatar || "",
+		email: otherUser?.email || "",
+		isGroup: false,
+	};
 }
 
 export function getMessageSenderId(senderId) {

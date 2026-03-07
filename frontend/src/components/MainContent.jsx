@@ -16,7 +16,7 @@ function MainContent() {
 	}
 
 	return (
-		<main className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
+		<main className=" flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
 			<ChatHeader />
 
 			<div className="min-h-0 flex-1">
@@ -24,7 +24,7 @@ function MainContent() {
 			</div>
 
 			<div className="shrink-0 p-3 sm:p-4">
-				<div className="mx-auto w-full max-w-4xl">
+				<div className="w-full ">
 					<ChatMessageBar />
 				</div>
 			</div>

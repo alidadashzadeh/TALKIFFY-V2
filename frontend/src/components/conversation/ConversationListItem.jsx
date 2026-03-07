@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { useAuthContext } from "@/contexts/AuthContext";
-import { cn, getOtherUser } from "@/lib/utils";
+import { cn, getConversationDisplayData } from "@/lib/utils";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
@@ -11,10 +11,14 @@ function ConversationListItem({ conversation, isActive = false }) {
 	const { currentUser } = useAuthContext();
 	const { selectConversation } = useConversationContext();
 
-	const otherUser = getOtherUser(conversation, currentUser?._id);
 	const handleSelectConversation = () => {
 		selectConversation(conversation);
 	};
+
+	const displayData = getConversationDisplayData(
+		conversation,
+		currentUser?._id,
+	);
 
 	return (
 		<button
@@ -25,12 +29,13 @@ function ConversationListItem({ conversation, isActive = false }) {
 				isActive && "bg-accent",
 			)}
 		>
-			<AvatarGenerator avatar={otherUser?.avatar} name={otherUser?.username} />
+			<AvatarGenerator avatar={displayData?.avatar} name={displayData?.name} />
 
-			{/* fix preview of last message goes here */}
 			<div className="min-w-0 flex-1">
-				<P className="truncate font-medium">{otherUser?.username}</P>
-				<Muted className="truncate font-medium">{otherUser?.email}</Muted>
+				<P className="truncate font-medium">{displayData?.name}</P>
+				{displayData?.email && (
+					<Muted className="truncate font-medium">{displayData?.email}</Muted>
+				)}
 				{/* <p className="truncate text-sm text-muted-foreground">
 					{lastMessagePreview}
 				</p> */}

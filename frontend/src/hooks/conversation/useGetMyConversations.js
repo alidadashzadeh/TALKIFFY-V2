@@ -1,36 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
-import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useGetMyConversations() {
-	const [loading, setLoading] = useState(false);
-	const { conversations, setConversations } = useConversationContext();
+	const query = useQuery({
+		queryKey: ["conversations"],
 
-	const getConversations = useCallback(async () => {
-		setLoading(true);
-
-		try {
+		queryFn: async () => {
 			const { data } = await axiosInstance.get("/conversations");
-			setConversations(data?.data?.conversations || []);
-		} catch (error) {
+
+			return data?.data?.conversations || [];
+		},
+
+		onError: (error) => {
 			handleErrorToast(error);
-		} finally {
-			setLoading(false);
-		}
-	}, [setConversations]);
+		},
+	});
 
-	useEffect(() => {
-		getConversations();
-	}, [getConversations]);
-
-	return {
-		conversations,
-		loading,
-		setConversations,
-		refetchConversations: getConversations,
-	};
+	return query;
 }
 
 export default useGetMyConversations;
