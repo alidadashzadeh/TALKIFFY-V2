@@ -11,11 +11,11 @@ import {
 export const sendMessage = async (req, res) => {
 	try {
 		const senderId = req.user.id;
-		const receiverId = req.params.id;
+		const { conversationId } = req.params;
 
 		const newMessage = await Message.create({
 			senderId,
-			receiverId,
+			conversationId,
 			content: req.body.content,
 		});
 
@@ -25,29 +25,7 @@ export const sendMessage = async (req, res) => {
 	}
 };
 
-// export const getMessages = async (req, res) => {
-// 	try {
-// 		const myId = req.user._id;
-// 		const contactId = req.params.id;
-
-// 		const messages = await Message.find({
-// 			$or: [
-// 				{ receiverId: myId, senderId: contactId },
-// 				{ senderId: myId, receiverId: contactId },
-// 			],
-// 		});
-
-// 		res.status(200).json({
-// 			status: "success",
-// 			results: messages.length,
-// 			data: { messages },
-// 		});
-// 	} catch (error) {
-// 		res.status(400).json({ status: "fail", message: error.message });
-// 	}
-// };
-
-export const getMessages = async (req, res, next) => {
+export const getConversationMessages = async (req, res, next) => {
 	const { conversationId } = req.params;
 
 	const messages = await Message.find({ conversationId })

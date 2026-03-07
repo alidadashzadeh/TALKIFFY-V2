@@ -8,7 +8,7 @@ function HomePage() {
 				<Sidebar />
 			</div>
 
-			<div className="min-w-0 flex-1">
+			<div className="min-w-0 flex-1 ">
 				<MainContent />
 			</div>
 		</div>

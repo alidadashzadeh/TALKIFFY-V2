@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/popover";
 
 import EmojiPicker from "emoji-picker-react";
-import useSendMessage from "@/hooks/useSendMessage";
+import useSendMessage from "@/hooks/messages/useSendMessage";
 
 // eslint-disable-next-line react/prop-types
 function ChatMessageBar({ loading }) {

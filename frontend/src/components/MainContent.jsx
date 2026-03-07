@@ -1,55 +1,35 @@
-import { useEffect } from "react";
-
-import { useContactContext } from "@/contexts/ContactContext";
-import useGetMessages from "@/hooks/useGetMessages";
-
+import { useConversationContext } from "@/contexts/ConversationContext";
 import ChatEmptyState from "./chat/ChatEmptyState";
 import ChatMessages from "./chat/ChatMessages";
 import ChatHeader from "./chat/ChatHeader";
 import ChatMessageBar from "./chat/ChatMessageBar";
-import ChatLoading from "./chat/ChatLoading";
-import { useConversationContext } from "@/contexts/ConversationContext";
 
 function MainContent() {
-	const { currentContactId, setCurrentContactId } = useContactContext();
-	const { loading, getMessages } = useGetMessages();
+	const { currentConversation } = useConversationContext();
 
-	const { currentConversationId } = useConversationContext();
-
-	useEffect(() => {
-		if (!currentContactId) return;
-		getMessages();
-	}, [currentContactId, getMessages]);
-
-	useEffect(() => {
-		return () => {
-			setCurrentContactId(null);
-		};
-	}, [setCurrentContactId]);
-
-	if (loading) return <ChatLoading />;
+	if (!currentConversation?._id) {
+		return (
+			<main className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
+				<ChatEmptyState />
+			</main>
+		);
+	}
 
 	return (
 		<main className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
-			{!currentConversationId ? (
-				<ChatEmptyState />
-			) : (
-				<>
-					<div className="shrink-0 bg-background">
-						<ChatHeader />
-					</div>
+			<div className="shrink-0 bg-background">
+				<ChatHeader />
+			</div>
 
-					<div className="min-h-0 flex-1">
-						<ChatMessages />
-					</div>
+			<div className="min-h-0 flex-1">
+				<ChatMessages />
+			</div>
 
-					<div className="shrink-0 p-3 sm:p-4">
-						<div className="mx-auto w-full max-w-4xl">
-							<ChatMessageBar loading={loading} />
-						</div>
-					</div>
-				</>
-			)}
+			<div className="shrink-0 p-3 sm:p-4">
+				<div className="mx-auto w-full max-w-4xl">
+					<ChatMessageBar />
+				</div>
+			</div>
 		</main>
 	);
 }

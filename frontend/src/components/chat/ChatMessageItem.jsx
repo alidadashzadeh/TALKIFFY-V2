@@ -14,8 +14,7 @@ function MessageItem({ message, isGrouped = false }) {
 		(contact) => contact._id === currentContactId,
 	);
 
-	const isMe = message.senderId === currentUser?._id;
-
+	const isMe = message.senderId._id === currentUser?._id;
 	const name = isMe ? currentUser?.username : currentContact?.username;
 	const avatarFile = isMe ? currentUser?.avatar : currentContact?.avatar;
 

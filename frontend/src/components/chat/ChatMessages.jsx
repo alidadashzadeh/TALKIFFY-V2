@@ -1,37 +1,48 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { useConversationContext } from "@/contexts/ConversationContext";
+import { axiosInstance } from "@/utils/axios";
+import { handleErrorToast } from "@/utils/errorHandler";
+
 import { useMessagesContext } from "@/contexts/MessagesContext";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 import MessageItem from "./ChatMessageItem";
 import ChatNoMessages from "./ChatNoMessages";
 import ChatDateSeparator from "./ChatDateSeparator";
 
 import { isSameCalendarDay } from "@/lib/utils";
-import useGetMessages from "@/hooks/useGetMessages";
+import { Spinner } from "../ui/spinner";
 
 function ChatMessages() {
-	const { currentConversationId } = useConversationContext();
 	const { messages, setMessages } = useMessagesContext();
+	const { currentConversation } = useConversationContext();
 
-	const chatContainerRef = useRef(null);
-	const { messages: fetchedMessages, loading } = useGetMessages(
-		currentConversationId,
-	);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
-		if (fetchedMessages) {
-			setMessages(fetchedMessages);
-		}
-	}, [fetchedMessages, setMessages]);
+		const fetchMessages = async () => {
+			if (!currentConversation?._id) {
+				setMessages([]);
+				return;
+			}
 
-	useEffect(() => {
-		const container = chatContainerRef.current;
+			setLoading(true);
 
-		if (container) {
-			container.scrollTop = container.scrollHeight;
-		}
-	}, [messages]);
+			try {
+				const { data } = await axiosInstance.get(
+					`/messages/conversation/${currentConversation._id}`,
+				);
+
+				setMessages(data?.data?.messages || []);
+			} catch (error) {
+				handleErrorToast(error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchMessages();
+	}, [currentConversation?._id, setMessages]);
 
 	const items = useMemo(() => {
 		if (!messages?.length) return [];
@@ -71,23 +82,16 @@ function ChatMessages() {
 		return result;
 	}, [messages]);
 
-	if (!currentConversationId) {
-		return <ChatNoMessages />;
-	}
-
 	if (loading) {
 		return (
 			<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-				Loading messages...
+				<Spinner />
 			</div>
 		);
 	}
 
 	return (
-		<div
-			ref={chatContainerRef}
-			className="h-full overflow-y-auto px-3 py-4 sm:px-4"
-		>
+		<div className="h-full overflow-y-auto px-3 py-4 sm:px-4">
 			{!messages?.length ? (
 				<ChatNoMessages />
 			) : (

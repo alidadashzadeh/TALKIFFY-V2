@@ -3,7 +3,7 @@ import { Loader2, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import useAddNewContact from "@/hooks/useAddNewContact";
+import useAddNewContact from "@/hooks/contacts/useAddNewContact";
 
 function AddContactForm({ onSuccess }) {
 	const [email, setEmail] = useState("");

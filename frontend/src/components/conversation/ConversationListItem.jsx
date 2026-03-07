@@ -6,12 +6,15 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { baseURL } from "@/constants/BaseURL";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 function ConversationListItem({ conversation, isActive = false, onClick }) {
 	const { currentUser } = useAuthContext();
+	const { selectConversation } = useConversationContext();
 
 	const otherUser = useMemo(() => {
-		if (conversation.isGroup) return null;
+		if (conversation.type === "group") return null;
 
 		return conversation.participants?.find(
 			(user) => user._id !== currentUser?._id,
@@ -19,19 +22,24 @@ function ConversationListItem({ conversation, isActive = false, onClick }) {
 	}, [conversation, currentUser]);
 
 	const displayName = useMemo(() => {
-		if (conversation.isGroup) {
-			return conversation.groupName || "Unnamed group";
+		if (conversation.type === "group") {
+			return conversation.name || "group chat";
 		}
 
 		return otherUser?.username || otherUser?.email || "Unknown user";
 	}, [conversation, otherUser]);
 
-	const avatar = useMemo(() => {
-		if (conversation.isGroup) {
-			return conversation.groupAvatar || null;
-		}
+	// avatar logic
 
-		return otherUser?.avatar || null;
+	const avatar = useMemo(() => {
+		if (conversation.type === "private") {
+			return otherUser?.avatar
+				? `${baseURL}/avatars/${otherUser.avatar}`
+				: null;
+		}
+		return conversation.groupAvatar
+			? `${baseURL}/avatars/${conversation.avatar}`
+			: null;
 	}, [conversation, otherUser]);
 
 	const lastMessagePreview = useMemo(() => {
@@ -57,12 +65,23 @@ function ConversationListItem({ conversation, isActive = false, onClick }) {
 		});
 	}, [conversation]);
 
-	const fallback = displayName?.charAt(0)?.toUpperCase() || "?";
+	// 2-letter fallback
+	const fallback = useMemo(() => {
+		if (!displayName) return "?";
+
+		const words = displayName.trim().split(" ");
+
+		if (words.length === 1) {
+			return words[0].slice(0, 2).toUpperCase();
+		}
+
+		return (words[0][0] + words[1][0]).toUpperCase();
+	}, [displayName]);
 
 	return (
 		<button
 			type="button"
-			onClick={() => onClick?.(conversation)}
+			onClick={() => selectConversation(conversation)}
 			className={cn(
 				"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent",
 				isActive && "bg-accent",

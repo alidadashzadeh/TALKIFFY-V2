@@ -3,26 +3,19 @@
 import { useConversationContext } from "@/contexts/ConversationContext";
 import ConversationListItem from "./ConversationListItem";
 import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
+import ConversationLoader from "./ConversationLoader";
 
 function ConversationList() {
-	const { currentConversationId, selectConversation } =
-		useConversationContext();
+	const { currentConversationId } = useConversationContext();
 
 	const { conversations, loading } = useGetMyConversations();
+
 	if (loading) {
-		return (
-			<div className="flex min-h-[300px] items-center justify-center text-sm text-muted-foreground">
-				Loading conversations...
-			</div>
-		);
+		return <ConversationLoader />;
 	}
 
 	if (!conversations.length) {
-		return (
-			<div className="flex min-h-[300px] items-center justify-center rounded-xl border border-dashed text-sm text-muted-foreground">
-				No conversations yet
-			</div>
-		);
+		return <div>No conversations yet</div>;
 	}
 
 	return (
@@ -32,7 +25,6 @@ function ConversationList() {
 					key={conversation._id}
 					conversation={conversation}
 					isActive={currentConversationId === conversation._id}
-					onClick={selectConversation}
 				/>
 			))}
 		</div>

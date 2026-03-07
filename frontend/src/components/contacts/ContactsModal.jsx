@@ -22,7 +22,7 @@ function ContactsModal() {
 		<Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
 			<DialogTrigger asChild>
 				<Button variant="ghost" className="flex justify-start">
-					<Contact className="mr-2 h-4 w-4" />
+					<Contact className="h-4 w-4" />
 					Contacts
 				</Button>
 			</DialogTrigger>
