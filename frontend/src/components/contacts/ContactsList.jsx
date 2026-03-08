@@ -1,25 +1,19 @@
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useContactContext } from "@/contexts/ContactContext";
+
 import ContactListItem from "./ContactListItem";
+import { filterContacts } from "@/lib/utils/contact";
 
 function ContactsList() {
 	const { currentUser } = useAuthContext();
 	const { filteredBy } = useContactContext();
 
 	const contacts = currentUser?.contacts || [];
-	const normalizedFilter = filteredBy?.trim().toLowerCase() || "";
 
-	const filteredContacts = !normalizedFilter
-		? contacts
-		: contacts.filter((contact) => {
-				const username = contact.username?.toLowerCase() || "";
-				const email = contact.email?.toLowerCase() || "";
-
-				return (
-					username.includes(normalizedFilter) ||
-					email.includes(normalizedFilter)
-				);
-			});
+	const filteredContacts = filterContacts({
+		contacts,
+		search: filteredBy || "",
+	});
 
 	if (!filteredContacts.length) {
 		return (

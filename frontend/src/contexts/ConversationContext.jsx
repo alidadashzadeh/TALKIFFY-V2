@@ -20,6 +20,7 @@ export const useConversationContext = () => {
 export const ConversationContextProvider = ({ children }) => {
 	const [currentConversation, setCurrentConversation] = useState(null);
 	const [conversations, setConversations] = useState([]);
+	const [filteredConversationsBy, setFilteredConversationsBy] = useState("");
 
 	const currentConversationId = currentConversation?._id || null;
 
@@ -39,8 +40,15 @@ export const ConversationContextProvider = ({ children }) => {
 			clearCurrentConversation,
 			conversations,
 			setConversations,
+			filteredConversationsBy,
+			setFilteredConversationsBy,
 		}),
-		[currentConversation, currentConversationId, conversations],
+		[
+			currentConversation,
+			currentConversationId,
+			conversations,
+			filteredConversationsBy,
+		],
 	);
 
 	return (

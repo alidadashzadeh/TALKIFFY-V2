@@ -1,16 +1,16 @@
 import { Search } from "lucide-react";
-import { useContactContext } from "@/contexts/ContactContext";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
 import AccountSheet from "../AccountSheet/Accountheet";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 function SidebarHeader() {
-	const { setFilteredBy } = useContactContext();
+	const { setFilteredConversationsBy } = useConversationContext();
 	const handleChange = (e) => {
-		setFilteredBy(e.target.value);
+		setFilteredConversationsBy(e.target.value);
 	};
 
 	return (
