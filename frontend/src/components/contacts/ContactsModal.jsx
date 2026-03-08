@@ -1,12 +1,10 @@
-import { Contact, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useContactContext } from "@/contexts/ContactContext";
@@ -20,13 +18,6 @@ function ContactsModal() {
 
 	return (
 		<Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
-			<DialogTrigger asChild>
-				<Button variant="ghost" className="flex justify-start">
-					<Contact className="h-4 w-4" />
-					Contacts
-				</Button>
-			</DialogTrigger>
-
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>

@@ -67,7 +67,6 @@ function ContactListItem({ contact }) {
 					size="icon"
 					variant="ghost"
 					onClick={handleMessageClick}
-					// disabled={loading}
 					aria-label={`Message ${contact.username}`}
 				>
 					{loading ? <Spinner /> : <MessageSquare className="h-5 w-5" />}

@@ -1,21 +1,21 @@
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { axiosInstance } from "@/lib/axios";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useGetOrCreatePrivateConversation() {
 	const [loading, setLoading] = useState(false);
-	const { setConversations, selectConversation } = useConversationContext();
+
+	const queryClient = useQueryClient();
+	const { selectConversation } = useConversationContext();
 
 	const getOrCreatePrivateConversation = async (contactId) => {
 		setLoading(true);
 
 		try {
-			// create or get conversation
 			const { data } = await axiosInstance.get(
 				`/conversations/private/${contactId}`,
-				{
-					withCredentials: true,
-				},
 			);
 
 			const conversation = data?.data?.conversation;
@@ -24,12 +24,10 @@ function useGetOrCreatePrivateConversation() {
 				selectConversation(conversation);
 			}
 
-			// refresh conversations list
-			const res = await axiosInstance.get("/conversations", {
-				withCredentials: true,
+			// refresh conversations cache
+			queryClient.invalidateQueries({
+				queryKey: ["conversations"],
 			});
-
-			setConversations(res?.data?.data?.conversations || []);
 
 			return conversation;
 		} finally {

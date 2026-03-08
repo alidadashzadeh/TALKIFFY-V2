@@ -39,13 +39,13 @@ function MessageItem({ message, isGroup }) {
 
 				<div
 					className={cn(
-						"flex flex-col gap-1",
+						"flex flex-col gap-1 max-w-[520px]",
 						isMe ? "items-end" : "items-start",
 					)}
 				>
 					<div
 						className={cn(
-							"inline-flex items-end gap-2 px-3.5 py-2 text-sm shadow-sm break-words",
+							"inline-flex  items-end gap-2 px-3.5 py-2 text-sm shadow-sm break-words",
 							isMe
 								? "bg-primary text-primary-foreground"
 								: "border bg-background text-foreground",
@@ -59,7 +59,7 @@ function MessageItem({ message, isGroup }) {
 									: "rounded-2xl rounded-bl-md",
 						)}
 					>
-						<p className="whitespace-pre-wrap break-words">
+						<p className="whitespace-pre-wrap [overflow-wrap:anywhere] max-w-full">
 							{message?.content}
 						</p>
 
