@@ -2,37 +2,11 @@
 
 import { useSocketContext } from "@/contexts/SocketContext";
 import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
-import { MessageSquare } from "lucide-react";
 import { Separator } from "../ui/separator";
-import { useConversationContext } from "@/contexts/ConversationContext";
-import { Spinner } from "../ui/spinner";
-import useGetOrCreatePrivateConversation from "@/hooks/conversation/useGetOrCreatePrivateConversation";
-import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import AvatarGenerator from "../AvatarGenerator";
 
-function ContactListItem({ contact }) {
-	const { setAccountSheetOpen, setContactModalOpen } = useSheetModalContext();
-
+function ContactListItem({ contact, ActionComponent }) {
 	const { onlineUsers } = useSocketContext();
-	const { selectConversation } = useConversationContext();
-
-	const { getOrCreatePrivateConversation, loading } =
-		useGetOrCreatePrivateConversation();
-
-	const handleMessageClick = async () => {
-		try {
-			const conversation = await getOrCreatePrivateConversation(contact._id);
-			setAccountSheetOpen(false);
-			setContactModalOpen(false);
-
-			if (conversation?.data?.conversation?._id) {
-				selectConversation(conversation);
-			}
-		} catch (error) {
-			console.error("Failed to get or create conversation:", error);
-		}
-	};
 	const isOnline = onlineUsers.includes(contact._id);
 
 	return (
@@ -52,7 +26,6 @@ function ContactListItem({ contact }) {
 						)}
 					/>
 				</div>
-
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center justify-between gap-2">
 						<p className="truncate font-medium">{contact.username}</p>
@@ -62,15 +35,7 @@ function ContactListItem({ contact }) {
 						{contact.email}
 					</p>
 				</div>
-				<Button
-					type="button"
-					size="icon"
-					variant="ghost"
-					onClick={handleMessageClick}
-					aria-label={`Message ${contact.username}`}
-				>
-					{loading ? <Spinner /> : <MessageSquare className="h-5 w-5" />}
-				</Button>
+				{ActionComponent ? <ActionComponent contact={contact} /> : null}
 			</div>
 			<Separator />
 		</>

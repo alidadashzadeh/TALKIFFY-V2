@@ -108,3 +108,65 @@ export const createGroupConversation = async (req, res) => {
 		});
 	}
 };
+
+export const updateGroupParticipants = async (req, res) => {
+	try {
+		const { conversationId } = req.params;
+		let { participants } = req.body;
+
+		if (!Array.isArray(participants)) {
+			return res.status(400).json({
+				message: "Participants must be an array",
+			});
+		}
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				message: "Conversation not found",
+			});
+		}
+
+		// ensure it is a group
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				message: "Only group conversations can be updated",
+			});
+		}
+
+		// ✅ check if current user is one of the admins
+		const isAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(req.user._id),
+		);
+
+		if (!isAdmin) {
+			return res.status(403).json({
+				message: "Only group admins can modify participants",
+			});
+		}
+
+		// remove duplicates
+		participants = [...new Set(participants)];
+
+		console.log("participants", participants);
+
+		const updatedConversation = await Conversation.findByIdAndUpdate(
+			conversationId,
+			{ participants },
+			{ new: true },
+		)
+			.populate("participants", "username email avatar")
+			.populate("admins", "username avatar");
+
+		res.status(200).json({
+			success: true,
+			conversation: updatedConversation,
+		});
+	} catch (error) {
+		console.error("Update participants error:", error);
+		res.status(500).json({
+			message: error,
+		});
+	}
+};

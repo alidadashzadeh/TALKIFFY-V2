@@ -10,6 +10,7 @@ function useGetMyConversations() {
 		queryFn: async () => {
 			const { data } = await axiosInstance.get("/conversations");
 
+			console.log(data?.data?.conversations);
 			return data?.data?.conversations || [];
 		},
 

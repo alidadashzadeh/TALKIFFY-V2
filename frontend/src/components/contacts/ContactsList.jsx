@@ -4,7 +4,7 @@ import { useContactContext } from "@/contexts/ContactContext";
 import ContactListItem from "./ContactListItem";
 import { filterContacts } from "@/lib/utils/contact";
 
-function ContactsList() {
+function ContactsList({ ActionComponent }) {
 	const { currentUser } = useAuthContext();
 	const { filteredBy } = useContactContext();
 
@@ -26,7 +26,11 @@ function ContactsList() {
 	return (
 		<div className="flex h-full flex-col gap-1 overflow-y-auto p-1 pr-1">
 			{filteredContacts.map((contact) => (
-				<ContactListItem key={contact._id} contact={contact} />
+				<ContactListItem
+					key={contact._id}
+					contact={contact}
+					ActionComponent={ActionComponent}
+				/>
 			))}
 		</div>
 	);

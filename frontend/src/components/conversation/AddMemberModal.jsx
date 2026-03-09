@@ -1,33 +1,23 @@
-import { Contact, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { useContactContext } from "@/contexts/ContactContext";
-import AddContactModal from "./AddContactModal";
-import ContactsList from "./ContactsList";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
-import StartConversationButton from "../conversation/StartConversationButton";
+import { Search } from "lucide-react";
+import { Input } from "../ui/input";
+import ContactsList from "../contacts/ContactsList";
+import { useContactContext } from "@/contexts/ContactContext";
+import AddMemberButton from "./AddMemberButton";
 
-function ContactsModal() {
-	const { contactModalOpen, setContactModalOpen } = useSheetModalContext();
+function AddMemberModal() {
+	const { addMemberModalOpen, setAddMemberModalOpen } = useSheetModalContext();
 	const { filteredBy, setFilteredBy } = useContactContext();
 
 	return (
-		<Dialog open={contactModalOpen} onOpenChange={setContactModalOpen}>
-			<DialogTrigger asChild>
-				<Button variant="ghost" className="flex justify-start">
-					<Contact className="h-4 w-4" />
-					Contacts
-				</Button>
-			</DialogTrigger>
-
+		<Dialog open={addMemberModalOpen} onOpenChange={setAddMemberModalOpen}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>
@@ -47,12 +37,10 @@ function ContactsModal() {
 								className="pl-9"
 							/>
 						</div>
-
-						<AddContactModal />
 					</div>
 
 					<div className="h-[350px] overflow-hidden rounded-xl ">
-						<ContactsList ActionComponent={StartConversationButton} />
+						<ContactsList ActionComponent={AddMemberButton} />
 					</div>
 				</div>
 			</DialogContent>
@@ -60,4 +48,4 @@ function ContactsModal() {
 	);
 }
 
-export default ContactsModal;
+export default AddMemberModal;

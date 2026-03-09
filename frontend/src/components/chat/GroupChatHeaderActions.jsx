@@ -21,12 +21,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
-import ContactsModal from "../contacts/ContactsModal";
+import AddMemberModal from "../conversation/AddMemberModal";
 
 function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
-	const { setContactModalOpen } = useSheetModalContext();
+	const { setAddMemberModalOpen } = useSheetModalContext();
+
 	const handleCloseSearch = () => {
 		setShowSearch(false);
 		setSearchValue("");
@@ -34,8 +35,7 @@ function GroupChatHeaderActions() {
 
 	return (
 		<div className="flex items-center gap-1">
-			<ContactsModal />
-
+			<AddMemberModal />
 			{showSearch ? (
 				<div className="flex items-center gap-2">
 					<div className="w-48 sm:w-56">
@@ -76,7 +76,7 @@ function GroupChatHeaderActions() {
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent align="end" className="w-56">
-					<DropdownMenuItem onClick={() => setContactModalOpen(true)}>
+					<DropdownMenuItem onClick={() => setAddMemberModalOpen(true)}>
 						<UserPlus className="mr-2 h-4 w-4" />
 						Add Members
 					</DropdownMenuItem>

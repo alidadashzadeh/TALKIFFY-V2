@@ -3,18 +3,16 @@ import { SheetContent } from "../ui/sheet";
 import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
 import ProfileModal from "../profile/ProfileModal";
-import { Contact, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import SettingsModal from "../settings/SettingsModal";
 import NewGroupModal from "../modals/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
 import ContactsModal from "../contacts/ContactsModal";
 import useLogout from "@/hooks/useLogout";
-import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 
 function AccountSheetContent() {
 	const { logout } = useLogout();
-	const { setContactModalOpen } = useSheetModalContext();
 
 	return (
 		<SheetContent
@@ -27,19 +25,7 @@ function AccountSheetContent() {
 			<ScrollArea className="flex-1">
 				<div className="grid gap-2 p-4">
 					<ProfileModal />
-
-					{/* ContactsModal is reusable  */}
-					<>
-						<ContactsModal />
-						<Button
-							variant="ghost"
-							className="flex justify-start"
-							onClick={() => setContactModalOpen(true)}
-						>
-							<Contact className="h-4 w-4" />
-							Contacts
-						</Button>
-					</>
+					<ContactsModal />
 					<NewGroupModal />
 					<SettingsModal />
 

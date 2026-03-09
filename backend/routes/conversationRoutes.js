@@ -3,6 +3,7 @@ import {
 	createGroupConversation,
 	getMyConversations,
 	getOrCreatePrivateConversation,
+	updateGroupParticipants,
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
 
@@ -14,5 +15,7 @@ router
 	.post(protect, createGroupConversation);
 
 router.get("/private/:userId", protect, getOrCreatePrivateConversation);
+
+router.patch("/:conversationId", protect, updateGroupParticipants);
 
 export default router;
