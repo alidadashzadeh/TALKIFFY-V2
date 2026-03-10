@@ -1,8 +1,11 @@
+import { useConversationContext } from "@/contexts/ConversationContext";
 import { axiosInstance } from "@/lib/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 function useAddGroupMember() {
 	const queryClient = useQueryClient();
+	const { selectConversation } = useConversationContext();
 
 	const mutation = useMutation({
 		mutationFn: async ({ conversationId, participants }) => {
@@ -10,13 +13,14 @@ function useAddGroupMember() {
 				`/conversations/${conversationId}`,
 				{ participants },
 			);
-			console.log(data);
 			return data;
 		},
-		onSuccess: (_, variables) => {
+		onSuccess: (data) => {
 			queryClient.invalidateQueries({
 				queryKey: ["conversations"],
 			});
+			toast.success("Member added successfully");
+			selectConversation(data.data.conversation);
 		},
 	});
 

@@ -7,6 +7,7 @@ function SheetModalProvider({ children }) {
 	const [contactModalOpen, setContactModalOpen] = useState(false);
 	const [groupModalOpen, setGroupModalOpen] = useState(false);
 	const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
+	const [conversationInfoOpen, setConversationInfoOpen] = useState(false);
 
 	return (
 		<SheetModalContext.Provider
@@ -19,6 +20,8 @@ function SheetModalProvider({ children }) {
 				setGroupModalOpen,
 				addMemberModalOpen,
 				setAddMemberModalOpen,
+				conversationInfoOpen,
+				setConversationInfoOpen,
 			}}
 		>
 			{children}

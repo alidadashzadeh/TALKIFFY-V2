@@ -26,7 +26,10 @@ export const sendMessage = async (req, res) => {
 
 		res.status(201).json({ status: "success", data: { newMessage } });
 	} catch (error) {
-		res.status(400).json({ status: "fail", message: error.message });
+		res.status(400).json({
+			status: "fail",
+			message: error.message || "Message send went wrong",
+		});
 	}
 };
 

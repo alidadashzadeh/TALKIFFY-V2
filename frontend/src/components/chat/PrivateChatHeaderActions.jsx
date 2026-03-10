@@ -19,6 +19,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import SidePanelAction from "../ui/SidePanelAction";
 
 function PrivateChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
@@ -70,6 +71,8 @@ function PrivateChatHeaderActions() {
 					>
 						<Search className="h-5 w-5" />
 					</Button>
+
+					<SidePanelAction />
 				</>
 			)}
 

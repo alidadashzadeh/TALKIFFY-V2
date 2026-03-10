@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
 	MoreVertical,
 	UserPlus,
-	Users,
 	Search,
 	Folder,
 	Pencil,
@@ -22,11 +21,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import AddMemberModal from "../conversation/AddMemberModal";
+import SidePanelAction from "../ui/SidePanelAction";
 
 function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
 	const { setAddMemberModalOpen } = useSheetModalContext();
+	// const { conversationInfoOpen, setConversationInfoOpen } =
+	// 	useSheetModalContext();
 
 	const handleCloseSearch = () => {
 		setShowSearch(false);
@@ -67,6 +69,7 @@ function GroupChatHeaderActions() {
 					<Search className="h-5 w-5" />
 				</Button>
 			)}
+			<SidePanelAction />
 
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -79,16 +82,6 @@ function GroupChatHeaderActions() {
 					<DropdownMenuItem onClick={() => setAddMemberModalOpen(true)}>
 						<UserPlus className="mr-2 h-4 w-4" />
 						Add Members
-					</DropdownMenuItem>
-
-					<DropdownMenuItem>
-						<Users className="mr-2 h-4 w-4" />
-						Group Info
-					</DropdownMenuItem>
-
-					<DropdownMenuItem>
-						<Folder className="mr-2 h-4 w-4" />
-						Shared Files
 					</DropdownMenuItem>
 
 					<DropdownMenuSeparator />

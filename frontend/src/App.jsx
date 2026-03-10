@@ -11,27 +11,27 @@ import SettingsPage from "./pages/SettingsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import MessageLoading from "./components/chat/ChatLoading.jsx";
 
-import useListenContacts from "./hooks/useListenContacts.js";
-import useListenMessages from "./hooks/useListenSingleMessages.js";
-import useListenDeliver from "./hooks/useListenSingleDeliver.js";
-import useSetDeliverOnLogin from "./hooks/useSetDeliverOnLogin.js";
-import useGetDeliverOnLogin from "./hooks/useGetDeliverOnLogin.js";
-import useListenSeen from "./hooks/useListenSignleSeen.js";
-import useSeenMessagesOnClick from "./hooks/useSeenMessagesOnClick.js";
-import useGetUnseenMessagesOnLogin from "./hooks/useGetUnseenMessagesOnLogin.js";
+// import useListenContacts from "./hooks/useListenContacts.js";
+// import useListenMessages from "./hooks/useListenSingleMessages.js";
+// import useListenDeliver from "./hooks/useListenSingleDeliver.js";
+// import useSetDeliverOnLogin from "./hooks/useSetDeliverOnLogin.js";
+// import useGetDeliverOnLogin from "./hooks/useGetDeliverOnLogin.js";
+// import useListenSeen from "./hooks/useListenSignleSeen.js";
+// import useSeenMessagesOnClick from "./hooks/useSeenMessagesOnClick.js";
+// import useGetUnseenMessagesOnLogin from "./hooks/useGetUnseenMessagesOnLogin.js";
 
 function App() {
 	const { loading, checkAuth } = useCheckCurrentUser();
 	const { currentUser } = useAuthContext();
 
-	useListenContacts();
-	useListenMessages();
-	useListenDeliver();
-	useListenSeen();
-	useSetDeliverOnLogin();
-	useGetDeliverOnLogin();
-	useSeenMessagesOnClick();
-	useGetUnseenMessagesOnLogin();
+	// useListenContacts();
+	// useListenMessages();
+	// useListenDeliver();
+	// useListenSeen();
+	// useSetDeliverOnLogin();
+	// useGetDeliverOnLogin();
+	// useSeenMessagesOnClick();
+	// useGetUnseenMessagesOnLogin();
 
 	useEffect(() => {
 		checkAuth();

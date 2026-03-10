@@ -46,10 +46,10 @@ export const getOrCreatePrivateConversation = async (req, res, next) => {
 
 export const getMyConversations = async (req, res, next) => {
 	try {
-		const userId = req.user._id;
+		const currentUserId = req.user._id;
 
 		const conversations = await Conversation.find({
-			participants: userId,
+			participants: currentUserId,
 		})
 			.populate("participants", "username avatar email")
 			.populate("lastMessageId")
@@ -74,7 +74,7 @@ export const createGroupConversation = async (req, res) => {
 
 		if (!name || !name.trim()) {
 			return res.status(400).json({
-				success: false,
+				status: "fail",
 				message: "Group name is required",
 			});
 		}
@@ -92,19 +92,20 @@ export const createGroupConversation = async (req, res) => {
 		const populatedConversation = await Conversation.findById(
 			newConversation._id,
 		)
-			.populate("participants", "_id fullName username profilePic")
-			.populate("admins", "_id fullName username profilePic");
+			.populate("participants", "username avatar email")
+			.populate("admins", "username avatar email");
 
 		return res.status(201).json({
-			success: true,
-			message: "Group created successfully",
-			conversation: populatedConversation,
+			status: "success",
+			data: {
+				conversation: populatedConversation,
+			},
 		});
 	} catch (error) {
 		console.error("createGroupConversation error:", error);
 		return res.status(500).json({
-			success: false,
-			message: "Internal server error",
+			status: "fail",
+			message: error.message || "Something went wrong",
 		});
 	}
 };
@@ -116,6 +117,7 @@ export const updateGroupParticipants = async (req, res) => {
 
 		if (!Array.isArray(participants)) {
 			return res.status(400).json({
+				status: "fail",
 				message: "Participants must be an array",
 			});
 		}
@@ -123,14 +125,15 @@ export const updateGroupParticipants = async (req, res) => {
 		const conversation = await Conversation.findById(conversationId);
 
 		if (!conversation) {
-			return res.status(404).json({
-				message: "Conversation not found",
-			});
+			return res
+				.status(404)
+				.json({ status: "fail", message: "Conversation not found" });
 		}
 
 		// ensure it is a group
 		if (conversation.type !== "group") {
 			return res.status(400).json({
+				status: "fail",
 				message: "Only group conversations can be updated",
 			});
 		}
@@ -142,14 +145,13 @@ export const updateGroupParticipants = async (req, res) => {
 
 		if (!isAdmin) {
 			return res.status(403).json({
+				status: "fail",
 				message: "Only group admins can modify participants",
 			});
 		}
 
 		// remove duplicates
 		participants = [...new Set(participants)];
-
-		console.log("participants", participants);
 
 		const updatedConversation = await Conversation.findByIdAndUpdate(
 			conversationId,
@@ -160,13 +162,16 @@ export const updateGroupParticipants = async (req, res) => {
 			.populate("admins", "username avatar");
 
 		res.status(200).json({
-			success: true,
-			conversation: updatedConversation,
+			status: "success",
+			data: {
+				conversation: updatedConversation,
+			},
 		});
 	} catch (error) {
 		console.error("Update participants error:", error);
 		res.status(500).json({
-			message: error,
+			status: "fail",
+			message: error.message || "Something went wrong",
 		});
 	}
 };
