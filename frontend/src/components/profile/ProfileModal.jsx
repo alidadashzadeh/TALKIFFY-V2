@@ -14,6 +14,8 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import ProfileAvatar from "./ProfileAvatar";
 import ProfileInfoField from "./ProfileInfoField";
 import ProfileAccountInfo from "./ProfileAccountInfo";
+import useUpdateUserAvatar from "@/hooks/useUpdateUserAvatar";
+import { useState } from "react";
 
 function ProfileModal() {
 	const { currentUser } = useAuthContext();

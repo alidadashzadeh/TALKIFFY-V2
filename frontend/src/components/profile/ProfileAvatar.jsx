@@ -1,20 +1,43 @@
 /* eslint-disable react/prop-types */
 import { Camera } from "lucide-react";
-import {} from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import useUploadImage from "@/hooks/useUploadImage";
 import AvatarGenerator from "../AvatarGenerator";
+import useUpdateUserAvatar from "@/hooks/useUpdateUserAvatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 function ProfileAvatar({ currentUser }) {
-	const { loading, handleImageUpload } = useUploadImage();
+	const { updateUserAvatar, loading } = useUpdateUserAvatar();
+	const [preview, setPreview] = useState(null);
+
+	const handleImageUpload = async (e) => {
+		const file = e.target.files?.[0];
+		if (!file || !currentUser?._id) return;
+
+		const localPreview = URL.createObjectURL(file);
+		setPreview(localPreview);
+
+		try {
+			await updateUserAvatar({
+				userId: currentUser._id,
+				file,
+			});
+		} catch {
+			setPreview(null);
+		} finally {
+			e.target.value = "";
+		}
+	};
 
 	return (
 		<div className="relative flex items-center justify-center py-4">
-			<AvatarGenerator
-				avatar={currentUser?.avatar}
-				name={currentUser?.username}
-				size="w-24 h-24"
-			/>
+			<Avatar className="w-24 h-24 object-cover">
+				<AvatarImage src={currentUser?.avatar} alt={currentUser?.username} />
+				<AvatarFallback className="flex items-center justify-center">
+					{currentUser?.username}
+				</AvatarFallback>
+			</Avatar>
+
 			<Button
 				type="button"
 				size="icon"
@@ -30,6 +53,7 @@ function ProfileAvatar({ currentUser }) {
 						hidden
 						accept="image/*"
 						onChange={handleImageUpload}
+						disabled={loading}
 					/>
 				</label>
 			</Button>
