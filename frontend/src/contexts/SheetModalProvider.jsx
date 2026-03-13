@@ -8,7 +8,7 @@ function SheetModalProvider({ children }) {
 	const [groupModalOpen, setGroupModalOpen] = useState(false);
 	const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 	const [conversationInfoOpen, setConversationInfoOpen] = useState(false);
-
+	const [editGroupModalOpen, setEditGroupModalOpen] = useState(false);
 	return (
 		<SheetModalContext.Provider
 			value={{
@@ -22,6 +22,8 @@ function SheetModalProvider({ children }) {
 				setAddMemberModalOpen,
 				conversationInfoOpen,
 				setConversationInfoOpen,
+				editGroupModalOpen,
+				setEditGroupModalOpen,
 			}}
 		>
 			{children}

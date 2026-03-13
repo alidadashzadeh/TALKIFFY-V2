@@ -9,8 +9,8 @@ function useAddGroupMember() {
 
 	const mutation = useMutation({
 		mutationFn: async ({ conversationId, participants }) => {
-			const { data } = await axiosInstance.patch(
-				`/conversations/${conversationId}`,
+			const { data } = await axiosInstance.post(
+				`/conversations/${conversationId}/participants`,
 				{ participants },
 			);
 			return data;

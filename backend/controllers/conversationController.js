@@ -110,7 +110,7 @@ export const createGroupConversation = async (req, res) => {
 	}
 };
 
-export const updateGroupParticipants = async (req, res) => {
+export const addGroupParticipants = async (req, res) => {
 	try {
 		const { conversationId } = req.params;
 		let { participants } = req.body;
@@ -170,6 +170,77 @@ export const updateGroupParticipants = async (req, res) => {
 	} catch (error) {
 		console.error("Update participants error:", error);
 		res.status(500).json({
+			status: "fail",
+			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const removeGroupParticipant = async (req, res) => {
+	try {
+		const { conversationId, userId } = req.params;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can be updated",
+			});
+		}
+
+		const isAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(req.user._id),
+		);
+
+		if (!isAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only group admins can modify participants",
+			});
+		}
+
+		const isParticipant = conversation.participants.some(
+			(participant) =>
+				String(participant._id || participant) === String(userId),
+		);
+
+		if (!isParticipant) {
+			return res.status(404).json({
+				status: "fail",
+				message: "User is not a member in this group",
+			});
+		}
+
+		const participants = conversation.participants.filter(
+			(participant) =>
+				String(participant._id || participant) !== String(userId),
+		);
+
+		const updatedConversation = await Conversation.findByIdAndUpdate(
+			conversationId,
+			{ participants },
+			{ new: true },
+		)
+			.populate("participants", "username email avatar")
+			.populate("admins", "username email avatar");
+
+		return res.status(200).json({
+			status: "success",
+			data: {
+				conversation: updatedConversation,
+			},
+		});
+	} catch (error) {
+		console.error("Remove participant error:", error);
+		return res.status(500).json({
 			status: "fail",
 			message: error.message || "Something went wrong",
 		});

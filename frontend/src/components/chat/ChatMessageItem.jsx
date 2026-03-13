@@ -2,18 +2,18 @@
 import { Check, CheckCheck } from "lucide-react";
 
 import { useAuthContext } from "@/contexts/AuthContext";
-import { useContactContext } from "@/contexts/ContactContext";
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 function MessageItem({ message, isGroup }) {
 	const { currentUser } = useAuthContext();
-	const { currentContact } = useContactContext();
+	const { currentConversation } = useConversationContext();
+	const isGroupConversation = currentConversation?.type === "group";
 
-	const { isMe, username, avatarFile } = getMessageDisplayData(
+	const { isMe, username, avatar } = getMessageDisplayData(
 		message,
 		currentUser,
-		currentContact,
 	);
 
 	return (
@@ -30,10 +30,9 @@ function MessageItem({ message, isGroup }) {
 					isMe ? "flex-row-reverse" : "flex-row gap-4",
 				)}
 			>
-				{/* avatar */}
 				<div className="w-8 h-8 shrink-0">
 					{!isGroup ? (
-						<AvatarGenerator avatar={avatarFile} name={username} />
+						<AvatarGenerator avatar={avatar} name={username} />
 					) : null}
 				</div>
 
@@ -43,6 +42,11 @@ function MessageItem({ message, isGroup }) {
 						isMe ? "items-end" : "items-start",
 					)}
 				>
+					{isGroupConversation && !isGroup && !isMe && (
+						<p className="px-1 text-xs font-medium text-muted-foreground">
+							{username}
+						</p>
+					)}
 					<div
 						className={cn(
 							"inline-flex  items-end gap-2 px-3.5 py-2 text-sm shadow-sm break-words",

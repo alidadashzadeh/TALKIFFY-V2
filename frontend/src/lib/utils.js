@@ -72,6 +72,9 @@ export function getConversationDisplayData(conversation, currentUserId) {
 			avatar: conversation.avatar || "",
 			email: "",
 			isGroup: true,
+			isAdmin: conversation.admins?.some(
+				(admin) => String(admin?._id || admin) === String(currentUserId),
+			),
 		};
 	}
 
@@ -84,6 +87,7 @@ export function getConversationDisplayData(conversation, currentUserId) {
 		avatar: otherUser?.avatar || "",
 		email: otherUser?.email || "",
 		isGroup: false,
+		isAdmin: false,
 	};
 }
 
@@ -96,12 +100,12 @@ export function isMyMessage(message, currentUserId) {
 	return getMessageSenderId(message?.senderId) === currentUserId;
 }
 
-export function getMessageDisplayData(message, currentUser, currentContact) {
+export function getMessageDisplayData(message, currentUser) {
 	const isMe = isMyMessage(message, currentUser?._id);
 
 	return {
 		isMe,
-		username: isMe ? currentUser?.username : currentContact?.username,
-		avatarFile: isMe ? currentUser?.avatar : currentContact?.avatar,
+		username: isMe ? currentUser?.username : message?.senderId?.username,
+		avatar: isMe ? currentUser?.avatar : message?.senderId?.avatar,
 	};
 }

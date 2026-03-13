@@ -22,7 +22,10 @@ function useCreateGroupConversation() {
 
 	const mutation = useMutation({
 		mutationFn: async (payload) => {
-			const { data } = await axiosInstance.post("/conversations", payload);
+			const { data } = await axiosInstance.post(
+				"/conversations/group",
+				payload,
+			);
 			selectConversation(data?.conversation);
 			return data?.conversation;
 		},

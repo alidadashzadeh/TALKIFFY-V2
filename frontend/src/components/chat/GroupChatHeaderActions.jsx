@@ -3,7 +3,6 @@ import {
 	MoreVertical,
 	UserPlus,
 	Search,
-	Folder,
 	Pencil,
 	Shield,
 	LogOut,
@@ -27,8 +26,6 @@ function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
 	const { setAddMemberModalOpen } = useSheetModalContext();
-	// const { conversationInfoOpen, setConversationInfoOpen } =
-	// 	useSheetModalContext();
 
 	const handleCloseSearch = () => {
 		setShowSearch(false);
