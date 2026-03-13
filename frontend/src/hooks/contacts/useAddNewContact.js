@@ -3,7 +3,7 @@ import { useSocketContext } from "@/contexts/SocketContext";
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function useAddNewContact() {
 	const [loading, setLoading] = useState(false);

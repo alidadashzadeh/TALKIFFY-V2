@@ -4,7 +4,7 @@ import { handleErrorToast } from "../lib/errorHandler.js";
 import { useAuthContext } from "./../contexts/AuthContext";
 
 import { axiosInstance } from "../lib/axios.js";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function useSignup() {
 	const [loading, setLoading] = useState(false);

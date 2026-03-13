@@ -3,7 +3,7 @@ import AvatarGenerator from "../AvatarGenerator";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { getConversationDisplayData } from "@/lib/utils";
 import { Separator } from "../ui/separator";
-import { P } from "../ui/typography";
+import { H4, Muted } from "../ui/typography";
 import GroupInfoActions from "../group/GroupInfoActions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import GroupMembersList from "../group/GroupMembersList";
@@ -19,9 +19,12 @@ function ConversationInfoSidebar() {
 
 	return (
 		<div>
-			<div className="relative flex items-center justify-center gap-4 py-4">
+			<div className="relative flex flex-col items-center justify-center gap-4 py-4">
 				<AvatarGenerator avatar={avatar} name={name} size="w-24 h-24" />
-				<P>{name}</P>
+				<div className=" flex flex-col justify-center items-center">
+					<H4>{name}</H4>
+					<Muted>{currentConversation?.participants?.length} Members</Muted>
+				</div>
 			</div>
 
 			{isGroup && isAdmin && <GroupInfoActions />}

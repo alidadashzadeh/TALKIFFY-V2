@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
 	MoreVertical,
-	UserPlus,
 	Search,
 	Pencil,
 	Shield,
 	LogOut,
 	X,
+	Volume2Icon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,14 +18,19 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import AddMemberModal from "../conversation/AddMemberModal";
 import SidePanelAction from "../ui/SidePanelAction";
-
+import useLeaveGroup from "@/hooks/group/useLeaveGroup";
+import { useConversationContext } from "@/contexts/ConversationContext";
 function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
-	const { setAddMemberModalOpen } = useSheetModalContext();
+	const { leaveGroup } = useLeaveGroup();
+	const { currentConversation } = useConversationContext();
+	const handleLeaveGroup = async () => {
+		if (!currentConversation?._id) return;
+		await leaveGroup(currentConversation._id);
+	};
 
 	const handleCloseSearch = () => {
 		setShowSearch(false);
@@ -76,26 +81,17 @@ function GroupChatHeaderActions() {
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent align="end" className="w-56">
-					<DropdownMenuItem onClick={() => setAddMemberModalOpen(true)}>
-						<UserPlus className="mr-2 h-4 w-4" />
-						Add Members
+					<DropdownMenuItem>
+						<Volume2Icon className="mr-2 h-4 w-4" />
+						Mute Group
 					</DropdownMenuItem>
 
 					<DropdownMenuSeparator />
 
-					<DropdownMenuItem>
-						<Pencil className="mr-2 h-4 w-4" />
-						Rename Group
-					</DropdownMenuItem>
-
-					<DropdownMenuItem>
-						<Shield className="mr-2 h-4 w-4" />
-						Manage Admins
-					</DropdownMenuItem>
-
-					<DropdownMenuSeparator />
-
-					<DropdownMenuItem className="text-red-500 focus:text-red-500">
+					<DropdownMenuItem
+						onClick={handleLeaveGroup}
+						className="text-red-500 focus:text-red-500"
+					>
 						<LogOut className="mr-2 h-4 w-4" />
 						Leave Group
 					</DropdownMenuItem>

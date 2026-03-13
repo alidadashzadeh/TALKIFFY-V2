@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import { toast } from "sonner";
 
 function useCreateGroupConversation() {
 	const queryClient = useQueryClient();
@@ -31,7 +31,7 @@ function useCreateGroupConversation() {
 		},
 
 		onSuccess: () => {
-			toast.success("Group created successfully");
+			toast.success("Group Created Successfully");
 			queryClient.invalidateQueries({
 				queryKey: ["conversations"],
 			});

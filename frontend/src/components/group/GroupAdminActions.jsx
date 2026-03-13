@@ -13,17 +13,43 @@ import {
 } from "lucide-react";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { getConversationDisplayData } from "@/lib/utils";
-import useRemoveGroupParticipant from "@/hooks/conversation/useRemoveGroupParticipant";
+
+import useAddGroupAdmin from "@/hooks/group/useAddGroupAdmin";
+import useRemoveGroupAdmin from "@/hooks/group/useRemoveGroupAdmin";
+import useRemoveGroupMember from "@/hooks/group/useRemoveGroupMember";
 
 function GroupAdminActions({ member }) {
 	const { currentConversation } = useConversationContext();
-	const { removeParticipant, loading } = useRemoveGroupParticipant();
+	const { removeParticipant, loading } = useRemoveGroupMember();
+	const { addAdmin } = useAddGroupAdmin();
+	const { removeAdmin } = useRemoveGroupAdmin();
 
 	const { isAdmin } = getConversationDisplayData(
 		currentConversation,
 		member?._id,
 	);
 
+	const handleMakeAdmin = async () => {
+		try {
+			await addAdmin({
+				conversationId: currentConversation?._id,
+				userId: member?._id,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	const handleRemoveAdmin = async () => {
+		try {
+			await removeAdmin({
+				conversationId: currentConversation?._id,
+				userId: member?._id,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
 	const handleRemoveMember = async () => {
 		try {
 			await removeParticipant({
@@ -50,12 +76,20 @@ function GroupAdminActions({ member }) {
 			<PopoverContent align="end" className="w-48 p-2">
 				<div className="space-y-1">
 					{!isAdmin ? (
-						<Button variant="ghost" className="w-full justify-start">
+						<Button
+							onClick={handleMakeAdmin}
+							variant="ghost"
+							className="w-full justify-start"
+						>
 							<Shield className="mr-2 h-4 w-4" />
 							Make admin
 						</Button>
 					) : (
-						<Button variant="ghost" className="w-full justify-start">
+						<Button
+							onClick={handleRemoveAdmin}
+							variant="ghost"
+							className="w-full justify-start"
+						>
 							<ShieldXIcon className="mr-2 h-4 w-4" />
 							Remove admin
 						</Button>

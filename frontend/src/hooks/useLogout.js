@@ -4,7 +4,7 @@ import { handleErrorToast } from "../lib/errorHandler";
 import { useAuthContext } from "../contexts/AuthContext";
 
 import { axiosInstance } from "../lib/axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 function useLogout() {
 	const [loading, setLoading] = useState(false);

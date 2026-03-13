@@ -154,14 +154,22 @@ export const removeGroupParticipant = async (req, res) => {
 			});
 		}
 
+		const isMemberAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(userId),
+		);
+
 		const participants = conversation.participants.filter(
 			(participant) =>
 				String(participant._id || participant) !== String(userId),
 		);
 
+		const admins = conversation.admins.filter(
+			(admin) => String(admin._id || admin) !== String(userId),
+		);
+
 		const updatedConversation = await Conversation.findByIdAndUpdate(
 			conversationId,
-			{ participants },
+			{ participants, admins },
 			{ new: true },
 		)
 			.populate("participants", "username email avatar")
@@ -182,7 +190,7 @@ export const removeGroupParticipant = async (req, res) => {
 	}
 };
 
-export const addGroupSingleParticipant = async (req, res) => {
+export const addGroupParticipant = async (req, res) => {
 	try {
 		const { conversationId, userId } = req.params;
 		const currentUserId = req.user._id;
@@ -203,11 +211,11 @@ export const addGroupSingleParticipant = async (req, res) => {
 			});
 		}
 
-		const isAdmin = conversation.admins.some(
+		const isRequesterAdmin = conversation.admins.some(
 			(admin) => String(admin) === String(currentUserId),
 		);
 
-		if (!isAdmin) {
+		if (!isRequesterAdmin) {
 			return res.status(403).json({
 				status: "fail",
 				message: "Only admins can add participants",
@@ -221,7 +229,7 @@ export const addGroupSingleParticipant = async (req, res) => {
 		if (alreadyParticipant) {
 			return res.status(400).json({
 				status: "fail",
-				message: "User already in the group",
+				message: "User is already in the group",
 			});
 		}
 
@@ -243,6 +251,243 @@ export const addGroupSingleParticipant = async (req, res) => {
 		res.status(500).json({
 			status: "fail",
 			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const addGroupAdmin = async (req, res) => {
+	try {
+		const { conversationId, userId } = req.params;
+		const currentUserId = req.user._id;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can have admins",
+			});
+		}
+
+		const isRequesterAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(currentUserId),
+		);
+
+		if (!isRequesterAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only admins can promote members",
+			});
+		}
+
+		const isParticipant = conversation.participants.some(
+			(p) => String(p._id || p) === String(userId),
+		);
+
+		if (!isParticipant) {
+			return res.status(400).json({
+				status: "fail",
+				message: "User must be a group participant first",
+			});
+		}
+
+		const alreadyAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(userId),
+		);
+
+		if (alreadyAdmin) {
+			return res.status(400).json({
+				status: "fail",
+				message: "User is already an admin",
+			});
+		}
+
+		conversation.admins.push(userId);
+		await conversation.save();
+
+		await conversation.populate([
+			{ path: "participants", select: "username email avatar" },
+			{ path: "admins", select: "username avatar" },
+		]);
+
+		return res.status(200).json({
+			status: "success",
+			data: {
+				conversation,
+			},
+		});
+	} catch (error) {
+		console.error("Add admin error:", error);
+
+		return res.status(500).json({
+			status: "fail",
+			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const removeGroupAdmin = async (req, res) => {
+	try {
+		const { conversationId, userId } = req.params;
+		const currentUserId = req.user._id;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		// must be group
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can have admins",
+			});
+		}
+
+		// requester must be admin
+		const isRequesterAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(currentUserId),
+		);
+
+		if (!isRequesterAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only admins can remove other admins",
+			});
+		}
+
+		// target must be admin
+		const isTargetAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(userId),
+		);
+
+		if (!isTargetAdmin) {
+			return res.status(400).json({
+				status: "fail",
+				message: "User is not an admin",
+			});
+		}
+
+		// prevent removing last admin
+		if (conversation.admins.length === 1) {
+			return res.status(400).json({
+				status: "fail",
+				message: "Cannot remove the last admin",
+			});
+		}
+
+		const updatedConversation = await Conversation.findByIdAndUpdate(
+			conversationId,
+			{
+				$pull: { admins: userId },
+			},
+			{ new: true },
+		)
+			.populate("participants", "username email avatar")
+			.populate("admins", "username email avatar");
+
+		return res.status(200).json({
+			status: "success",
+			data: {
+				conversation: updatedConversation,
+			},
+		});
+	} catch (error) {
+		console.error("Remove admin error:", error);
+
+		return res.status(500).json({
+			status: "fail",
+			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const leaveGroup = async (req, res) => {
+	try {
+		const { conversationId } = req.params;
+		const currentUserId = req.user._id;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can be left",
+			});
+		}
+
+		const isParticipant = conversation.participants.some(
+			(user) => String(user._id || user) === String(currentUserId),
+		);
+
+		if (!isParticipant) {
+			return res.status(400).json({
+				status: "fail",
+				message: "You are not a member of this group",
+			});
+		}
+
+		// remove from participants
+		conversation.participants = conversation.participants.filter(
+			(user) => String(user._id || user) !== String(currentUserId),
+		);
+
+		// remove from admins if admin
+		conversation.admins = conversation.admins.filter(
+			(admin) => String(admin._id || admin) !== String(currentUserId),
+		);
+
+		if (conversation.participants.length === 0) {
+			await Conversation.findByIdAndDelete(conversationId);
+
+			return res.status(200).json({
+				status: "success",
+				message:
+					"You left the group and it was deleted because it became empty",
+				data: {
+					conversationId,
+					deleted: true,
+				},
+			});
+		}
+
+		// if no admins left but members exist → promote first member
+		if (
+			conversation.admins.length === 0 &&
+			conversation.participants.length > 0
+		) {
+			conversation.admins.push(conversation.participants[0]);
+		}
+
+		await conversation.save();
+
+		res.status(200).json({
+			status: "success",
+			message: "You left the group",
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
+			status: "error",
+			message: "Failed to leave group",
 		});
 	}
 };

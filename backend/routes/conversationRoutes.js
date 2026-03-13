@@ -1,9 +1,12 @@
 import express from "express";
 import {
-	addGroupSingleParticipant,
+	addGroupAdmin,
+	addGroupParticipant,
 	createGroupConversation,
 	getMyConversations,
 	getOrCreatePrivateConversation,
+	leaveGroup,
+	removeGroupAdmin,
 	removeGroupParticipant,
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
@@ -18,12 +21,15 @@ router.post("/group", protect, createGroupConversation);
 router.post(
 	"/:conversationId/participants/:userId",
 	protect,
-	addGroupSingleParticipant,
+	addGroupParticipant,
 );
 router.delete(
 	"/:conversationId/participants/:userId",
 	protect,
 	removeGroupParticipant,
 );
+router.post("/:conversationId/admins/:userId", protect, addGroupAdmin);
+router.delete("/:conversationId/admins/:userId", protect, removeGroupAdmin);
+router.delete("/:conversationId/leave", protect, leaveGroup);
 
 export default router;

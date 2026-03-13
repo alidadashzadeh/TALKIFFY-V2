@@ -2,7 +2,7 @@ import { UserPlus } from "lucide-react";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import { useConversationContext } from "@/contexts/ConversationContext";
-import useAddGroupMember from "@/hooks/conversation/useAddGroupMember";
+import useAddGroupMember from "@/hooks/group/useAddGroupMember";
 
 function AddMemberButton({ contact }) {
 	const { currentConversation } = useConversationContext();
