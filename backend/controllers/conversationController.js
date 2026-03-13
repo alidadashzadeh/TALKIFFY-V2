@@ -110,75 +110,10 @@ export const createGroupConversation = async (req, res) => {
 	}
 };
 
-export const addGroupParticipants = async (req, res) => {
-	try {
-		const { conversationId } = req.params;
-		let { participants } = req.body;
-
-		if (!Array.isArray(participants)) {
-			return res.status(400).json({
-				status: "fail",
-				message: "Participants must be an array",
-			});
-		}
-
-		const conversation = await Conversation.findById(conversationId);
-
-		if (!conversation) {
-			return res
-				.status(404)
-				.json({ status: "fail", message: "Conversation not found" });
-		}
-
-		// ensure it is a group
-		if (conversation.type !== "group") {
-			return res.status(400).json({
-				status: "fail",
-				message: "Only group conversations can be updated",
-			});
-		}
-
-		// ✅ check if current user is one of the admins
-		const isAdmin = conversation.admins.some(
-			(admin) => String(admin._id || admin) === String(req.user._id),
-		);
-
-		if (!isAdmin) {
-			return res.status(403).json({
-				status: "fail",
-				message: "Only group admins can modify participants",
-			});
-		}
-
-		// remove duplicates
-		participants = [...new Set(participants)];
-
-		const updatedConversation = await Conversation.findByIdAndUpdate(
-			conversationId,
-			{ participants },
-			{ new: true },
-		)
-			.populate("participants", "username email avatar")
-			.populate("admins", "username avatar");
-
-		res.status(200).json({
-			status: "success",
-			data: {
-				conversation: updatedConversation,
-			},
-		});
-	} catch (error) {
-		console.error("Update participants error:", error);
-		res.status(500).json({
-			status: "fail",
-			message: error.message || "Something went wrong",
-		});
-	}
-};
-
 export const removeGroupParticipant = async (req, res) => {
 	try {
 		const { conversationId, userId } = req.params;
+		const currentUserId = req.user._id;
 
 		const conversation = await Conversation.findById(conversationId);
 
@@ -197,7 +132,7 @@ export const removeGroupParticipant = async (req, res) => {
 		}
 
 		const isAdmin = conversation.admins.some(
-			(admin) => String(admin._id || admin) === String(req.user._id),
+			(admin) => String(admin._id || admin) === String(currentUserId),
 		);
 
 		if (!isAdmin) {
@@ -241,6 +176,71 @@ export const removeGroupParticipant = async (req, res) => {
 	} catch (error) {
 		console.error("Remove participant error:", error);
 		return res.status(500).json({
+			status: "fail",
+			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const addGroupSingleParticipant = async (req, res) => {
+	try {
+		const { conversationId, userId } = req.params;
+		const currentUserId = req.user._id;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can add participants",
+			});
+		}
+
+		const isAdmin = conversation.admins.some(
+			(admin) => String(admin) === String(currentUserId),
+		);
+
+		if (!isAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only admins can add participants",
+			});
+		}
+
+		const alreadyParticipant = conversation.participants.some(
+			(p) => String(p) === String(userId),
+		);
+
+		if (alreadyParticipant) {
+			return res.status(400).json({
+				status: "fail",
+				message: "User already in the group",
+			});
+		}
+
+		conversation.participants.push(userId);
+
+		await conversation.save();
+
+		await conversation.populate([
+			{ path: "participants", select: "username email avatar" },
+			{ path: "admins", select: "username avatar" },
+		]);
+
+		res.status(200).json({
+			status: "success",
+			data: { conversation },
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({
 			status: "fail",
 			message: error.message || "Something went wrong",
 		});

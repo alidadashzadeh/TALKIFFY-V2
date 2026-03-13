@@ -18,7 +18,8 @@ function AddMemberButton({ contact }) {
 			if (participantIds.includes(contact._id)) return;
 			await addMemberToGroup({
 				conversationId: currentConversation._id,
-				participants: [...participantIds, contact._id],
+				// participants: [...participantIds, contact._id],
+				userId: contact._id,
 			});
 		} catch (error) {
 			console.error("Failed to add member:", error);

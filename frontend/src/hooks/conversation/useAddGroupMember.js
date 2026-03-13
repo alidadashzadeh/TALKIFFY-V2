@@ -8,10 +8,9 @@ function useAddGroupMember() {
 	const { selectConversation } = useConversationContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ conversationId, participants }) => {
+		mutationFn: async ({ conversationId, userId }) => {
 			const { data } = await axiosInstance.post(
-				`/conversations/${conversationId}/participants`,
-				{ participants },
+				`/conversations/${conversationId}/participants/${userId}`,
 			);
 			return data;
 		},
@@ -20,6 +19,7 @@ function useAddGroupMember() {
 				queryKey: ["conversations"],
 			});
 			toast.success("Member added successfully");
+
 			selectConversation(data.data.conversation);
 		},
 	});

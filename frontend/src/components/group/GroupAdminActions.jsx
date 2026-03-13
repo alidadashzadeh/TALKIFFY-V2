@@ -13,14 +13,27 @@ import {
 } from "lucide-react";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { getConversationDisplayData } from "@/lib/utils";
+import useRemoveGroupParticipant from "@/hooks/conversation/useRemoveGroupParticipant";
 
 function GroupAdminActions({ member }) {
 	const { currentConversation } = useConversationContext();
+	const { removeParticipant, loading } = useRemoveGroupParticipant();
 
 	const { isAdmin } = getConversationDisplayData(
 		currentConversation,
 		member?._id,
 	);
+
+	const handleRemoveMember = async () => {
+		try {
+			await removeParticipant({
+				conversationId: currentConversation?._id,
+				userId: member?._id,
+			});
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	return (
 		<Popover>
@@ -56,9 +69,11 @@ function GroupAdminActions({ member }) {
 					<Button
 						variant="ghost"
 						className="w-full justify-start text-destructive hover:text-destructive"
+						onClick={handleRemoveMember}
+						disabled={loading}
 					>
 						<UserMinus className="mr-2 h-4 w-4" />
-						Remove
+						{loading ? "Removing..." : "Remove"}
 					</Button>
 				</div>
 			</PopoverContent>

@@ -1,9 +1,11 @@
+import { useConversationContext } from "@/contexts/ConversationContext";
 import { axiosInstance } from "@/lib/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import toast from "react-hot-toast";
 
 function useRemoveGroupParticipant() {
 	const queryClient = useQueryClient();
+	const { selectConversation } = useConversationContext();
 
 	const mutation = useMutation({
 		mutationFn: async ({ conversationId, userId }) => {
@@ -14,8 +16,13 @@ function useRemoveGroupParticipant() {
 			return res.data;
 		},
 
-		onSuccess: () => {
-			queryClient.invalidateQueries(["conversations"]);
+		onSuccess: (data) => {
+			queryClient.invalidateQueries({
+				queryKey: ["conversations"],
+			});
+			toast.success("Member added successfully");
+			// console.log(data);
+			selectConversation(data.data.conversation);
 		},
 	});
 
