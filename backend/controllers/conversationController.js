@@ -1,5 +1,7 @@
+import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { buildPrivateConversationKey } from "../lib/utils.js";
 import Conversation from "../models/conversationModel.js";
+import sharp from "sharp";
 
 export const getOrCreatePrivateConversation = async (req, res, next) => {
 	try {
@@ -488,6 +490,78 @@ export const leaveGroup = async (req, res) => {
 		res.status(500).json({
 			status: "error",
 			message: "Failed to leave group",
+		});
+	}
+};
+export const updateGroupAvatar = async (req, res) => {
+	try {
+		const { conversationId } = req.params;
+		const currentUserId = req.user._id;
+		const file = req.file;
+
+		if (!file) {
+			return res.status(400).json({
+				status: "fail",
+				message: "Avatar image is required",
+			});
+		}
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can update avatar",
+			});
+		}
+
+		const isAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(currentUserId),
+		);
+
+		if (!isAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only group admins can update avatar",
+			});
+		}
+
+		const optimizedBuffer = await sharp(req.file.buffer)
+			.resize(500, 500, { fit: "cover" })
+			.webp({ quality: 60 })
+			.toBuffer();
+
+		const uploaded = await uploadBufferToCloudinary(
+			optimizedBuffer,
+			"talkiffy/groups",
+		);
+
+		conversation.avatar = uploaded.secure_url;
+
+		await conversation.save();
+
+		const updatedConversation = await Conversation.findById(conversationId)
+			.populate("participants", "username email avatar")
+			.populate("admins", "username email avatar");
+
+		return res.status(200).json({
+			status: "success",
+			data: {
+				conversation: updatedConversation,
+			},
+		});
+	} catch (error) {
+		console.error("updateGroupAvatar error:", error);
+		return res.status(500).json({
+			status: "error",
+			message: "Failed to update group avatar",
 		});
 	}
 };

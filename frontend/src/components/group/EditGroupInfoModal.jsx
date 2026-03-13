@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
@@ -14,21 +13,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import AvatarGenerator from "@/components/AvatarGenerator";
 import { Camera } from "lucide-react";
 import { P } from "../ui/typography";
-import { getConversationDisplayData } from "@/lib/utils";
+import useUpdateGroupAvatar from "@/hooks/group/useUpdateGroupAvatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 function EditGroupInfoModal() {
 	const { currentConversation } = useConversationContext();
 	const { editGroupModalOpen, setEditGroupModalOpen } = useSheetModalContext();
-	const { name, avatar } = getConversationDisplayData(currentConversation);
-	const loading = false;
+	const { updateGroupAvatar, loading } = useUpdateGroupAvatar();
+
+	const handleImageUpload = async (e) => {
+		const file = e.target.files?.[0];
+		await updateGroupAvatar({
+			conversationId: currentConversation._id,
+			file,
+		});
+		e.target.value = "";
+	};
 
 	const {
 		register,
 		handleSubmit,
-		reset,
 		formState: { errors },
 	} = useForm({
 		defaultValues: {
@@ -37,16 +43,7 @@ function EditGroupInfoModal() {
 		},
 	});
 
-	useEffect(() => {
-		if (editGroupModalOpen) {
-			reset({
-				name: currentConversation?.name || "",
-				avatar: currentConversation?.avatar || "",
-			});
-		}
-	}, [editGroupModalOpen, currentConversation, reset]);
-
-	const onSubmit = async (data) => {
+	const onSubmit = (data) => {
 		console.log(data);
 	};
 
@@ -65,15 +62,18 @@ function EditGroupInfoModal() {
 				<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 					<div className="relative flex flex-col gap-4 items-center justify-center py-4 ">
 						<div>
-							<AvatarGenerator avatar={avatar} name={name} size="w-24 h-24" />
-
-							<div className=" relative">
+							<Avatar className="w-24 h-24 object-cover">
+								<AvatarImage src={currentConversation?.avatar} alt={name} />
+								<AvatarFallback className="flex items-center justify-center">
+									{currentConversation?.name}
+								</AvatarFallback>
+							</Avatar>
+							<div className="relative">
 								<Button
 									type="button"
 									size="icon"
 									variant="secondary"
 									className="absolute bottom-0 -right-4 rounded-full"
-									disabled={false}
 									asChild
 								>
 									<label className="cursor-pointer">
@@ -82,19 +82,20 @@ function EditGroupInfoModal() {
 											type="file"
 											hidden
 											accept="image/*"
-											// onChange={handleImageUpload}
+											onChange={handleImageUpload}
 										/>
 									</label>
 								</Button>
 							</div>
 						</div>
-						<P>{name}</P>
+						<P>{currentConversation?.name}</P>
 					</div>
 
 					<div className="space-y-2">
 						<Label htmlFor="name">Group Name</Label>
 						<Input
 							id="name"
+							defaultValues={currentConversation?.name}
 							placeholder="Enter group name"
 							{...register("name", {
 								required: "Group name is required",

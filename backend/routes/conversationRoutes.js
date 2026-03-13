@@ -8,8 +8,10 @@ import {
 	leaveGroup,
 	removeGroupAdmin,
 	removeGroupParticipant,
+	updateGroupAvatar,
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
+import upload from "../lib/middleware/upload.js";
 
 const router = express.Router();
 
@@ -31,5 +33,12 @@ router.delete(
 router.post("/:conversationId/admins/:userId", protect, addGroupAdmin);
 router.delete("/:conversationId/admins/:userId", protect, removeGroupAdmin);
 router.delete("/:conversationId/leave", protect, leaveGroup);
+
+router.patch(
+	"/:conversationId/avatar",
+	protect,
+	upload.single("avatar"),
+	updateGroupAvatar,
+);
 
 export default router;
