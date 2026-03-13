@@ -9,6 +9,8 @@ function useUpdateUserAvatar() {
 
 	const { mutateAsync: updateUserAvatar, isPending: loading } = useMutation({
 		mutationFn: async ({ userId, file }) => {
+			if (!file || !userId) return;
+
 			const formData = new FormData();
 			formData.append("avatar", file);
 
