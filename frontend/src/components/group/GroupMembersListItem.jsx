@@ -1,13 +1,13 @@
 import AvatarGenerator from "../AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { getConversationDisplayData } from "@/lib/utils";
-import { useAuthContext } from "@/contexts/AuthContext";
 import GroupAdminActions from "./GroupAdminActions";
 import GroupMemberActions from "./GroupMemberActions";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function GroupMembersListItem({ member }) {
 	const { currentConversation } = useConversationContext();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	const { isAdmin } = getConversationDisplayData(
 		currentConversation,

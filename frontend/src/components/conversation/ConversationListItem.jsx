@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
 
-import { useAuthContext } from "@/contexts/AuthContext";
 import { cn, getConversationDisplayData } from "@/lib/utils";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
 import { Muted, P } from "../ui/typography";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ConversationListItem({ conversation, isActive = false }) {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { selectConversation } = useConversationContext();
 
 	const handleSelectConversation = () => {

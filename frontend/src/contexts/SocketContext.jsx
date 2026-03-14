@@ -2,9 +2,8 @@
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { useAuthContext } from "./AuthContext";
-
 import { io } from "socket.io-client";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 export const SocketContext = createContext();
 
@@ -16,14 +15,14 @@ export const SocketContextProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
 	const [onlineUsers, setOnlineUsers] = useState([]);
 
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	useEffect(() => {
 		if (currentUser) {
 			const socket = io(
 				import.meta.env.MODE === "development"
 					? "http://localhost:5001"
-					: "https://talkiffy.onrender.com"
+					: "https://talkiffy.onrender.com",
 			);
 			setSocket(socket);
 

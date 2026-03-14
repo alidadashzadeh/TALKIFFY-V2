@@ -1,18 +1,13 @@
-import { useState } from "react";
-
-import { handleErrorToast } from "../lib/errorHandler.js";
-import { useAuthContext } from "./../contexts/AuthContext";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios.js";
+import { handleErrorToast } from "../lib/errorHandler.js";
 import { toast } from "sonner";
 
 function useSignup() {
-	const [loading, setLoading] = useState(false);
-	const { setCurrentUser } = useAuthContext();
+	const queryClient = useQueryClient();
 
-	const signup = async ({ email, username, password, passwordConfirm }) => {
-		setLoading(true);
-		try {
+	const { mutateAsync: signup, isPending: loading } = useMutation({
+		mutationFn: async ({ email, username, password, passwordConfirm }) => {
 			const { data } = await axiosInstance.post("/users/signup", {
 				email,
 				username,
@@ -20,18 +15,22 @@ function useSignup() {
 				passwordConfirm,
 			});
 
-			if (data.status === "success") {
-				toast.success("user created successfully.");
-				setCurrentUser(data?.data.user);
-			}
-		} catch (error) {
-			handleErrorToast(error);
-		} finally {
-			setLoading(false);
-		}
-	};
+			return data;
+		},
 
-	return { loading, signup };
+		onSuccess: (data) => {
+			if (data.status === "success") {
+				queryClient.setQueryData(["currentUser"], data?.data?.user);
+				toast.success("User created successfully.");
+			}
+		},
+
+		onError: (error) => {
+			handleErrorToast(error);
+		},
+	});
+
+	return { signup, loading };
 }
 
 export default useSignup;

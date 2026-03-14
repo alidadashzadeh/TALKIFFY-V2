@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { Check, CheckCheck } from "lucide-react";
 
-import { useAuthContext } from "@/contexts/AuthContext";
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function MessageItem({ message, isGroup }) {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 	const isGroupConversation = currentConversation?.type === "group";
 

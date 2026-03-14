@@ -1,11 +1,11 @@
-import { useAuthContext } from "./../contexts/AuthContext.jsx";
 import { axiosInstance } from "../lib/axios.js";
 import { useState } from "react";
 import { toast } from "sonner";
+import useCurrentUser from "./user/useCurrentUser .js";
 
 function useUploadImage() {
 	const [loading, setLoading] = useState(false);
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const handleImageUpload = async (e) => {
 		const file = e.target.files[0];
 		if (!file) return;

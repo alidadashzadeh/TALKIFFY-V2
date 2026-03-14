@@ -10,13 +10,13 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useAuthContext } from "@/contexts/AuthContext";
 import ProfileAvatar from "./ProfileAvatar";
 import ProfileInfoField from "./ProfileInfoField";
 import ProfileAccountInfo from "./ProfileAccountInfo";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ProfileModal() {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	return (
 		<Dialog>

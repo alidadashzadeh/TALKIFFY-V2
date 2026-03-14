@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { useAuthContext } from "@/contexts/AuthContext";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { useSocketContext } from "@/contexts/SocketContext";
 
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
+import useCurrentUser from "../user/useCurrentUser ";
 
 function useSendMessage() {
 	const queryClient = useQueryClient();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { currentConversationId } = useConversationContext();
 	const { socket } = useSocketContext();
 

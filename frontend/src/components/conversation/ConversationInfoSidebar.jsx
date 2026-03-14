@@ -1,16 +1,16 @@
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
-import { useAuthContext } from "@/contexts/AuthContext";
 import { getConversationDisplayData } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { H4, Muted } from "../ui/typography";
 import GroupInfoActions from "../group/GroupInfoActions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import GroupMembersList from "../group/GroupMembersList";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ConversationInfoSidebar() {
 	const { currentConversation } = useConversationContext();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	const { name, avatar, isGroup, isAdmin } = getConversationDisplayData(
 		currentConversation,

@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 
 import { useMessagesContext } from "../contexts/MessagesContext";
-import { useAuthContext } from "../contexts/AuthContext";
 
 import { handleErrorToast } from "../lib/errorHandler";
 import { axiosInstance } from "../lib/axios";
+import useCurrentUser from "./user/useCurrentUser ";
 
 function useGetUnseenMessagesOnLogin() {
 	const { setUnseenMessages } = useMessagesContext();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	useEffect(() => {
 		if (!currentUser) return;

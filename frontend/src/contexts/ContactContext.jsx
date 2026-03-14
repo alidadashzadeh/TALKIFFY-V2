@@ -2,8 +2,8 @@
 /* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useState } from "react";
 import { useConversationContext } from "./ConversationContext";
-import { useAuthContext } from "./AuthContext";
 import { getOtherUser } from "@/lib/utils";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 const ContactContext = createContext();
 
@@ -17,7 +17,7 @@ export const ContactContextProvider = ({ children }) => {
 	const [currentContact, setCurrentContact] = useState(null);
 	const [filteredBy, setFilteredBy] = useState("");
 
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 
 	useEffect(() => {

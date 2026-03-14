@@ -1,32 +1,36 @@
-import { useState } from "react";
-
-import { handleErrorToast } from "../lib/errorHandler";
-import { useAuthContext } from "../contexts/AuthContext";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
+import { handleErrorToast } from "../lib/errorHandler";
 import { toast } from "sonner";
+import { useSheetModalContext } from "@/contexts/SheetModalProvider";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useLogout() {
-	const [loading, setLoading] = useState(false);
-	const { setCurrentUser } = useAuthContext();
-
-	const logout = async () => {
-		setLoading(true);
-
-		try {
+	const queryClient = useQueryClient();
+	const { setAccountSheetOpen } = useSheetModalContext();
+	const { selectConversation } = useConversationContext();
+	const { mutateAsync: logout, isPending: loading } = useMutation({
+		mutationFn: async () => {
 			const { data } = await axiosInstance.get("/users/logout");
-			if (data.status === "success") {
-				toast.success("Logged out successfully.");
-				setCurrentUser(null);
-			}
-		} catch (error) {
-			handleErrorToast(error.message);
-		} finally {
-			setLoading(false);
-		}
-	};
+			return data;
+		},
 
-	return { loading, logout };
+		onSuccess: (data) => {
+			if (data.status === "success") {
+				queryClient.setQueryData(["conversations"], []);
+				queryClient.setQueryData(["currentUser"], null);
+				setAccountSheetOpen(false);
+				selectConversation(null);
+				toast.success("Logged out successfully.");
+			}
+		},
+
+		onError: (error) => {
+			handleErrorToast(error);
+		},
+	});
+
+	return { logout, loading };
 }
 
 export default useLogout;

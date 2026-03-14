@@ -2,14 +2,14 @@ import { getConversationDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 import GroupChatHeaderActions from "./GroupChatHeaderActions";
 import PrivateChatHeaderActions from "./PrivateChatHeaderActions";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ChatHeader() {
 	const { currentConversation } = useConversationContext();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 
 	const displayData = getConversationDisplayData(
 		currentConversation,

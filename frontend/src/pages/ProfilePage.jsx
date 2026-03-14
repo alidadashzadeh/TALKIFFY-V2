@@ -3,11 +3,11 @@ import { ArrowLeft, Camera, Mail, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-import { useAuthContext } from "../contexts/AuthContext";
 import useUploadImage from "../hooks/useUploadImage";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ProfilePage() {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { loading, handleImageUpload } = useUploadImage();
 	const navigate = useNavigate();
 

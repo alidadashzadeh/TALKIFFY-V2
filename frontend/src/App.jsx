@@ -1,15 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
-
-import { useAuthContext } from "./contexts/AuthContext.jsx";
 
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
-import useCheckCurrentUser from "./hooks/useCheckingCurrentUser.js";
 import SettingsPage from "./pages/SettingsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import MessageLoading from "./components/chat/ChatLoading.jsx";
+import useCurrentUser from "./hooks/user/useCurrentUser .js";
 
 // import useListenContacts from "./hooks/useListenContacts.js";
 // import useListenMessages from "./hooks/useListenSingleMessages.js";
@@ -21,8 +18,7 @@ import MessageLoading from "./components/chat/ChatLoading.jsx";
 // import useGetUnseenMessagesOnLogin from "./hooks/useGetUnseenMessagesOnLogin.js";
 
 function App() {
-	const { loading, checkAuth } = useCheckCurrentUser();
-	const { currentUser } = useAuthContext();
+	const { data: currentUser, isLoading } = useCurrentUser();
 
 	// useListenContacts();
 	// useListenMessages();
@@ -33,18 +29,16 @@ function App() {
 	// useSeenMessagesOnClick();
 	// useGetUnseenMessagesOnLogin();
 
-	useEffect(() => {
-		checkAuth();
-	}, [checkAuth]);
-
-	if (loading && !currentUser) return <MessageLoading />;
+	if (isLoading && !currentUser) return <MessageLoading />;
 
 	return (
 		<div className="min-h-dvh">
 			<Routes>
 				<Route
 					path="/"
-					element={currentUser ? <HomePage /> : <Navigate to="/login" />}
+					element={
+						currentUser && !isLoading ? <HomePage /> : <Navigate to="/login" />
+					}
 				/>
 				<Route
 					path="/signup"

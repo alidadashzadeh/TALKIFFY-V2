@@ -1,9 +1,10 @@
-import { useAuthContext } from "@/contexts/AuthContext";
 import { SheetHeader, SheetTitle } from "../ui/sheet";
 import AvatarGenerator from "../AvatarGenerator";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function AccountSheetHeader() {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
+
 	const shortName =
 		currentUser?.username.length < 16
 			? currentUser?.username

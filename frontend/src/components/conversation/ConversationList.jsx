@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
 
 import { useConversationContext } from "@/contexts/ConversationContext";
-import { useAuthContext } from "@/contexts/AuthContext";
 
 import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 
 import ConversationListItem from "./ConversationListItem";
 import ConversationLoader from "./ConversationLoader";
 import { filterConversations } from "@/lib/utils/conversation";
+import useCurrentUser from "@/hooks/user/useCurrentUser ";
 
 function ConversationList() {
-	const { currentUser } = useAuthContext();
+	const { data: currentUser } = useCurrentUser();
 	const { currentConversationId, filteredConversationsBy } =
 		useConversationContext();
 

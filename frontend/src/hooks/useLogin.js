@@ -1,34 +1,32 @@
-import { useState } from "react";
-
-import { handleErrorToast } from "../lib/errorHandler";
-import { useAuthContext } from "./../contexts/AuthContext.jsx";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios.js";
+import { handleErrorToast } from "../lib/errorHandler";
 import { toast } from "sonner";
 
 function useLogin() {
-	const [loading, setLoading] = useState(false);
-	const { setCurrentUser } = useAuthContext();
+	const queryClient = useQueryClient();
 
-	const login = async ({ email, password }) => {
-		setLoading(true);
-
-		try {
+	const { mutateAsync: login, isPending: loading } = useMutation({
+		mutationFn: async ({ email, password }) => {
 			const { data } = await axiosInstance.post("/users/login", {
 				email,
 				password,
 			});
 
+			return data;
+		},
+
+		onSuccess: (data) => {
 			if (data.status === "success") {
+				queryClient.setQueryData(["currentUser"], data?.data?.user);
 				toast.success("Logged in successfully.");
-				setCurrentUser(data?.data.user);
 			}
-		} catch (error) {
+		},
+
+		onError: (error) => {
 			handleErrorToast(error);
-		} finally {
-			setLoading(false);
-		}
-	};
+		},
+	});
 
 	return { loading, login };
 }
