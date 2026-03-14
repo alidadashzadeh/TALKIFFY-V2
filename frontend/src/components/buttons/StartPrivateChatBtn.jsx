@@ -7,7 +7,7 @@ import useGetOrCreatePrivateConversation from "@/hooks/conversation/useGetOrCrea
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
-function StartConversationButton({ contact }) {
+function StartPrivateChatBtn({ contact }) {
 	const { selectConversation } = useConversationContext();
 	const { setAccountSheetOpen, setContactModalOpen } = useSheetModalContext();
 	const { getOrCreatePrivateConversation, loading } =
@@ -39,4 +39,4 @@ function StartConversationButton({ contact }) {
 	);
 }
 
-export default StartConversationButton;
+export default StartPrivateChatBtn;

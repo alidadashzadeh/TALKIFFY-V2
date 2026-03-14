@@ -12,6 +12,7 @@ function useAddNewContact() {
 
 	const { mutateAsync: addNewContact, isPending: loading } = useMutation({
 		mutationFn: async ({ email }) => {
+			if (!email.trim()) return;
 			const { data } = await axiosInstance.post("/users/contacts", { email });
 			return data?.data;
 		},

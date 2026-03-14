@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -7,23 +7,9 @@ import useAddNewContact from "@/hooks/contacts/useAddNewContact";
 
 function AddContactForm({ onSuccess }) {
 	const [email, setEmail] = useState("");
-
-	const { loading, addNewContact, isContactAdded, setIsContactAdded } =
-		useAddNewContact();
-
-	useEffect(() => {
-		if (isContactAdded) {
-			setEmail("");
-			onSuccess?.();
-			setIsContactAdded(false);
-		}
-	}, [isContactAdded, onSuccess, setIsContactAdded]);
-
+	const { loading, addNewContact } = useAddNewContact();
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
-		if (!email.trim()) return;
-
 		await addNewContact({ email });
 	};
 

@@ -1,13 +1,24 @@
-import { MessageSquare } from "lucide-react";
-import { Button } from "../ui/button";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import MessageMemberBtn from "../buttons/MessageMemberBtn";
+import MoreHorizontalBtn from "../buttons/MoreHorizontalBtn";
 
-function GroupMemberActions() {
+function GroupMemberActions({ member }) {
 	return (
-		<div>
-			<Button variant="ghost" className="h-8 w-8 shrink-0 rounded-full">
-				<MessageSquare className="h-4 w-4" />
-			</Button>
-		</div>
+		<Popover>
+			<PopoverTrigger asChild>
+				<MoreHorizontalBtn />
+			</PopoverTrigger>
+
+			<PopoverContent align="end" className="w-48 p-2">
+				<div className="space-y-1">
+					<MessageMemberBtn member={member} />
+				</div>
+			</PopoverContent>
+		</Popover>
 	);
 }
 

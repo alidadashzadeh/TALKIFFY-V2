@@ -13,7 +13,7 @@ import { useContactContext } from "@/contexts/ContactContext";
 import AddContactModal from "./AddContactModal";
 import ContactsList from "./ContactsList";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
-import StartConversationButton from "../conversation/StartConversationButton";
+import StartPrivateChatBtn from "../buttons/StartPrivateChatBtn";
 
 function ContactsModal() {
 	const { contactModalOpen, setContactModalOpen } = useSheetModalContext();
@@ -52,7 +52,7 @@ function ContactsModal() {
 					</div>
 
 					<div className="h-[350px] overflow-hidden rounded-xl ">
-						<ContactsList ActionComponent={StartConversationButton} />
+						<ContactsList ActionComponent={StartPrivateChatBtn} />
 					</div>
 				</div>
 			</DialogContent>

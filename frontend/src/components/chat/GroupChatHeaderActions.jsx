@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-	MoreVertical,
-	Search,
-	Pencil,
-	Shield,
-	LogOut,
-	X,
-	Volume2Icon,
-} from "lucide-react";
+import { MoreVertical, Search, X, Volume2Icon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,19 +10,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AddMemberModal from "../conversation/AddMemberModal";
+import AddMemberModal from "../group/AddMemberModal";
 import SidePanelAction from "../ui/SidePanelAction";
-import useLeaveGroup from "@/hooks/group/useLeaveGroup";
-import { useConversationContext } from "@/contexts/ConversationContext";
+
+import LeaveGroupBtn from "../buttons/LeaveGroupBtn";
 function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
-	const { leaveGroup } = useLeaveGroup();
-	const { currentConversation } = useConversationContext();
-	const handleLeaveGroup = async () => {
-		if (!currentConversation?._id) return;
-		await leaveGroup(currentConversation._id);
-	};
 
 	const handleCloseSearch = () => {
 		setShowSearch(false);
@@ -88,13 +74,7 @@ function GroupChatHeaderActions() {
 
 					<DropdownMenuSeparator />
 
-					<DropdownMenuItem
-						onClick={handleLeaveGroup}
-						className="text-red-500 focus:text-red-500"
-					>
-						<LogOut className="mr-2 h-4 w-4" />
-						Leave Group
-					</DropdownMenuItem>
+					<LeaveGroupBtn />
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>

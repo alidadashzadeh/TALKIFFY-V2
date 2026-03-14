@@ -9,7 +9,9 @@ function useLeaveGroup() {
 	const queryClient = useQueryClient();
 	const { currentConversation, selectConversation } = useConversationContext();
 
-	const leaveGroup = async (conversationId) => {
+	const leaveGroup = async () => {
+		const conversationId = currentConversation?._id;
+		if (!currentConversation?._id) return;
 		try {
 			setLoading(true);
 

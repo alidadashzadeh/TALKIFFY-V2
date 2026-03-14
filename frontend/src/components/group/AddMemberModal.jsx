@@ -10,7 +10,7 @@ import { Search } from "lucide-react";
 import { Input } from "../ui/input";
 import ContactsList from "../contacts/ContactsList";
 import { useContactContext } from "@/contexts/ContactContext";
-import AddMemberButton from "./AddMemberButton";
+import AddMemberBtn from "../buttons/AddMemberBtn";
 
 function AddMemberModal() {
 	const { addMemberModalOpen, setAddMemberModalOpen } = useSheetModalContext();
@@ -40,7 +40,7 @@ function AddMemberModal() {
 					</div>
 
 					<div className="h-[350px] overflow-hidden rounded-xl ">
-						<ContactsList ActionComponent={AddMemberButton} />
+						<ContactsList ActionComponent={AddMemberBtn} />
 					</div>
 				</div>
 			</DialogContent>
