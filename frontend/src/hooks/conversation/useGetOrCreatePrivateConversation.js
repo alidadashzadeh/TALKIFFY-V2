@@ -24,7 +24,6 @@ function useGetOrCreatePrivateConversation() {
 				selectConversation(conversation);
 			}
 
-			// refresh conversations cache
 			queryClient.invalidateQueries({
 				queryKey: ["conversations"],
 			});

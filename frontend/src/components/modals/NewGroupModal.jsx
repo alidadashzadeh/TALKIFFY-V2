@@ -1,4 +1,5 @@
 import { Users } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,21 +14,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 import useCreateGroupConversation from "@/hooks/conversation/useCreateGroupConversation";
 
 function NewGroupModal() {
-	const {
-		open,
-		name,
-		error,
-		loading,
-		setName,
-		handleOpenChange,
-		handleCreateGroup,
-	} = useCreateGroupConversation();
+	const { loading, createGroupConversation } = useCreateGroupConversation();
+	const [name, setName] = useState("");
+
+	const handleCreateGroup = async (e) => {
+		e.preventDefault();
+		await createGroupConversation({ name: name.trim() });
+		setName("");
+	};
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
+		<Dialog>
 			<DialogTrigger asChild>
 				<Button variant="ghost" className="w-full justify-start">
 					<Users className="h-4 w-4" />
@@ -55,8 +56,6 @@ function NewGroupModal() {
 								autoFocus
 							/>
 						</div>
-
-						{error ? <p className="text-sm text-red-500">{error}</p> : null}
 					</div>
 
 					<DialogFooter>

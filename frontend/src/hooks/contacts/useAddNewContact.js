@@ -3,12 +3,10 @@ import { useSocketContext } from "@/contexts/SocketContext";
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
 import { toast } from "sonner";
-import { useState } from "react";
 
 function useAddNewContact() {
 	const queryClient = useQueryClient();
 	const { onlineUsers, socket } = useSocketContext();
-	const [isContactAdded, setIsContactAdded] = useState(false);
 
 	const { mutateAsync: addNewContact, isPending: loading } = useMutation({
 		mutationFn: async ({ email }) => {
@@ -25,7 +23,6 @@ function useAddNewContact() {
 			}
 
 			toast.success("Contact added successfully");
-			setIsContactAdded(true);
 		},
 
 		onError: (error) => {
@@ -33,7 +30,7 @@ function useAddNewContact() {
 		},
 	});
 
-	return { loading, addNewContact, isContactAdded, setIsContactAdded };
+	return { loading, addNewContact };
 }
 
 export default useAddNewContact;

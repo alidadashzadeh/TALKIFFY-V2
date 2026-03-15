@@ -5,12 +5,13 @@ import { toast } from "sonner";
 
 function useRemoveGroupAdmin() {
 	const queryClient = useQueryClient();
-	const { selectConversation } = useConversationContext();
+	const { selectConversation, currentConversationId } =
+		useConversationContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ conversationId, userId }) => {
+		mutationFn: async ({ userId }) => {
 			const res = await axiosInstance.delete(
-				`/conversations/${conversationId}/admins/${userId}`,
+				`/conversations/${currentConversationId}/admins/${userId}`,
 			);
 
 			return res.data;

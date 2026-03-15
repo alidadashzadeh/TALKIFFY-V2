@@ -5,12 +5,13 @@ import { toast } from "sonner";
 
 function useAddGroupAdmin() {
 	const queryClient = useQueryClient();
-	const { selectConversation } = useConversationContext();
+	const { selectConversation, currentConversationId } =
+		useConversationContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ conversationId, userId }) => {
+		mutationFn: async ({ userId }) => {
 			const res = await axiosInstance.post(
-				`/conversations/${conversationId}/admins/${userId}`,
+				`/conversations/${currentConversationId}/admins/${userId}`,
 			);
 
 			return res.data;

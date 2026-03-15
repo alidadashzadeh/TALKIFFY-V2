@@ -16,7 +16,6 @@ function ManageAdminBtn({ member }) {
 	const handleMakeAdmin = async () => {
 		try {
 			await addAdmin({
-				conversationId: currentConversation?._id,
 				userId: member?._id,
 			});
 		} catch (error) {
@@ -27,7 +26,6 @@ function ManageAdminBtn({ member }) {
 	const handleRemoveAdmin = async () => {
 		try {
 			await removeAdmin({
-				conversationId: currentConversation?._id,
 				userId: member?._id,
 			});
 		} catch (error) {

@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useAddNewContact from "@/hooks/contacts/useAddNewContact";
 
-function AddContactForm({ onSuccess }) {
+function AddContactForm() {
 	const [email, setEmail] = useState("");
 	const { loading, addNewContact } = useAddNewContact();
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		await addNewContact({ email });
