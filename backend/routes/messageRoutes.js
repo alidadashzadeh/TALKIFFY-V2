@@ -13,6 +13,8 @@ import {
 	getConversationMessages,
 } from "../controllers/messageController.js";
 import { protect } from "../controllers/authController.js";
+import upload from "../lib/middleware/upload.js";
+import { optimizeMessageImage } from "../lib/middleware/optimizeMessageImage.js";
 
 const router = express.Router();
 router.route("/update-delivered").patch(protect, updateDeliverMessages);
@@ -30,6 +32,6 @@ router
 router
 	.route("/conversation/:conversationId")
 	.get(protect, getConversationMessages)
-	.post(protect, sendMessage);
+	.post(protect, upload.single("file"), optimizeMessageImage, sendMessage);
 
 export default router;

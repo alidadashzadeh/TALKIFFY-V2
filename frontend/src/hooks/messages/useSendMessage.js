@@ -14,16 +14,26 @@ function useSendMessage() {
 	const { socket } = useSocketContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ message: messageContent }) => {
+		mutationFn: async ({ text, file }) => {
+			const formData = new FormData();
+
+			if (text?.trim()) {
+				formData.append("content", text.trim());
+			}
+
+			if (file) {
+				formData.append("file", file);
+			}
+
 			const { data } = await axiosInstance.post(
 				`/messages/conversation/${currentConversationId}`,
-				{ content: messageContent },
+				formData,
 			);
 
 			return data?.data?.newMessage;
 		},
 
-		onMutate: async ({ message: messageContent }) => {
+		onMutate: async ({ text, file }) => {
 			if (!currentConversationId) return {};
 
 			const queryKey = ["messages", currentConversationId];
@@ -32,16 +42,46 @@ function useSendMessage() {
 
 			const previousMessages = queryClient.getQueryData(queryKey) || [];
 
+			const attachmentType = file?.type?.startsWith("image/")
+				? "image"
+				: file?.type?.startsWith("video/")
+					? "video"
+					: file?.type?.startsWith("audio/")
+						? "audio"
+						: file
+							? "file"
+							: null;
+
 			const optimisticMessage = {
 				_id: `temp-${Date.now()}`,
-				content: messageContent,
 				conversationId: currentConversationId,
 				senderId: {
 					_id: currentUser?._id,
 					username: currentUser?.username,
 					avatar: currentUser?.avatar,
 				},
+				type: attachmentType || "text",
+				content: text?.trim() || "",
+				attachments: file
+					? [
+							{
+								type: attachmentType,
+								url: URL.createObjectURL(file),
+								publicId: "",
+								fileName: file.name,
+								mimeType: file.type,
+								size: file.size,
+							},
+						]
+					: [],
+				replyTo: null,
+				reactions: [],
+				readBy: [],
+				deliveredTo: [],
+				isEdited: false,
+				isDeleted: false,
 				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 				optimistic: true,
 			};
 

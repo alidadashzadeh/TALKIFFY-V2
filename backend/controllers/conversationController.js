@@ -493,13 +493,13 @@ export const leaveGroup = async (req, res) => {
 		});
 	}
 };
+
 export const updateGroupAvatar = async (req, res) => {
 	try {
 		const { conversationId } = req.params;
 		const currentUserId = req.user._id;
-		const file = req.file;
 
-		if (!file) {
+		if (!req.file) {
 			return res.status(400).json({
 				status: "fail",
 				message: "Avatar image is required",
@@ -533,13 +533,8 @@ export const updateGroupAvatar = async (req, res) => {
 			});
 		}
 
-		const optimizedBuffer = await sharp(req.file.buffer)
-			.resize(500, 500, { fit: "cover" })
-			.webp({ quality: 60 })
-			.toBuffer();
-
 		const uploaded = await uploadBufferToCloudinary(
-			optimizedBuffer,
+			req.file.buffer,
 			"talkiffy/groups",
 		);
 
@@ -551,7 +546,7 @@ export const updateGroupAvatar = async (req, res) => {
 			.populate("participants", "username email avatar")
 			.populate("admins", "username email avatar");
 
-		return res.status(200).json({
+		res.status(200).json({
 			status: "success",
 			data: {
 				conversation: updatedConversation,
@@ -559,7 +554,8 @@ export const updateGroupAvatar = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("updateGroupAvatar error:", error);
-		return res.status(500).json({
+
+		res.status(500).json({
 			status: "error",
 			message: "Failed to update group avatar",
 		});

@@ -12,6 +12,7 @@ import {
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
+import { optimizeGroupAvatar } from "../lib/middleware/OptimizeGroupAvatar.js";
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.patch(
 	"/:conversationId/avatar",
 	protect,
 	upload.single("avatar"),
+	optimizeGroupAvatar,
 	updateGroupAvatar,
 );
 

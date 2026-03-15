@@ -14,7 +14,7 @@ function ChatMessageBar() {
 		const trimmedMessage = text?.trim();
 		if (!trimmedMessage || loading) return;
 
-		await sendMessage({ message: trimmedMessage });
+		await sendMessage({ text, file });
 		clearMessageState();
 	};
 

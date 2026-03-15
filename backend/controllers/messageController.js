@@ -1,3 +1,4 @@
+import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/messageModel.js";
 import {
@@ -7,16 +8,56 @@ import {
 	getOne,
 	updateOne,
 } from "./handleFactory.js";
-
 export const sendMessage = async (req, res) => {
 	try {
 		const senderId = req.user.id;
 		const { conversationId } = req.params;
+		const content = req.body.content?.trim() || "";
+
+		if (!content && !req.file) {
+			return res.status(400).json({
+				status: "fail",
+				message: "Message content or attachment is required",
+			});
+		}
+
+		let type = "text";
+		let attachments = [];
+
+		if (req.file) {
+			const uploadedFile = await uploadBufferToCloudinary(
+				req.file.buffer,
+				"talkiffy/messages",
+			);
+
+			const attachmentType = req.file.mimetype.startsWith("image/")
+				? "image"
+				: req.file.mimetype.startsWith("video/")
+					? "video"
+					: req.file.mimetype.startsWith("audio/")
+						? "audio"
+						: "file";
+
+			type = attachmentType;
+
+			attachments = [
+				{
+					type: attachmentType,
+					url: uploadedFile.secure_url,
+					publicId: uploadedFile.public_id,
+					fileName: req.file.originalname,
+					mimeType: req.file.mimetype,
+					size: req.file.size,
+				},
+			];
+		}
 
 		const newMessage = await Message.create({
 			senderId,
 			conversationId,
-			content: req.body.content,
+			type,
+			content,
+			attachments,
 		});
 
 		const populatedMessage = await Message.findById(newMessage._id).populate(
@@ -24,7 +65,10 @@ export const sendMessage = async (req, res) => {
 			"username avatar",
 		);
 
-		res.status(201).json({ status: "success", data: { newMessage } });
+		res.status(201).json({
+			status: "success",
+			data: { newMessage: populatedMessage },
+		});
 	} catch (error) {
 		res.status(400).json({
 			status: "fail",
