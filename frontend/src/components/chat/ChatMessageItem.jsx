@@ -1,10 +1,53 @@
 /* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 import { Check, CheckCheck } from "lucide-react";
 
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useCurrentUser from "@/hooks/user/useCurrentUser ";
+
+function MessageAttachmentImage({ attachment }) {
+	const localUrl = attachment?.localUrl;
+	const remoteUrl = attachment?.url;
+
+	const [displayUrl, setDisplayUrl] = useState(localUrl || remoteUrl || "");
+
+	useEffect(() => {
+		if (!remoteUrl) {
+			setDisplayUrl(localUrl || "");
+			return;
+		}
+
+		if (!localUrl) {
+			setDisplayUrl(remoteUrl);
+			return;
+		}
+
+		setDisplayUrl(localUrl);
+
+		const img = new Image();
+		img.src = remoteUrl;
+
+		img.onload = () => {
+			setDisplayUrl(remoteUrl);
+		};
+
+		img.onerror = () => {
+			setDisplayUrl(localUrl);
+		};
+	}, [localUrl, remoteUrl]);
+
+	if (!displayUrl) return null;
+
+	return (
+		<img
+			src={displayUrl}
+			alt={attachment?.fileName || "attachment"}
+			className="max-h-40 w-auto max-w-[220px] rounded-xl object-cover"
+		/>
+	);
+}
 
 function MessageItem({ message, isGroup }) {
 	const { data: currentUser } = useCurrentUser();
@@ -17,7 +60,7 @@ function MessageItem({ message, isGroup }) {
 	);
 
 	const attachment = message?.attachments?.[0];
-	const hasImageAttachment = attachment?.type === "image" && attachment?.url;
+	const hasImageAttachment = attachment?.type === "image";
 
 	return (
 		<div
@@ -67,11 +110,7 @@ function MessageItem({ message, isGroup }) {
 						)}
 					>
 						{hasImageAttachment && (
-							<img
-								src={attachment.url}
-								alt={attachment.fileName || "attachment"}
-								className="max-h-40 w-auto max-w-[220px] rounded-xl object-cover"
-							/>
+							<MessageAttachmentImage attachment={attachment} />
 						)}
 
 						{message?.content && (

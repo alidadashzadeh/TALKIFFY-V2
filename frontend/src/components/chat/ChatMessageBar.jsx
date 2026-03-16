@@ -20,7 +20,7 @@ function ChatMessageBar() {
 
 	return (
 		<div className="mx-auto w-full max-w-4xl p-2">
-			{file && <FilePreview />}
+			{file && !loading && <FilePreview />}
 			<form
 				className="mx-auto flex w-full max-w-4xl items-start gap-2 p-2"
 				onSubmit={(e) => {

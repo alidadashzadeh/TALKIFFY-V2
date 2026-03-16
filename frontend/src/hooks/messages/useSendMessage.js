@@ -6,15 +6,17 @@ import { useSocketContext } from "@/contexts/SocketContext";
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
 import useCurrentUser from "../user/useCurrentUser ";
+import { useMessagesContext } from "@/contexts/MessagesContext";
 
 function useSendMessage() {
 	const queryClient = useQueryClient();
 	const { data: currentUser } = useCurrentUser();
 	const { currentConversationId } = useConversationContext();
 	const { socket } = useSocketContext();
+	const { clearMessageState } = useMessagesContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ text, file }) => {
+		mutationFn: async ({ text, file, clientTempId }) => {
 			const formData = new FormData();
 
 			if (text?.trim()) {
@@ -25,6 +27,8 @@ function useSendMessage() {
 				formData.append("file", file);
 			}
 
+			formData.append("clientTempId", clientTempId);
+
 			const { data } = await axiosInstance.post(
 				`/messages/conversation/${currentConversationId}`,
 				formData,
@@ -33,7 +37,7 @@ function useSendMessage() {
 			return data?.data?.newMessage;
 		},
 
-		onMutate: async ({ text, file }) => {
+		onMutate: async ({ text, file, clientTempId }) => {
 			if (!currentConversationId) return {};
 
 			const queryKey = ["messages", currentConversationId];
@@ -41,6 +45,7 @@ function useSendMessage() {
 			await queryClient.cancelQueries({ queryKey });
 
 			const previousMessages = queryClient.getQueryData(queryKey) || [];
+			const localUrl = file ? URL.createObjectURL(file) : null;
 
 			const attachmentType = file?.type?.startsWith("image/")
 				? "image"
@@ -53,7 +58,8 @@ function useSendMessage() {
 							: null;
 
 			const optimisticMessage = {
-				_id: `temp-${Date.now()}`,
+				_id: clientTempId,
+				clientTempId,
 				conversationId: currentConversationId,
 				senderId: {
 					_id: currentUser?._id,
@@ -66,11 +72,12 @@ function useSendMessage() {
 					? [
 							{
 								type: attachmentType,
-								url: URL.createObjectURL(file),
+								url: localUrl,
 								publicId: "",
 								fileName: file.name,
 								mimeType: file.type,
 								size: file.size,
+								localUrl,
 							},
 						]
 					: [],
@@ -90,22 +97,52 @@ function useSendMessage() {
 				optimisticMessage,
 			]);
 
-			return { previousMessages, optimisticMessage, queryKey };
+			clearMessageState();
+
+			return {
+				queryKey,
+				previousMessages,
+				clientTempId,
+				localUrl,
+			};
 		},
 
 		onSuccess: (newMessage, _variables, context) => {
-			if (!context?.queryKey) return;
+			if (!context?.queryKey || !context?.clientTempId) return;
 
 			queryClient.setQueryData(context.queryKey, (old = []) =>
-				old.map((message) =>
-					message._id === context.optimisticMessage._id ? newMessage : message,
-				),
-			);
+				old.map((message) => {
+					if (message.clientTempId !== context.clientTempId) return message;
 
-			// socket.emit("setMessage", newMessage);
+					const optimisticAttachment = message.attachments?.[0];
+					const serverAttachment = newMessage.attachments?.[0];
+
+					return {
+						...message,
+						...newMessage,
+						clientTempId: message.clientTempId,
+						createdAt: message.createdAt,
+						optimistic: false,
+						attachments: serverAttachment
+							? [
+									{
+										...serverAttachment,
+										localUrl:
+											optimisticAttachment?.localUrl ||
+											optimisticAttachment?.url,
+									},
+								]
+							: [],
+					};
+				}),
+			);
 		},
 
 		onError: (error, _variables, context) => {
+			if (context?.localUrl) {
+				URL.revokeObjectURL(context.localUrl);
+			}
+
 			if (context?.queryKey && context?.previousMessages) {
 				queryClient.setQueryData(context.queryKey, context.previousMessages);
 			}
@@ -113,8 +150,14 @@ function useSendMessage() {
 			handleErrorToast(error);
 		},
 
-		onSettled: (_data, _error, _variables, context) => {
+		onSettled: (_data, error, _variables, context) => {
 			if (!context?.queryKey) return;
+
+			if (!error && context?.localUrl) {
+				setTimeout(() => {
+					URL.revokeObjectURL(context.localUrl);
+				}, 30000);
+			}
 
 			queryClient.invalidateQueries({
 				queryKey: context.queryKey,
@@ -124,7 +167,18 @@ function useSendMessage() {
 
 	return {
 		loading: mutation.isPending,
-		sendMessage: mutation.mutateAsync,
+		sendMessage: ({ text, file }) => {
+			const clientTempId =
+				typeof crypto !== "undefined" && crypto.randomUUID
+					? crypto.randomUUID()
+					: `temp-${Date.now()}-${Math.random()}`;
+
+			return mutation.mutateAsync({
+				text,
+				file,
+				clientTempId,
+			});
+		},
 	};
 }
 

@@ -14,7 +14,7 @@ import {
 } from "../controllers/messageController.js";
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
-import { optimizeMessageImage } from "../lib/middleware/optimizeMessageImage.js";
+import { optimizeMessageImage } from "../lib/middleware/OptimizeImage.js";
 
 const router = express.Router();
 router.route("/update-delivered").patch(protect, updateDeliverMessages);

@@ -1,5 +1,35 @@
 import sharp from "sharp";
 
+export const optimizeUserAvatar = async (req, res, next) => {
+	try {
+		if (!req.file) return next();
+
+		req.file.buffer = await sharp(req.file.buffer)
+			.resize(300, 300, { fit: "cover" })
+			.webp({ quality: 80 })
+			.toBuffer();
+
+		next();
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const optimizeGroupAvatar = async (req, res, next) => {
+	try {
+		if (!req.file) return next();
+
+		req.file.buffer = await sharp(req.file.buffer)
+			.resize(500, 500, { fit: "cover" })
+			.webp({ quality: 60 })
+			.toBuffer();
+
+		next();
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const optimizeMessageImage = async (req, res, next) => {
 	try {
 		if (!req.file) return next();

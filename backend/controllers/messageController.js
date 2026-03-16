@@ -13,7 +13,7 @@ export const sendMessage = async (req, res) => {
 		const senderId = req.user.id;
 		const { conversationId } = req.params;
 		const content = req.body.content?.trim() || "";
-
+		const clientTempId = req.body.clientTempId || null;
 		if (!content && !req.file) {
 			return res.status(400).json({
 				status: "fail",
@@ -67,7 +67,12 @@ export const sendMessage = async (req, res) => {
 
 		res.status(201).json({
 			status: "success",
-			data: { newMessage: populatedMessage },
+			data: {
+				newMessage: {
+					...populatedMessage.toObject(),
+					clientTempId,
+				},
+			},
 		});
 	} catch (error) {
 		res.status(400).json({

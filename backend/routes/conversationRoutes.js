@@ -12,7 +12,7 @@ import {
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
-import { optimizeGroupAvatar } from "../lib/middleware/OptimizeGroupAvatar.js";
+import { optimizeGroupAvatar } from "../lib/middleware/OptimizeImage.js";
 
 const router = express.Router();
 
