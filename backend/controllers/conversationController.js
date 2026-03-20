@@ -54,7 +54,14 @@ export const getMyConversations = async (req, res, next) => {
 			participants: currentUserId,
 		})
 			.populate("participants", "username avatar email")
-			.populate("lastMessageId")
+			.populate({
+				path: "lastMessageId",
+				select: "content attachments senderId",
+				populate: {
+					path: "senderId",
+					select: "username",
+				},
+			})
 			.sort({ lastMessageAt: -1 });
 
 		res.status(200).json({

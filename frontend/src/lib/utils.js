@@ -27,6 +27,35 @@ export function formatSeparatorDate(dateString) {
 	});
 }
 
+export function formatMessageTime(date) {
+	if (!date) return "";
+
+	const d = new Date(date);
+	const now = new Date();
+
+	const isToday = d.toDateString() === now.toDateString();
+
+	const isYesterday =
+		new Date(now.setDate(now.getDate() - 1)).toDateString() ===
+		d.toDateString();
+
+	if (isToday) {
+		return d.toLocaleTimeString([], {
+			hour: "2-digit",
+			minute: "2-digit",
+		});
+	}
+
+	if (isYesterday) {
+		return "Yesterday";
+	}
+
+	return d.toLocaleDateString([], {
+		month: "short",
+		day: "numeric",
+	});
+}
+
 export function isSameCalendarDay(dateA, dateB) {
 	const a = new Date(dateA);
 	const b = new Date(dateB);
@@ -108,4 +137,9 @@ export function getMessageDisplayData(message, currentUser) {
 		username: isMe ? currentUser?.username : message?.senderId?.username,
 		avatar: isMe ? currentUser?.avatar : message?.senderId?.avatar,
 	};
+}
+
+export function truncateText(text, maxLength = 40) {
+	if (!text) return "";
+	return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
 }

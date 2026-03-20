@@ -1,5 +1,6 @@
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
+import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
 import {
 	createOne,
@@ -8,6 +9,7 @@ import {
 	getOne,
 	updateOne,
 } from "./handleFactory.js";
+
 export const sendMessage = async (req, res) => {
 	try {
 		const senderId = req.user.id;
@@ -58,6 +60,11 @@ export const sendMessage = async (req, res) => {
 			type,
 			content,
 			attachments,
+		});
+
+		await Conversation.findByIdAndUpdate(conversationId, {
+			lastMessageId: newMessage._id,
+			lastMessageAt: Date.now(),
 		});
 
 		const populatedMessage = await Message.findById(newMessage._id).populate(

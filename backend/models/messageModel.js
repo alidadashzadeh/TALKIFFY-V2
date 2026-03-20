@@ -8,11 +8,11 @@ const attachmentSchema = new mongoose.Schema(
 			required: true,
 		},
 		url: { type: String, required: true },
-		publicId: { type: String }, // cloudinary or storage id
+		publicId: { type: String },
 		fileName: { type: String },
 		mimeType: { type: String },
-		size: { type: Number }, // bytes
-		duration: { type: Number }, // useful for audio/video
+		size: { type: Number },
+		duration: { type: Number },
 		thumbnailUrl: { type: String },
 	},
 	{ _id: false },

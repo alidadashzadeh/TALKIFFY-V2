@@ -1,6 +1,11 @@
 /* eslint-disable react/prop-types */
 
-import { cn, getConversationDisplayData } from "@/lib/utils";
+import {
+	cn,
+	formatMessageTime,
+	getConversationDisplayData,
+	truncateText,
+} from "@/lib/utils";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
@@ -30,22 +35,32 @@ function ConversationListItem({ conversation, isActive = false }) {
 			)}
 		>
 			<AvatarGenerator avatar={displayData?.avatar} name={displayData?.name} />
+			<div className="flex-col w-full">
+				<div className="min-w-0 flex-1 flex justify-between items-center ">
+					<P className="truncate font-medium">
+						{truncateText(displayData?.name, 15)}
+					</P>
 
-			<div className="min-w-0 flex-1">
-				<P className="truncate font-medium">{displayData?.name}</P>
-				{displayData?.email && (
-					<Muted className="truncate font-medium">{displayData?.email}</Muted>
-				)}
-				{/* <p className="truncate text-sm text-muted-foreground">
-					{lastMessagePreview}
-				</p> */}
+					<Muted className="shrink-0 text-xs">
+						{formatMessageTime(conversation?.lastMessageAt)}
+					</Muted>
+				</div>
+				<div className=" flex gap-2 items-baseline">
+					{conversation?.type === "group" && (
+						<P className="text-blue-500 text-sm">
+							@
+							{truncateText(
+								conversation?.lastMessageId?.senderId?.username,
+								10,
+							)}{" "}
+							:
+						</P>
+					)}
+					<Muted className="truncate text-sm text-muted-foreground">
+						{truncateText(conversation?.lastMessageId?.content, 15)}
+					</Muted>
+				</div>
 			</div>
-			{/*
-			{formattedTime && (
-				<span className="shrink-0 text-xs text-muted-foreground">
-					{formattedTime}
-				</span>
-			)} */}
 		</button>
 	);
 }

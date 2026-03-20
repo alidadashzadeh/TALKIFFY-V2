@@ -136,6 +136,10 @@ function useSendMessage() {
 					};
 				}),
 			);
+
+			queryClient.invalidateQueries({
+				queryKey: ["conversations"],
+			});
 		},
 
 		onError: (error, _variables, context) => {
