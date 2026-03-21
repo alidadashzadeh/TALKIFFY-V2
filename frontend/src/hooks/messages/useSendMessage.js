@@ -1,8 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { useConversationContext } from "@/contexts/ConversationContext";
-import { useSocketContext } from "@/contexts/SocketContext";
-
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
 import useCurrentUser from "../user/useCurrentUser ";
@@ -12,15 +10,15 @@ function useSendMessage() {
 	const queryClient = useQueryClient();
 	const { data: currentUser } = useCurrentUser();
 	const { currentConversationId } = useConversationContext();
-	const { socket } = useSocketContext();
 	const { clearMessageState } = useMessagesContext();
 
 	const mutation = useMutation({
 		mutationFn: async ({ text, file, clientTempId }) => {
 			const formData = new FormData();
+			const trimmedText = text?.trim() || "";
 
-			if (text?.trim()) {
-				formData.append("content", text.trim());
+			if (trimmedText) {
+				formData.append("content", trimmedText);
 			}
 
 			if (file) {
@@ -46,16 +44,7 @@ function useSendMessage() {
 
 			const previousMessages = queryClient.getQueryData(queryKey) || [];
 			const localUrl = file ? URL.createObjectURL(file) : null;
-
-			const attachmentType = file?.type?.startsWith("image/")
-				? "image"
-				: file?.type?.startsWith("video/")
-					? "video"
-					: file?.type?.startsWith("audio/")
-						? "audio"
-						: file
-							? "file"
-							: null;
+			const trimmedText = text?.trim() || "";
 
 			const optimisticMessage = {
 				_id: clientTempId,
@@ -66,12 +55,12 @@ function useSendMessage() {
 					username: currentUser?.username,
 					avatar: currentUser?.avatar,
 				},
-				type: attachmentType || "text",
-				content: text?.trim() || "",
+				type: file ? "image" : "text",
+				content: trimmedText,
 				attachments: file
 					? [
 							{
-								type: attachmentType,
+								type: "image",
 								url: localUrl,
 								publicId: "",
 								fileName: file.name,

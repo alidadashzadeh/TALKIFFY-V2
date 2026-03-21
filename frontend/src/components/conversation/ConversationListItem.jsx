@@ -57,7 +57,7 @@ function ConversationListItem({ conversation, isActive = false }) {
 						</P>
 					)}
 					<Muted className="truncate text-sm text-muted-foreground">
-						{truncateText(conversation?.lastMessageId?.content, 15)}
+						{truncateText(conversation?.lastMessageId?.content, 10)}
 					</Muted>
 				</div>
 			</div>

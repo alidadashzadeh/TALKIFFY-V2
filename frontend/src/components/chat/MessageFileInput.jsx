@@ -14,9 +14,12 @@ function MessageFileInput() {
 				type="file"
 				className="hidden"
 				onChange={(e) => {
-					setFile(e.target.files?.[0]);
+					const selectedFile = e.target.files?.[0];
+					if (!selectedFile) return;
+
+					setFile(selectedFile);
 				}}
-				accept="image/*,video/*"
+				accept="image/*"
 			/>
 
 			<Button

@@ -7,15 +7,14 @@ import EmojiPopover from "./EmojiPopover";
 import SendMessageBtn from "../buttons/SendMessageBtn";
 
 function ChatMessageBar() {
-	const { text, file, clearMessageState } = useMessagesContext();
+	const { text, file } = useMessagesContext();
 	const { sendMessage, loading } = useSendMessage();
 
 	const onSubmit = async () => {
 		const trimmedMessage = text?.trim();
-		if (!trimmedMessage || loading) return;
+		if (!trimmedMessage && !file) return;
 
-		await sendMessage({ text, file });
-		clearMessageState();
+		await sendMessage({ text: trimmedMessage, file });
 	};
 
 	return (

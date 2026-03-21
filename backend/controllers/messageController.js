@@ -9,13 +9,13 @@ import {
 	getOne,
 	updateOne,
 } from "./handleFactory.js";
-
 export const sendMessage = async (req, res) => {
 	try {
 		const senderId = req.user.id;
 		const { conversationId } = req.params;
 		const content = req.body.content?.trim() || "";
 		const clientTempId = req.body.clientTempId || null;
+
 		if (!content && !req.file) {
 			return res.status(400).json({
 				status: "fail",
@@ -27,24 +27,23 @@ export const sendMessage = async (req, res) => {
 		let attachments = [];
 
 		if (req.file) {
+			if (!req.file.mimetype.startsWith("image/")) {
+				return res.status(400).json({
+					status: "fail",
+					message: "Only image uploads are allowed",
+				});
+			}
+
 			const uploadedFile = await uploadBufferToCloudinary(
 				req.file.buffer,
 				"talkiffy/messages",
 			);
 
-			const attachmentType = req.file.mimetype.startsWith("image/")
-				? "image"
-				: req.file.mimetype.startsWith("video/")
-					? "video"
-					: req.file.mimetype.startsWith("audio/")
-						? "audio"
-						: "file";
-
-			type = attachmentType;
+			type = "image";
 
 			attachments = [
 				{
-					type: attachmentType,
+					type: "image",
 					url: uploadedFile.secure_url,
 					publicId: uploadedFile.public_id,
 					fileName: req.file.originalname,

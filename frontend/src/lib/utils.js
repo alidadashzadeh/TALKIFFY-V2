@@ -27,6 +27,31 @@ export function formatSeparatorDate(dateString) {
 	});
 }
 
+export function formatDateKey(date) {
+	const d = new Date(date);
+	return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
+}
+
+export function formatSectionDate(date) {
+	const d = new Date(date);
+	const now = new Date();
+
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	const yesterday = new Date(today);
+	yesterday.setDate(today.getDate() - 1);
+
+	const current = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+	if (current.getTime() === today.getTime()) return "Today";
+	if (current.getTime() === yesterday.getTime()) return "Yesterday";
+
+	return d.toLocaleDateString([], {
+		month: "short",
+		day: "numeric",
+		year: "numeric",
+	});
+}
+
 export function formatMessageTime(date) {
 	if (!date) return "";
 
