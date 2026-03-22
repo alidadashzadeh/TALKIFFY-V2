@@ -5,21 +5,22 @@ import MessageFileInput from "./MessageFileInput";
 import FilePreview from "./FilePreview";
 import EmojiPopover from "./EmojiPopover";
 import SendMessageBtn from "../buttons/SendMessageBtn";
+import ReplyToPreview from "./ReplyToPreview";
 
 function ChatMessageBar() {
-	const { text, file } = useMessagesContext();
+	const { text, file, replyTo } = useMessagesContext();
 	const { sendMessage, loading } = useSendMessage();
 
 	const onSubmit = async () => {
 		const trimmedMessage = text?.trim();
 		if (!trimmedMessage && !file) return;
-
-		await sendMessage({ text: trimmedMessage, file });
+		await sendMessage({ text: trimmedMessage, file, replyTo });
 	};
 
 	return (
 		<div className="mx-auto w-full max-w-4xl p-2">
 			{file && !loading && <FilePreview />}
+			{replyTo && <ReplyToPreview />}
 			<form
 				className="mx-auto flex w-full max-w-4xl items-start gap-2 p-2"
 				onSubmit={(e) => {

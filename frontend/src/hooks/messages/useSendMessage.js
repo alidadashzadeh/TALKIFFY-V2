@@ -10,10 +10,10 @@ function useSendMessage() {
 	const queryClient = useQueryClient();
 	const { data: currentUser } = useCurrentUser();
 	const { currentConversationId } = useConversationContext();
-	const { clearMessageState } = useMessagesContext();
+	const { clearMessageState, setReplyTo } = useMessagesContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ text, file, clientTempId }) => {
+		mutationFn: async ({ text, file, clientTempId, replyTo }) => {
 			const formData = new FormData();
 			const trimmedText = text?.trim() || "";
 
@@ -25,6 +25,8 @@ function useSendMessage() {
 				formData.append("file", file);
 			}
 
+			if (replyTo) formData.append("replyToId", replyTo._id);
+
 			formData.append("clientTempId", clientTempId);
 
 			const { data } = await axiosInstance.post(
@@ -35,7 +37,7 @@ function useSendMessage() {
 			return data?.data?.newMessage;
 		},
 
-		onMutate: async ({ text, file, clientTempId }) => {
+		onMutate: async ({ text, file, clientTempId, replyTo }) => {
 			if (!currentConversationId) return {};
 
 			const queryKey = ["messages", currentConversationId];
@@ -70,7 +72,7 @@ function useSendMessage() {
 							},
 						]
 					: [],
-				replyTo: null,
+				replyTo: replyTo || null,
 				reactions: [],
 				readBy: [],
 				deliveredTo: [],
@@ -80,6 +82,8 @@ function useSendMessage() {
 				updatedAt: new Date().toISOString(),
 				optimistic: true,
 			};
+
+			setReplyTo(null);
 
 			queryClient.setQueryData(queryKey, (old = []) => [
 				...old,
@@ -160,7 +164,7 @@ function useSendMessage() {
 
 	return {
 		loading: mutation.isPending,
-		sendMessage: ({ text, file }) => {
+		sendMessage: ({ text, file, replyTo }) => {
 			const clientTempId =
 				typeof crypto !== "undefined" && crypto.randomUUID
 					? crypto.randomUUID()
@@ -169,6 +173,7 @@ function useSendMessage() {
 			return mutation.mutateAsync({
 				text,
 				file,
+				replyTo,
 				clientTempId,
 			});
 		},

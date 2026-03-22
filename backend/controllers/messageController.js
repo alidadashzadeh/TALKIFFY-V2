@@ -15,6 +15,7 @@ export const sendMessage = async (req, res) => {
 		const { conversationId } = req.params;
 		const content = req.body.content?.trim() || "";
 		const clientTempId = req.body.clientTempId || null;
+		const replyToId = req.body.replyToId || null;
 
 		if (!content && !req.file) {
 			return res.status(400).json({
@@ -59,6 +60,7 @@ export const sendMessage = async (req, res) => {
 			type,
 			content,
 			attachments,
+			replyTo: replyToId,
 		});
 
 		await Conversation.findByIdAndUpdate(conversationId, {
@@ -66,10 +68,15 @@ export const sendMessage = async (req, res) => {
 			lastMessageAt: Date.now(),
 		});
 
-		const populatedMessage = await Message.findById(newMessage._id).populate(
-			"senderId",
-			"username avatar",
-		);
+		const populatedMessage = await Message.findById(newMessage._id)
+			.populate("senderId", "username avatar")
+			.populate({
+				path: "replyTo",
+				populate: {
+					path: "senderId",
+					select: "username avatar",
+				},
+			});
 
 		res.status(201).json({
 			status: "success",
@@ -93,6 +100,13 @@ export const getConversationMessages = async (req, res, next) => {
 
 	const messages = await Message.find({ conversationId })
 		.populate("senderId", "username avatar")
+		.populate({
+			path: "replyTo",
+			populate: {
+				path: "senderId",
+				select: "username avatar",
+			},
+		})
 		.sort({ createdAt: 1 });
 
 	res.status(200).json({

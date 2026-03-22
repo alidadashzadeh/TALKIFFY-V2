@@ -1,5 +1,6 @@
 import { useMessagesContext } from "@/contexts/MessagesContext";
 import { Textarea } from "../ui/textarea";
+import { useEffect } from "react";
 
 function MessageTextInput({ handleSubmit }) {
 	const { text, setText, textareaRef } = useMessagesContext();
@@ -11,6 +12,12 @@ function MessageTextInput({ handleSubmit }) {
 		el.style.height = "auto";
 		el.style.height = `${el.scrollHeight}px`;
 	};
+
+	useEffect(() => {
+		requestAnimationFrame(() => {
+			textareaRef.current?.focus();
+		});
+	});
 
 	const handleKeyDown = (e) => {
 		if (e.key === "Enter" && !e.shiftKey) {
