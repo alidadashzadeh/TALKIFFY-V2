@@ -142,6 +142,7 @@ export function getConversationDisplayData(conversation, currentUserId) {
 		email: otherUser?.email || "",
 		isGroup: false,
 		isAdmin: false,
+		id: otherUser._id,
 	};
 }
 

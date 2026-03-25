@@ -9,7 +9,7 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 import { useMessagesContext } from "@/contexts/MessagesContext";
 import MessageItemCheckMarks from "../message/MessageItemCheckMarks";
 import MessageAttachmentImage from "../message/MessageAttachmentImage";

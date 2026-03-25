@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { axiosInstance } from "@/lib/axios";
 import { handleErrorToast } from "@/lib/errorHandler";
-import useCurrentUser from "../user/useCurrentUser ";
+import useCurrentUser from "../user/useCurrentUser";
 import { useMessagesContext } from "@/contexts/MessagesContext";
 
 function useSendMessage() {

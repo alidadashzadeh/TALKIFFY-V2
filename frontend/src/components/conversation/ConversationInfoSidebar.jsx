@@ -4,7 +4,7 @@ import { getConversationDisplayData } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { H4 } from "../ui/typography";
 import GroupInfoActions from "../group/GroupInfoActions";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 import GroupMembersCount from "../group/GroupMembersCount";
 import GroupInfoContent from "../group/GroupInfoContent";
 import SharedFiles from "./SharedFiles";

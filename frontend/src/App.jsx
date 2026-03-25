@@ -6,7 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import SettingsPage from "./pages/SettingsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import MessageLoading from "./components/chat/ChatLoading.jsx";
-import useCurrentUser from "./hooks/user/useCurrentUser .js";
+import useCurrentUser from "./hooks/user/useCurrentUser.js";
 
 // import useListenContacts from "./hooks/useListenContacts.js";
 // import useListenMessages from "./hooks/useListenSingleMessages.js";

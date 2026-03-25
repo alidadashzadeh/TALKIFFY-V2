@@ -4,7 +4,7 @@ import { ArrowLeft, Camera, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import useUploadImage from "../hooks/useUploadImage";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ProfilePage() {
 	const { data: currentUser } = useCurrentUser();

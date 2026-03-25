@@ -1,7 +1,7 @@
 import { axiosInstance } from "../lib/axios.js";
 import { useState } from "react";
 import { toast } from "sonner";
-import useCurrentUser from "./user/useCurrentUser .js";
+import useCurrentUser from "./user/useCurrentUser.js";
 
 function useUploadImage() {
 	const [loading, setLoading] = useState(false);

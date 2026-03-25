@@ -1,6 +1,6 @@
 import { SheetHeader, SheetTitle } from "../ui/sheet";
 import AvatarGenerator from "../AvatarGenerator";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function AccountSheetHeader() {
 	const { data: currentUser } = useCurrentUser();

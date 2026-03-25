@@ -3,11 +3,14 @@ import { useConversationContext } from "@/contexts/ConversationContext";
 import { getConversationDisplayData } from "@/lib/utils";
 import GroupAdminActions from "./GroupAdminActions";
 import GroupMemberActions from "./GroupMemberActions";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { useSocketContext } from "@/contexts/SocketContext";
+import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function GroupMembersListItem({ member }) {
 	const { currentConversation } = useConversationContext();
 	const { data: currentUser } = useCurrentUser();
+	const { onlineUsers } = useSocketContext();
 
 	const { isAdmin } = getConversationDisplayData(
 		currentConversation,
@@ -18,14 +21,17 @@ function GroupMembersListItem({ member }) {
 		currentUser?._id,
 	);
 	const isYou = currentUser?._id === member?._id;
-
+	const isOnline = onlineUsers.includes(member?._id);
 	return (
 		<div
 			key={member?._id}
 			className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 transition-colors hover:bg-muted/60"
 		>
-			<div className="flex min-w-0 items-center gap-3">
-				<AvatarGenerator avatar={member?.avatar} name={member?.username} />
+			<div className="flex min-w-0 items-center gap-3 ">
+				<div className="relative">
+					<AvatarGenerator avatar={member?.avatar} name={member?.username} />
+					<OnlineStatusDot isOnline={isOnline} />
+				</div>
 
 				<div className="min-w-0">
 					<div className="flex items-center gap-2">

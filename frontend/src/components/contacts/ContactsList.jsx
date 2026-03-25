@@ -2,7 +2,7 @@ import { useContactContext } from "@/contexts/ContactContext";
 
 import ContactListItem from "./ContactListItem";
 import { filterContacts } from "@/lib/utils/contact";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ContactsList({ ActionComponent }) {
 	const { data: currentUser } = useCurrentUser();

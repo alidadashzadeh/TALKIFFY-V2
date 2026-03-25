@@ -13,7 +13,7 @@ import {
 import ProfileAvatar from "./ProfileAvatar";
 import ProfileInfoField from "./ProfileInfoField";
 import ProfileAccountInfo from "./ProfileAccountInfo";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ProfileModal() {
 	const { data: currentUser } = useCurrentUser();

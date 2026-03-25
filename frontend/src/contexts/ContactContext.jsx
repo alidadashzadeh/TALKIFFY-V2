@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useConversationContext } from "./ConversationContext";
 import { getOtherUser } from "@/lib/utils";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 const ContactContext = createContext();
 

@@ -7,7 +7,7 @@ import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 import ConversationListItem from "./ConversationListItem";
 import ConversationLoader from "./ConversationLoader";
 import { filterConversations } from "@/lib/utils/conversation";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ConversationList() {
 	const { data: currentUser } = useCurrentUser();

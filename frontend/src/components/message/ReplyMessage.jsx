@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { cn, getMessageDisplayData } from "@/lib/utils";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ReplyMessage({ replyMessage, isMe }) {
 	const { data: currentUser } = useCurrentUser();

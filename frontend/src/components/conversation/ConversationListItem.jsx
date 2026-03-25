@@ -10,11 +10,14 @@ import {
 import { useConversationContext } from "@/contexts/ConversationContext";
 import AvatarGenerator from "../AvatarGenerator";
 import { Muted, P } from "../ui/typography";
-import useCurrentUser from "@/hooks/user/useCurrentUser ";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { useSocketContext } from "@/contexts/SocketContext";
+import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function ConversationListItem({ conversation, isActive = false }) {
 	const { data: currentUser } = useCurrentUser();
 	const { selectConversation } = useConversationContext();
+	const { onlineUsers } = useSocketContext();
 
 	const handleSelectConversation = () => {
 		selectConversation(conversation);
@@ -24,6 +27,8 @@ function ConversationListItem({ conversation, isActive = false }) {
 		conversation,
 		currentUser?._id,
 	);
+	const isOnline =
+		conversation?.type !== "group" && onlineUsers.includes(displayData?.id);
 
 	return (
 		<button
@@ -34,7 +39,15 @@ function ConversationListItem({ conversation, isActive = false }) {
 				isActive && "bg-accent",
 			)}
 		>
-			<AvatarGenerator avatar={displayData?.avatar} name={displayData?.name} />
+			<div className="relative shrink-0">
+				<AvatarGenerator
+					avatar={displayData?.avatar}
+					name={displayData?.name}
+				/>
+				{conversation?.type !== "group" && (
+					<OnlineStatusDot isOnline={isOnline} />
+				)}
+			</div>
 			<div className="flex-col w-full">
 				<div className="min-w-0 flex-1 flex justify-between items-center ">
 					<P className="truncate font-medium">

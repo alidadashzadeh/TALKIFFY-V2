@@ -4,7 +4,7 @@ import { useMessagesContext } from "../contexts/MessagesContext";
 
 import { handleErrorToast } from "../lib/errorHandler";
 import { axiosInstance } from "../lib/axios";
-import useCurrentUser from "./user/useCurrentUser ";
+import useCurrentUser from "./user/useCurrentUser";
 
 function useGetUnseenMessagesOnLogin() {
 	const { setUnseenMessages } = useMessagesContext();
