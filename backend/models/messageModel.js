@@ -71,31 +71,17 @@ const messageSchema = new mongoose.Schema(
 
 		reactions: [reactionSchema],
 
-		readBy: [
-			{
-				userId: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-				readAt: {
-					type: Date,
-					default: Date.now,
-				},
-			},
-		],
+		isSeen: {
+			type: Boolean,
+			default: false,
+		},
+		seenAt: Date,
 
-		deliveredTo: [
-			{
-				userId: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: "User",
-				},
-				deliveredAt: {
-					type: Date,
-					default: Date.now,
-				},
-			},
-		],
+		isDelivered: {
+			type: Boolean,
+			default: false,
+		},
+		deliveredAt: Date,
 
 		isEdited: {
 			type: Boolean,

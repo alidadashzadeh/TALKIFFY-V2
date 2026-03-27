@@ -1,5 +1,5 @@
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-import { getReceiverSocketId, io } from "../lib/socket.js";
+import { getUserSocketIds, io } from "../lib/socket.js";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
 import {
@@ -9,6 +9,7 @@ import {
 	getOne,
 	updateOne,
 } from "./handleFactory.js";
+
 export const sendMessage = async (req, res) => {
 	try {
 		const senderId = req.user.id;
@@ -26,6 +27,32 @@ export const sendMessage = async (req, res) => {
 
 		let type = "text";
 		let attachments = [];
+
+		const conversation = await Conversation.findOne({
+			_id: conversationId,
+			participants: senderId,
+		});
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found or access denied",
+			});
+		}
+
+		if (replyToId) {
+			const replyMessage = await Message.findById(replyToId);
+
+			if (
+				!replyMessage ||
+				replyMessage.conversationId.toString() !== conversationId
+			) {
+				return res.status(400).json({
+					status: "fail",
+					message: "Invalid reply message",
+				});
+			}
+		}
 
 		if (req.file) {
 			if (!req.file.mimetype.startsWith("image/")) {
@@ -63,10 +90,54 @@ export const sendMessage = async (req, res) => {
 			replyTo: replyToId,
 		});
 
-		await Conversation.findByIdAndUpdate(conversationId, {
-			lastMessageId: newMessage._id,
-			lastMessageAt: Date.now(),
-		});
+		conversation.lastMessageId = newMessage._id;
+		conversation.lastMessageAt = new Date();
+		await conversation.save();
+
+		if (conversation?.type === "group") {
+			const allSocketIds = conversation.participants
+				.filter((p) => p.toString() !== senderId.toString())
+				.flatMap((participant) => getUserSocketIds(participant) || []);
+
+			if (allSocketIds?.length) {
+				allSocketIds.forEach((socketId) => {
+					io.to(socketId).emit("message:new", {
+						conversationId: conversation._id,
+					});
+				});
+			}
+		}
+		if (conversation?.type === "private") {
+			const senderIdStr = senderId.toString();
+			const receiverId = conversation.participants
+				.find((id) => id.toString() !== senderIdStr)
+				.toString();
+			const receiverSocketIds = getUserSocketIds(receiverId);
+
+			if (receiverSocketIds?.length) {
+				receiverSocketIds.forEach((socketId) => {
+					io.to(socketId).emit("message:new", {
+						conversationId: conversation._id,
+					});
+				});
+
+				await Message.findByIdAndUpdate(newMessage._id, {
+					isDelivered: true,
+					deliveredAt: new Date(),
+				});
+
+				const senderSocketIds = getUserSocketIds(senderIdStr);
+				if (senderSocketIds?.length) {
+					senderSocketIds.forEach((socketId) => {
+						io.to(socketId).emit("message:delivered", {
+							conversationId: conversation._id,
+							messageId: newMessage._id,
+							userId: receiverId,
+						});
+					});
+				}
+			}
+		}
 
 		const populatedMessage = await Message.findById(newMessage._id)
 			.populate("senderId", "username avatar")
@@ -78,7 +149,7 @@ export const sendMessage = async (req, res) => {
 				},
 			});
 
-		res.status(201).json({
+		return res.status(201).json({
 			status: "success",
 			data: {
 				newMessage: {
@@ -88,7 +159,7 @@ export const sendMessage = async (req, res) => {
 			},
 		});
 	} catch (error) {
-		res.status(400).json({
+		return res.status(500).json({
 			status: "fail",
 			message: error.message || "Message send went wrong",
 		});
@@ -132,7 +203,7 @@ export const updateDeliverMessages = async (req, res) => {
 
 			messages.forEach((message) =>
 				io
-					.to(getReceiverSocketId(message?.senderId))
+					.to(getUserSocketIds(message?.senderId))
 					.emit("getDeliveredOnLogin", message),
 			);
 		}
@@ -165,7 +236,7 @@ export const updateSeenMessages = async (req, res) => {
 			);
 
 			messages.forEach((message) =>
-				io.to(getReceiverSocketId(message?.senderId)).emit("getSeen", message),
+				io.to(getUserSocketIds(message?.senderId)).emit("getSeen", message),
 			);
 		}
 

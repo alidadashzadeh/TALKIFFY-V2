@@ -2,7 +2,7 @@ import User from "../models/userModel.js";
 
 import { createOne, deleteOne, getAll, getOne } from "./handleFactory.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-import { getReceiverSocketId, io } from "../lib/socket.js";
+import { getUserSocketIds, io } from "../lib/socket.js";
 
 export const getAllUsers = getAll(User);
 export const createUser = createOne(User);
@@ -121,11 +121,10 @@ export const addNewContact = async (req, res) => {
 				select: "username email avatar",
 			}),
 		]);
-		const newContactSocketIds = getReceiverSocketId(newContact._id);
+		const newContactSocketIds = getUserSocketIds(newContact._id);
 		if (newContactSocketIds?.length !== 0 && newContactSocketIds) {
 			newContactSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("contact:added", {
-					user: updatedNewContact,
 					addedBy: {
 						_id: currentUser._id,
 						username: currentUser.username,
