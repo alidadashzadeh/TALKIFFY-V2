@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
+import useSocketListeners from "@/hooks/socket/useSocketListeners";
 
 export const SocketContext = createContext(null);
 
@@ -47,6 +48,8 @@ export const SocketContextProvider = ({ children }) => {
 			newSocket.disconnect();
 		};
 	}, [currentUser?._id, isLoading]);
+
+	useSocketListeners(socket);
 
 	return (
 		<SocketContext.Provider value={{ socket, onlineUsers }}>

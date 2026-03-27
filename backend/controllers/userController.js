@@ -1,13 +1,8 @@
 import User from "../models/userModel.js";
-import sharp from "sharp";
-
-import { fileURLToPath } from "url";
 
 import { createOne, deleteOne, getAll, getOne } from "./handleFactory.js";
-import upload from "../lib/middleware/upload.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-
-const __filename = fileURLToPath(import.meta.url);
+import { getReceiverSocketId, io } from "../lib/socket.js";
 
 export const getAllUsers = getAll(User);
 export const createUser = createOne(User);
@@ -16,7 +11,6 @@ export const getUser = getOne(User, {
 	select: "email username avatar",
 });
 export const deleteUser = deleteOne(User);
-
 export const updateUserAvatar = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -59,7 +53,6 @@ export const updateUserAvatar = async (req, res) => {
 		});
 	}
 };
-
 export const addNewContact = async (req, res) => {
 	try {
 		const currentUserId = req.user._id;
@@ -90,9 +83,9 @@ export const addNewContact = async (req, res) => {
 			});
 		}
 
-		const foundUser = await User.findOne({ email: normalizedEmail });
+		const newContact = await User.findOne({ email: normalizedEmail });
 
-		if (!foundUser) {
+		if (!newContact) {
 			return res.status(404).json({
 				status: "fail",
 				message: "There is no user with the provided email",
@@ -101,7 +94,7 @@ export const addNewContact = async (req, res) => {
 
 		if (
 			currentUser.contacts.some(
-				(contact) => String(contact) === String(foundUser._id),
+				(contact) => String(contact) === String(newContact._id),
 			)
 		) {
 			return res.status(400).json({
@@ -111,23 +104,41 @@ export const addNewContact = async (req, res) => {
 		}
 
 		await User.findByIdAndUpdate(currentUserId, {
-			$addToSet: { contacts: foundUser._id },
+			$addToSet: { contacts: newContact._id },
 		});
 
-		await User.findByIdAndUpdate(foundUser._id, {
+		await User.findByIdAndUpdate(newContact._id, {
 			$addToSet: { contacts: currentUserId },
 		});
 
-		const updatedCurrentUser = await User.findById(currentUserId).populate({
-			path: "contacts",
-			select: "username email avatar",
-		});
-
+		const [updatedCurrentUser, updatedNewContact] = await Promise.all([
+			User.findById(currentUserId).populate({
+				path: "contacts",
+				select: "username email avatar",
+			}),
+			User.findById(newContact._id).populate({
+				path: "contacts",
+				select: "username email avatar",
+			}),
+		]);
+		const newContactSocketIds = getReceiverSocketId(newContact._id);
+		if (newContactSocketIds?.length !== 0 && newContactSocketIds) {
+			newContactSocketIds.forEach((socketId) => {
+				io.to(socketId).emit("contact:added", {
+					user: updatedNewContact,
+					addedBy: {
+						_id: currentUser._id,
+						username: currentUser.username,
+						email: currentUser.email,
+						avatar: currentUser.avatar,
+					},
+				});
+			});
+		}
 		return res.status(200).json({
 			status: "success",
 			data: {
 				user: updatedCurrentUser,
-				contactId: foundUser._id,
 			},
 		});
 	} catch (error) {

@@ -28,7 +28,6 @@ const addUserSocket = (userId, socketId) => {
 
 	onlineUsersMap.get(normalizedUserId).add(socketId);
 };
-
 const removeUserSocket = (userId, socketId) => {
 	const normalizedUserId = String(userId);
 
@@ -41,7 +40,6 @@ const removeUserSocket = (userId, socketId) => {
 		onlineUsersMap.delete(normalizedUserId);
 	}
 };
-
 const getOnlineUserIds = () => [...onlineUsersMap.keys()];
 
 export const getReceiverSocketId = (userId) => {
@@ -50,7 +48,7 @@ export const getReceiverSocketId = (userId) => {
 
 	if (!sockets || sockets.size === 0) return null;
 
-	return [...sockets][0];
+	return [...sockets];
 };
 
 io.use((socket, next) => {
@@ -91,15 +89,10 @@ io.on("connection", (socket) => {
 		return;
 	}
 
-	// console.log(`Socket connected: ${socket.id}, userId: ${userId}`);
-
 	addUserSocket(userId, socket.id);
 	io.emit("presence:update", getOnlineUserIds());
 
 	socket.on("disconnect", (reason) => {
-		console.log(
-			`Socket disconnected: ${socket.id}, userId: ${userId}, reason: ${reason}`,
-		);
 		removeUserSocket(userId, socket.id);
 		io.emit("presence:update", getOnlineUserIds());
 	});

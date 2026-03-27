@@ -3,8 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
-import SettingsPage from "./pages/SettingsPage.jsx";
-import ProfilePage from "./pages/ProfilePage.jsx";
 import MessageLoading from "./components/chat/ChatLoading.jsx";
 import useCurrentUser from "./hooks/user/useCurrentUser.js";
 
@@ -47,14 +45,6 @@ function App() {
 				<Route
 					path="/login"
 					element={!currentUser ? <LoginPage /> : <Navigate to="/" />}
-				/>
-				<Route
-					path="/settings"
-					element={!currentUser ? <LoginPage /> : <SettingsPage />}
-				/>
-				<Route
-					path="/profile"
-					element={!currentUser ? <LoginPage /> : <ProfilePage />}
 				/>
 			</Routes>
 		</div>
