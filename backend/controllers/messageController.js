@@ -219,34 +219,88 @@ export const updateDeliverMessages = async (req, res) => {
 };
 
 export const updateSeenMessages = async (req, res) => {
-	const { senderId } = req.body;
-	const { id: receiverId } = req.user;
+	const userId = req.user.id;
+	const { conversationId, lastSeenMessageId } = req.body;
 
 	try {
-		const messages = await Message.find({
-			receiverId,
-			senderId,
-			isSeen: false,
-		});
-
-		if (messages.length > 0) {
-			const results = await Message.updateMany(
-				{ receiverId, senderId, isSeen: false },
-				{ $set: { isSeen: true, isDelivered: true } },
-			);
-
-			messages.forEach((message) =>
-				io.to(getUserSocketIds(message?.senderId)).emit("getSeen", message),
-			);
+		if (!conversationId || !lastSeenMessageId) {
+			return res.status(400).json({
+				status: "fail",
+				message: "conversationId and lastSeenMessageId are required",
+			});
 		}
 
-		res.status(200).json({
+		const conversation = await Conversation.findOne({
+			_id: conversationId,
+			participants: userId,
+		});
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found or access denied",
+			});
+		}
+
+		const targetMessage = await Message.findOne({
+			_id: lastSeenMessageId,
+			conversationId,
+		});
+
+		if (!targetMessage) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Target message not found",
+			});
+		}
+
+		const now = new Date();
+
+		const updateResult = await Message.updateMany(
+			{
+				conversationId,
+				senderId: { $ne: userId },
+				isSeen: false,
+				createdAt: { $lte: targetMessage.createdAt },
+			},
+			{
+				$set: {
+					isSeen: true,
+					seenAt: now,
+				},
+			},
+		);
+
+		if (updateResult.modifiedCount > 0) {
+			const payload = {
+				conversationId,
+				lastSeenMessageId,
+				seenBy: userId,
+				seenAt: now,
+			};
+
+			const socketIds = conversation.participants
+				.filter((p) => p.toString() !== userId.toString())
+				.flatMap((participant) => getUserSocketIds(participant) || []);
+
+			socketIds.forEach((socketId) => {
+				io.to(socketId).emit("message:seen", payload);
+			});
+		}
+
+		return res.status(200).json({
 			status: "success",
+			data: {
+				updatedMessages: updateResult,
+			},
 		});
 	} catch (error) {
-		res
-			.status(400)
-			.json({ status: "fail", message: "error in update seen messages" });
+		console.error("error in updateSeenMessages:", error);
+
+		return res.status(400).json({
+			status: "fail",
+			message: error.message || "error in update seen messages",
+		});
 	}
 };
 

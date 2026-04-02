@@ -18,20 +18,22 @@ import { optimizeMessageImage } from "../lib/middleware/OptimizeImage.js";
 
 const router = express.Router();
 router.route("/update-delivered").patch(protect, updateDeliverMessages);
-router.route("/update-seen").patch(protect, updateSeenMessages);
 router.route("/check-unseen-messages").get(protect, checkUnseenMessagesOnLogin);
 router.route("/").get(getAllMessages).post(createMessage);
 router.route("/api/messages/:conversationId").get(getAllMessages);
-router
-	.route("/:id")
-	.get(getSingleMessage)
-	.patch(updateMessage)
-	.delete(deleteMessage);
 
 // ✅ NEW
 router
 	.route("/conversation/:conversationId")
 	.get(protect, getConversationMessages)
 	.post(protect, upload.single("file"), optimizeMessageImage, sendMessage);
+
+router.route("/update-seen").patch(protect, updateSeenMessages);
+
+router
+	.route("/:id")
+	.get(getSingleMessage)
+	.patch(updateMessage)
+	.delete(deleteMessage);
 
 export default router;

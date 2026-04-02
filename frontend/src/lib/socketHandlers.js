@@ -36,3 +36,16 @@ export const createHandleMessageDelivered =
 			queryKey: ["messages", conversationId],
 		});
 	};
+
+export const createHandleMessageSeen =
+	(queryClient) =>
+	({ conversationId }) => {
+		console.log("seen");
+		queryClient.invalidateQueries({
+			queryKey: ["conversations"],
+		});
+
+		queryClient.invalidateQueries({
+			queryKey: ["messages", conversationId],
+		});
+	};
