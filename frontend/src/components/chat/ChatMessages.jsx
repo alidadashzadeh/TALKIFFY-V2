@@ -12,15 +12,11 @@ import {
 	useLayoutEffect,
 } from "react";
 import { useConversationContext } from "@/contexts/ConversationContext";
-import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 
 function ChatMessages() {
 	const { data: messages = [], isLoading } = useGetMessages();
 	const { data: currentUser } = useCurrentUser();
-	const { currentConversationId } = useConversationContext();
-	const { data: conversations = [] } = useGetMyConversations();
-	const currentConversation =
-		conversations.find((c) => c._id === currentConversationId) || null;
+	const { currentConversation } = useConversationContext();
 
 	const { mutateAsync: markMessagesSeen } = useMarkMessagesSeen();
 

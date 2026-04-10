@@ -75,7 +75,7 @@ export const protect = async (req, res, next) => {
 
 		if (!currentUser.hasChangedPasswordAfter(decode.iat))
 			throw new Error(
-				"The user has changed password recently, PLease login again!"
+				"The user has changed password recently, PLease login again!",
 			);
 
 		req.user = currentUser;
@@ -98,31 +98,3 @@ export const checkAuth = async (req, res) => {
 		res.status(400).json({ status: "fail", message: error.message });
 	}
 };
-
-// export const signup = async (req, res) => {
-// 	try {
-// 		const newUser = await User.create({
-// 			email: req.body.email,
-// 			username: req.body.username,
-// 			password: req.body.password,
-// 			// passwordConfirm: req.body.passwordConfirm,
-// 		});
-// 		const userId = newUser._id;
-
-// 		const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-// 			expiresIn: process.env.JWT_EXPIRES_IN,
-// 		});
-
-// 		res.cookie("jwt", token, {
-// 			maxAge: 7 * 24 * 60 * 60 * 1000,
-// 			httpOnly: true,
-// 			sameSite: "strict",
-// 			secure: process.env.NODE_ENV !== "development",
-// 		});
-
-// 		await newUser.save();
-// 		res.status(201).json({ status: "success", data: { newUser } });
-// 	} catch (error) {
-// 		res.status(400).json({ status: "fail", message: error.message });
-// 	}
-// };

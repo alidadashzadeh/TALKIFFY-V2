@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
 
+import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 import { createContext, useContext, useMemo, useState } from "react";
 
 const ConversationContext = createContext();
@@ -18,18 +19,22 @@ export const useConversationContext = () => {
 };
 
 export const ConversationContextProvider = ({ children }) => {
-	const [currentConversation, setCurrentConversation] = useState(null);
-	const [conversations, setConversations] = useState([]);
+	const [currentConversationId, setCurrentConversationId] = useState(null);
 	const [filteredConversationsBy, setFilteredConversationsBy] = useState("");
 
-	const currentConversationId = currentConversation?._id || null;
+	const { data: conversations = [] } = useGetMyConversations();
+
+	const currentConversation =
+		conversations.find(
+			(conversation) => conversation._id === currentConversationId,
+		) || null;
 
 	const selectConversation = (conversation) => {
-		setCurrentConversation(conversation);
+		setCurrentConversationId(conversation?._id || null);
 	};
 
 	const clearCurrentConversation = () => {
-		setCurrentConversation(null);
+		setCurrentConversationId(null);
 	};
 
 	const value = useMemo(
@@ -39,7 +44,6 @@ export const ConversationContextProvider = ({ children }) => {
 			selectConversation,
 			clearCurrentConversation,
 			conversations,
-			setConversations,
 			filteredConversationsBy,
 			setFilteredConversationsBy,
 		}),

@@ -5,12 +5,12 @@ import { useConversationContext } from "@/contexts/ConversationContext";
 
 function RemoveMemberBtn({ member }) {
 	const { removeParticipant, loading } = useRemoveGroupMember();
-	const { currentConversation } = useConversationContext();
+	const { currentConversationId } = useConversationContext();
 
 	const handleRemoveMember = async () => {
 		try {
 			await removeParticipant({
-				conversationId: currentConversation?._id,
+				conversationId: currentConversationId,
 				userId: member?._id,
 			});
 		} catch (error) {

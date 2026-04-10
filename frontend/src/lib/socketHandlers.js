@@ -50,3 +50,17 @@ export const createHandleMessageSeen = (queryClient) => {
 		});
 	};
 };
+
+export const createHandleInvalidateConversations = (queryClient) => {
+	return (payload) => {
+		const { conversationId } = payload;
+
+		queryClient.invalidateQueries({
+			queryKey: ["conversations"],
+		});
+
+		queryClient.invalidateQueries({
+			queryKey: ["messages", conversationId],
+		});
+	};
+};

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import AppError from "./AppError.js";
 
 const signToken = (id) => {
 	return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -37,4 +38,50 @@ export const createSendToken = (user, statusCode, res) => {
 export const buildPrivateConversationKey = (userId1, userId2) => {
 	const [a, b] = [userId1.toString(), userId2.toString()].sort();
 	return `private_${a}_${b}`;
+};
+
+export const ensureConversationExists = (conversation) => {
+	if (!conversation) {
+		throw new AppError("Conversation not found", 404);
+	}
+};
+
+export const ensureGroupConversation = (conversation) => {
+	if (conversation.type !== "group") {
+		throw new AppError("Only group conversations allowed", 400);
+	}
+};
+
+export const isAdmin = (conversation, userId) => {
+	return conversation.admins.some(
+		(admin) => String(admin._id || admin) === String(userId),
+	);
+};
+
+export const isParticipant = (conversation, userId) => {
+	return conversation.participants.some(
+		(p) => String(p._id || p) === String(userId),
+	);
+};
+
+export const ensureAdmin = (conversation, userId) => {
+	if (!isAdmin(conversation, userId)) {
+		throw new AppError("Only admins can perform this action", 403);
+	}
+};
+export const alreadyAdmin = (conversation, userId) => {
+	if (isAdmin(conversation, userId)) {
+		throw new AppError("User is already an admin", 400);
+	}
+};
+
+export const ensureParticipant = (conversation, userId) => {
+	if (!isParticipant(conversation, userId)) {
+		throw new AppError("User is not a participant", 400);
+	}
+};
+export const alreadyParticipant = (conversation, userId) => {
+	if (isParticipant(conversation, userId)) {
+		throw new AppError("User is already a participant", 400);
+	}
 };

@@ -9,6 +9,7 @@ import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function GroupMembersListItem({ member }) {
 	const { currentConversation } = useConversationContext();
+
 	const { data: currentUser } = useCurrentUser();
 	const { onlineUsers } = useSocketContext();
 
