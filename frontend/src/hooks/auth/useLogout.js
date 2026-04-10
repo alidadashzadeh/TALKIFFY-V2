@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios";
-import { handleErrorToast } from "../lib/errorHandler";
+import { axiosInstance } from "../../lib/axios";
+import { handleErrorToast } from "../../lib/errorHandler";
 import { toast } from "sonner";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import { useConversationContext } from "@/contexts/ConversationContext";

@@ -23,15 +23,13 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.get("/logout", logout);
+router.post("/contacts", protect, addNewContact);
 router.get("/check", protect, checkAuth);
 router.route("/").get(getAllUsers).post(createUser);
-
 router
 	.route("/:id")
 	.get(getUser)
 	.patch(protect, upload.single("avatar"), optimizeUserAvatar, updateUserAvatar)
 	.delete(deleteUser);
-
-router.post("/contacts", protect, addNewContact);
 
 export default router;

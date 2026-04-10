@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import useLogin from "./../hooks/useLogin.js";
+import useLogin from "../hooks/auth/useLogin.js";
 
 function Login() {
 	const { loading, login } = useLogin();

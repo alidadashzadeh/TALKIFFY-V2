@@ -4,13 +4,6 @@ import { createOne, deleteOne, getAll, getOne } from "./handleFactory.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
 
-export const getAllUsers = getAll(User);
-export const createUser = createOne(User);
-export const getUser = getOne(User, {
-	path: "contacts",
-	select: "email username avatar",
-});
-export const deleteUser = deleteOne(User);
 export const updateUserAvatar = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -147,3 +140,11 @@ export const addNewContact = async (req, res) => {
 		});
 	}
 };
+
+export const getAllUsers = getAll(User);
+export const createUser = createOne(User);
+export const getUser = getOne(User, {
+	path: "contacts",
+	select: "email username avatar",
+});
+export const deleteUser = deleteOne(User);

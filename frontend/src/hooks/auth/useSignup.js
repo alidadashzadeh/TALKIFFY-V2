@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios.js";
-import { handleErrorToast } from "../lib/errorHandler.js";
+import { axiosInstance } from "../../lib/axios.js";
+import { handleErrorToast } from "../../lib/errorHandler.js";
 import { toast } from "sonner";
 
 function useSignup() {

@@ -18,24 +18,21 @@ import { optimizeGroupAvatar } from "../lib/middleware/OptimizeImage.js";
 const router = express.Router();
 
 router.route("/").get(protect, getMyConversations);
-
 router.get("/private/:userId", protect, getOrCreatePrivateConversation);
 router.post("/group", protect, createGroupConversation);
-
+router.post("/:conversationId/admins/:userId", protect, addGroupAdmin);
 router.post(
 	"/:conversationId/participants/:userId",
 	protect,
 	addGroupParticipant,
 );
+router.delete("/:conversationId/leave", protect, leaveGroup);
 router.delete(
 	"/:conversationId/participants/:userId",
 	protect,
 	removeGroupParticipant,
 );
-router.post("/:conversationId/admins/:userId", protect, addGroupAdmin);
 router.delete("/:conversationId/admins/:userId", protect, removeGroupAdmin);
-router.delete("/:conversationId/leave", protect, leaveGroup);
-
 router.patch(
 	"/:conversationId/avatar",
 	protect,
@@ -43,7 +40,6 @@ router.patch(
 	optimizeGroupAvatar,
 	updateGroupAvatar,
 );
-
 router.patch("/update-seen", protect, updateSeen);
 
 export default router;

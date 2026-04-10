@@ -6,26 +6,8 @@ import LoginPage from "./pages/LoginPage";
 import MessageLoading from "./components/chat/ChatLoading.jsx";
 import useCurrentUser from "./hooks/user/useCurrentUser.js";
 
-// import useListenContacts from "./hooks/useListenContacts.js";
-// import useListenMessages from "./hooks/useListenSingleMessages.js";
-// import useListenDeliver from "./hooks/useListenSingleDeliver.js";
-// import useSetDeliverOnLogin from "./hooks/useSetDeliverOnLogin.js";
-// import useGetDeliverOnLogin from "./hooks/useGetDeliverOnLogin.js";
-// import useListenSeen from "./hooks/useListenSignleSeen.js";
-// import useSeenMessagesOnClick from "./hooks/useSeenMessagesOnClick.js";
-// import useGetUnseenMessagesOnLogin from "./hooks/useGetUnseenMessagesOnLogin.js";
-
 function App() {
 	const { data: currentUser, isLoading } = useCurrentUser();
-
-	// useListenContacts();
-	// useListenMessages();
-	// useListenDeliver();
-	// useListenSeen();
-	// useSetDeliverOnLogin();
-	// useGetDeliverOnLogin();
-	// useSeenMessagesOnClick();
-	// useGetUnseenMessagesOnLogin();
 
 	if (isLoading && !currentUser) return <MessageLoading />;
 

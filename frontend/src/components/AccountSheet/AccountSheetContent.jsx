@@ -9,7 +9,7 @@ import NewGroupModal from "../modals/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
 import ContactsModal from "../contacts/ContactsModal";
-import useLogout from "@/hooks/useLogout";
+import useLogout from "@/hooks/auth/useLogout";
 
 function AccountSheetContent() {
 	const { logout } = useLogout();
