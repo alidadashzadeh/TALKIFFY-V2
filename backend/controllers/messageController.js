@@ -92,6 +92,28 @@ export const sendMessage = async (req, res) => {
 
 		conversation.lastMessageId = newMessage._id;
 		conversation.lastMessageAt = new Date();
+		const senderReadStateIndex = conversation.readState.findIndex(
+			(state) => state.userId.toString() === senderId.toString(),
+		);
+
+		if (senderReadStateIndex === -1) {
+			conversation.readState.push({
+				userId: senderId,
+				lastSeenMessageId: newMessage._id,
+				lastSeenAt: newMessage.createdAt,
+			});
+		} else {
+			const currentLastSeenAt =
+				conversation.readState[senderReadStateIndex].lastSeenAt;
+
+			if (!currentLastSeenAt || newMessage.createdAt > currentLastSeenAt) {
+				conversation.readState[senderReadStateIndex].lastSeenMessageId =
+					newMessage._id;
+				conversation.readState[senderReadStateIndex].lastSeenAt =
+					newMessage.createdAt;
+			}
+		}
+
 		await conversation.save();
 
 		if (conversation?.type === "group") {

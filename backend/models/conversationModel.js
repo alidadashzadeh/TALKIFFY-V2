@@ -1,5 +1,27 @@
 import mongoose from "mongoose";
 
+const conversationReadStateSchema = new mongoose.Schema(
+	{
+		userId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+
+		lastSeenMessageId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Message",
+			default: null,
+		},
+
+		lastSeenAt: {
+			type: Date,
+			default: null,
+		},
+	},
+	{ _id: false },
+);
+
 const conversationSchema = new mongoose.Schema(
 	{
 		type: {
@@ -50,6 +72,10 @@ const conversationSchema = new mongoose.Schema(
 		lastMessageAt: {
 			type: Date,
 			default: Date.now,
+		},
+		readState: {
+			type: [conversationReadStateSchema],
+			default: [],
 		},
 	},
 	{ timestamps: true },

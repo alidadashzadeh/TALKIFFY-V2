@@ -35,7 +35,7 @@ function ConversationListItem({ conversation, isActive = false }) {
 			type="button"
 			onClick={handleSelectConversation}
 			className={cn(
-				"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent",
+				"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent relative",
 				isActive && "bg-accent",
 			)}
 		>
@@ -73,6 +73,13 @@ function ConversationListItem({ conversation, isActive = false }) {
 						{truncateText(conversation?.lastMessageId?.content, 10)}
 					</Muted>
 				</div>
+			</div>
+			<div>
+				{conversation?.unreadCount > 0 && (
+					<div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white text-xs">
+						{conversation.unreadCount}
+					</div>
+				)}
 			</div>
 		</button>
 	);

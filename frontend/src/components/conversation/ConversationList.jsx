@@ -31,7 +31,7 @@ function ConversationList() {
 	}
 
 	return (
-		<div className="flex flex-col gap-1">
+		<div className="flex flex-col gap-1 ">
 			{filteredConversations.map((conversation) => (
 				<ConversationListItem
 					key={conversation._id}

@@ -6,7 +6,7 @@ function useMarkMessagesSeen() {
 
 	return useMutation({
 		mutationFn: async ({ conversationId, lastSeenMessageId }) => {
-			const { data } = await axiosInstance.patch("/messages/update-seen", {
+			const { data } = await axiosInstance.patch("/conversations/update-seen", {
 				conversationId,
 				lastSeenMessageId,
 			});
@@ -16,6 +16,10 @@ function useMarkMessagesSeen() {
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: ["messages", variables.conversationId],
+			});
+
+			queryClient.invalidateQueries({
+				queryKey: ["conversations"],
 			});
 		},
 	});

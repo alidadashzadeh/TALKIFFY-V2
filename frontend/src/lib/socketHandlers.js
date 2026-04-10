@@ -37,10 +37,10 @@ export const createHandleMessageDelivered =
 		});
 	};
 
-export const createHandleMessageSeen =
-	(queryClient) =>
-	({ conversationId }) => {
-		console.log("seen");
+export const createHandleMessageSeen = (queryClient) => {
+	return (payload) => {
+		const { conversationId } = payload;
+
 		queryClient.invalidateQueries({
 			queryKey: ["conversations"],
 		});
@@ -49,3 +49,4 @@ export const createHandleMessageSeen =
 			queryKey: ["messages", conversationId],
 		});
 	};
+};

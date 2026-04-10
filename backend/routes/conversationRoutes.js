@@ -9,6 +9,7 @@ import {
 	removeGroupAdmin,
 	removeGroupParticipant,
 	updateGroupAvatar,
+	updateSeen,
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
@@ -42,5 +43,7 @@ router.patch(
 	optimizeGroupAvatar,
 	updateGroupAvatar,
 );
+
+router.patch("/update-seen", protect, updateSeen);
 
 export default router;

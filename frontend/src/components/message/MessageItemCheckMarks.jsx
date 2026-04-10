@@ -3,7 +3,7 @@ import { cn, getMessageDisplayData } from "@/lib/utils";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
-function MessageItemCheckMarks({ message }) {
+function MessageItemCheckMarks({ message, isSeenByOtherUser }) {
 	const { currentConversation } = useConversationContext();
 	const { data: currentUser } = useCurrentUser();
 
@@ -16,7 +16,7 @@ function MessageItemCheckMarks({ message }) {
 				<CheckCheck
 					className={cn(
 						"h-4 w-4 stroke-[2.6]",
-						message?.isSeen ? "text-blue-600" : "text-primary-foreground/70",
+						isSeenByOtherUser ? "text-blue-600" : "text-primary-foreground/70",
 					)}
 				/>
 			) : (

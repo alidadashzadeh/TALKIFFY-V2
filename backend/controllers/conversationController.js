@@ -1,7 +1,8 @@
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
+import { getUserSocketIds, io } from "../lib/socket.js";
 import { buildPrivateConversationKey } from "../lib/utils.js";
 import Conversation from "../models/conversationModel.js";
-import sharp from "sharp";
+import Message from "../models/messageModel.js";
 
 export const getOrCreatePrivateConversation = async (req, res, next) => {
 	try {
@@ -27,6 +28,10 @@ export const getOrCreatePrivateConversation = async (req, res, next) => {
 				type: "private",
 				conversationKey,
 				participants: [currentUserId, userId],
+				readState: [
+					{ userId: currentUserId, lastSeenMessageId: null, lastSeenAt: null },
+					{ userId: userId, lastSeenMessageId: null, lastSeenAt: null },
+				],
 			});
 
 			conversation = await Conversation.findById(conversation._id).populate(
@@ -62,13 +67,37 @@ export const getMyConversations = async (req, res, next) => {
 					select: "username",
 				},
 			})
-			.sort({ lastMessageAt: -1 });
+			.sort({ lastMessageAt: -1 })
+			.lean();
+
+		const conversationsWithUnreadCounts = await Promise.all(
+			conversations.map(async (conversation) => {
+				const myReadState = conversation.readState?.find(
+					(state) => state.userId.toString() === currentUserId.toString(),
+				);
+
+				const unreadQuery = {
+					conversationId: conversation._id,
+					senderId: { $ne: currentUserId },
+				};
+
+				if (myReadState?.lastSeenAt) {
+					unreadQuery.createdAt = { $gt: myReadState.lastSeenAt };
+				}
+
+				const unreadCount = await Message.countDocuments(unreadQuery);
+
+				return {
+					...conversation,
+					unreadCount,
+				};
+			}),
+		);
 
 		res.status(200).json({
 			status: "success",
-			results: conversations.length,
 			data: {
-				conversations,
+				conversations: conversationsWithUnreadCounts,
 			},
 		});
 	} catch (err) {
@@ -76,9 +105,95 @@ export const getMyConversations = async (req, res, next) => {
 	}
 };
 
+export const updateSeen = async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const { conversationId, lastSeenMessageId } = req.body;
+
+		if (!conversationId || !lastSeenMessageId) {
+			return res.status(400).json({
+				status: "fail",
+				message: "conversationId and lastSeenMessageId are required",
+			});
+		}
+
+		const conversation = await Conversation.findOne({
+			_id: conversationId,
+			participants: userId,
+		});
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		const message = await Message.findOne({
+			_id: lastSeenMessageId,
+			conversationId,
+		}).select("_id createdAt");
+
+		if (!message) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Message not found in this conversation",
+			});
+		}
+
+		const readStateIndex = conversation.readState.findIndex(
+			(r) => String(r.userId) === String(userId),
+		);
+
+		if (readStateIndex !== -1) {
+			conversation.readState[readStateIndex].lastSeenMessageId = message._id;
+			conversation.readState[readStateIndex].lastSeenAt = message.createdAt;
+		} else {
+			conversation.readState.push({
+				userId,
+				lastSeenMessageId: message._id,
+				lastSeenAt: message.createdAt,
+			});
+		}
+
+		await conversation.save();
+
+		const payload = {
+			conversationId: String(conversation._id),
+			userId: String(userId),
+			lastSeenMessageId: String(message._id),
+			lastSeenAt: message.createdAt,
+		};
+
+		const otherParticipantIds = conversation.participants.filter(
+			(participantId) => String(participantId) !== String(userId),
+		);
+
+		otherParticipantIds.forEach((participantId) => {
+			const socketIds = getUserSocketIds(String(participantId));
+
+			socketIds.forEach((socketId) => {
+				io.to(socketId).emit("message:seen", payload);
+			});
+		});
+
+		return res.status(200).json({
+			status: "success",
+			message: "Messages marked as seen",
+			data: payload,
+		});
+	} catch (error) {
+		console.error("updateSeen error:", error);
+		return res.status(500).json({
+			status: "error",
+			message: "Something went wrong",
+		});
+	}
+};
+
 export const createGroupConversation = async (req, res) => {
 	try {
-		const currentUserId = req.user._id; // assuming auth middleware sets req.user
+		const currentUserId = req.user._id;
 		const { name, avatar } = req.body;
 
 		if (!name || !name.trim()) {
@@ -93,6 +208,9 @@ export const createGroupConversation = async (req, res) => {
 			name: name.trim(),
 			avatar: avatar || "",
 			participants: [currentUserId],
+			readState: [
+				{ userId: currentUserId, lastSeenMessageId: null, lastSeenAt: null },
+			],
 			admins: [currentUserId],
 			lastMessageId: null,
 			lastMessageAt: new Date(),
@@ -112,86 +230,6 @@ export const createGroupConversation = async (req, res) => {
 		});
 	} catch (error) {
 		console.error("createGroupConversation error:", error);
-		return res.status(500).json({
-			status: "fail",
-			message: error.message || "Something went wrong",
-		});
-	}
-};
-
-export const removeGroupParticipant = async (req, res) => {
-	try {
-		const { conversationId, userId } = req.params;
-		const currentUserId = req.user._id;
-
-		const conversation = await Conversation.findById(conversationId);
-
-		if (!conversation) {
-			return res.status(404).json({
-				status: "fail",
-				message: "Conversation not found",
-			});
-		}
-
-		if (conversation.type !== "group") {
-			return res.status(400).json({
-				status: "fail",
-				message: "Only group conversations can be updated",
-			});
-		}
-
-		const isAdmin = conversation.admins.some(
-			(admin) => String(admin._id || admin) === String(currentUserId),
-		);
-
-		if (!isAdmin) {
-			return res.status(403).json({
-				status: "fail",
-				message: "Only group admins can modify participants",
-			});
-		}
-
-		const isParticipant = conversation.participants.some(
-			(participant) =>
-				String(participant._id || participant) === String(userId),
-		);
-
-		if (!isParticipant) {
-			return res.status(404).json({
-				status: "fail",
-				message: "User is not a member in this group",
-			});
-		}
-
-		const isMemberAdmin = conversation.admins.some(
-			(admin) => String(admin._id || admin) === String(userId),
-		);
-
-		const participants = conversation.participants.filter(
-			(participant) =>
-				String(participant._id || participant) !== String(userId),
-		);
-
-		const admins = conversation.admins.filter(
-			(admin) => String(admin._id || admin) !== String(userId),
-		);
-
-		const updatedConversation = await Conversation.findByIdAndUpdate(
-			conversationId,
-			{ participants, admins },
-			{ new: true },
-		)
-			.populate("participants", "username email avatar")
-			.populate("admins", "username email avatar");
-
-		return res.status(200).json({
-			status: "success",
-			data: {
-				conversation: updatedConversation,
-			},
-		});
-	} catch (error) {
-		console.error("Remove participant error:", error);
 		return res.status(500).json({
 			status: "fail",
 			message: error.message || "Something went wrong",
@@ -243,6 +281,11 @@ export const addGroupParticipant = async (req, res) => {
 		}
 
 		conversation.participants.push(userId);
+		conversation.readState.push({
+			userId,
+			lastSeenMessageId: conversation.lastMessageId || null,
+			lastSeenAt: conversation.lastMessageAt || new Date(),
+		});
 
 		await conversation.save();
 
@@ -258,6 +301,86 @@ export const addGroupParticipant = async (req, res) => {
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({
+			status: "fail",
+			message: error.message || "Something went wrong",
+		});
+	}
+};
+
+export const removeGroupParticipant = async (req, res) => {
+	try {
+		const { conversationId, userId } = req.params;
+		const currentUserId = req.user._id;
+
+		const conversation = await Conversation.findById(conversationId);
+
+		if (!conversation) {
+			return res.status(404).json({
+				status: "fail",
+				message: "Conversation not found",
+			});
+		}
+
+		if (conversation.type !== "group") {
+			return res.status(400).json({
+				status: "fail",
+				message: "Only group conversations can be updated",
+			});
+		}
+
+		const isAdmin = conversation.admins.some(
+			(admin) => String(admin._id || admin) === String(currentUserId),
+		);
+
+		if (!isAdmin) {
+			return res.status(403).json({
+				status: "fail",
+				message: "Only group admins can modify participants",
+			});
+		}
+
+		const isParticipant = conversation.participants.some(
+			(participant) =>
+				String(participant._id || participant) === String(userId),
+		);
+
+		if (!isParticipant) {
+			return res.status(404).json({
+				status: "fail",
+				message: "User is not a member in this group",
+			});
+		}
+
+		const participants = conversation.participants.filter(
+			(participant) =>
+				String(participant._id || participant) !== String(userId),
+		);
+
+		const readState = conversation.readState.filter(
+			(state) => String(state.userId) !== String(userId),
+		);
+
+		const admins = conversation.admins.filter(
+			(admin) => String(admin._id || admin) !== String(userId),
+		);
+
+		const updatedConversation = await Conversation.findByIdAndUpdate(
+			conversationId,
+			{ participants, admins, readState },
+			{ new: true },
+		)
+			.populate("participants", "username email avatar")
+			.populate("admins", "username email avatar");
+
+		return res.status(200).json({
+			status: "success",
+			data: {
+				conversation: updatedConversation,
+			},
+		});
+	} catch (error) {
+		console.error("Remove participant error:", error);
+		return res.status(500).json({
 			status: "fail",
 			message: error.message || "Something went wrong",
 		});
@@ -457,6 +580,10 @@ export const leaveGroup = async (req, res) => {
 		// remove from participants
 		conversation.participants = conversation.participants.filter(
 			(user) => String(user._id || user) !== String(currentUserId),
+		);
+
+		conversation.readState = conversation.readState.filter(
+			(state) => String(state.userId) !== String(currentUserId),
 		);
 
 		// remove from admins if admin

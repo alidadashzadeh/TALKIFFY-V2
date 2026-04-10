@@ -12,12 +12,18 @@ import {
 	useLayoutEffect,
 } from "react";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 
 function ChatMessages() {
 	const { data: messages = [], isLoading } = useGetMessages();
 	const { data: currentUser } = useCurrentUser();
-	const { currentConversation } = useConversationContext();
+	const { currentConversationId } = useConversationContext();
+	const { data: conversations = [] } = useGetMyConversations();
+	const currentConversation =
+		conversations.find((c) => c._id === currentConversationId) || null;
+
 	const { mutateAsync: markMessagesSeen } = useMarkMessagesSeen();
+
 	const scrollContainerRef = useRef(null);
 	const targetMessageRef = useRef(null);
 	const bottomRef = useRef(null);
@@ -29,10 +35,39 @@ function ChatMessages() {
 	const seenTimeoutRef = useRef(null);
 	const lastSeenMessageRef = useRef(null);
 
-	const getSenderId = useCallback(
-		(msg) => msg?.senderId?._id || msg?.senderId,
-		[],
+	const getSenderId = useCallback((msg) => {
+		return msg?.senderId?._id || msg?.senderId;
+	}, []);
+
+	const myReadState = useMemo(() => {
+		return currentConversation?.readState?.find(
+			(r) => String(r.userId) === String(currentUser?._id),
+		);
+	}, [currentConversation?.readState, currentUser?._id]);
+
+	const lastSeenMessageId = myReadState?.lastSeenMessageId || null;
+
+	const lastSeenIndex = useMemo(() => {
+		if (!messages.length || !lastSeenMessageId) return -1;
+
+		return messages.findIndex(
+			(m) => String(m._id) === String(lastSeenMessageId),
+		);
+	}, [messages, lastSeenMessageId]);
+
+	const otherReadState = currentConversation?.readState?.find(
+		(r) => String(r.userId) !== String(currentUser?._id),
 	);
+
+	const otherLastSeenMessageId = otherReadState?.lastSeenMessageId || null;
+
+	const otherLastSeenIndex = useMemo(() => {
+		if (!otherLastSeenMessageId) return -1;
+
+		return messages.findIndex(
+			(m) => String(m._id) === String(otherLastSeenMessageId),
+		);
+	}, [messages, otherLastSeenMessageId]);
 
 	const measureNearBottom = useCallback(() => {
 		const container = scrollContainerRef.current;
@@ -42,7 +77,6 @@ function ChatMessages() {
 			container.scrollHeight - container.scrollTop - container.clientHeight;
 
 		const near = distanceFromBottom <= 200;
-
 		isNearBottomRef.current = near;
 
 		return near;
@@ -51,12 +85,16 @@ function ChatMessages() {
 	const firstUnseenMessageId = useMemo(() => {
 		if (!messages.length || !currentUser?._id) return null;
 
-		const first = messages.find(
-			(m) => m?.isSeen === false && getSenderId(m) !== currentUser._id,
-		);
+		if (!lastSeenMessageId) {
+			return messages[0]?._id || null;
+		}
 
-		return first?._id || null;
-	}, [messages, currentUser?._id, getSenderId]);
+		if (lastSeenIndex === -1) {
+			return null;
+		}
+
+		return messages[lastSeenIndex + 1]?._id || null;
+	}, [messages, currentUser?._id, lastSeenMessageId, lastSeenIndex]);
 
 	const queueSeenMessage = useCallback(
 		(message) => {
@@ -88,11 +126,18 @@ function ChatMessages() {
 		},
 		[currentConversation?._id, markMessagesSeen],
 	);
+
 	useEffect(() => {
 		didInitialScrollRef.current = false;
 		prevLastMessageIdRef.current = null;
 		isNearBottomRef.current = false;
 		targetMessageRef.current = null;
+		lastSeenMessageRef.current = null;
+
+		if (seenTimeoutRef.current) {
+			clearTimeout(seenTimeoutRef.current);
+			seenTimeoutRef.current = null;
+		}
 	}, [currentConversation?._id]);
 
 	useEffect(() => {
@@ -155,7 +200,8 @@ function ChatMessages() {
 		if (!lastMessageId) return;
 		if (lastMessageId === prevLastMessageId) return;
 
-		const isOwnLastMessage = getSenderId(lastMessage) === currentUser._id;
+		const isOwnLastMessage =
+			String(getSenderId(lastMessage)) === String(currentUser._id);
 
 		if (isOwnLastMessage || isNearBottomRef.current) {
 			bottomRef.current?.scrollIntoView({
@@ -202,7 +248,8 @@ function ChatMessages() {
 						let isGroup = false;
 
 						if (prev) {
-							const sameSender = getSenderId(prev) === getSenderId(message);
+							const sameSender =
+								String(getSenderId(prev)) === String(getSenderId(message));
 							const timeDiff =
 								new Date(message.createdAt) - new Date(prev.createdAt);
 							const within5min = timeDiff < 5 * 60 * 1000;
@@ -210,8 +257,16 @@ function ChatMessages() {
 							isGroup = sameSender && within5min;
 						}
 
-						const isTarget = message._id === firstUnseenMessageId;
-						const isOwnMessage = getSenderId(message) === currentUser?._id;
+						const isTarget =
+							String(message._id) === String(firstUnseenMessageId);
+
+						const isOwnMessage =
+							String(getSenderId(message)) === String(currentUser?._id);
+
+						const shouldTrackSeen = !isOwnMessage && index > lastSeenIndex;
+
+						const isSeenByOtherUser =
+							isOwnMessage && index <= otherLastSeenIndex;
 
 						return (
 							<MessageItem
@@ -219,9 +274,10 @@ function ChatMessages() {
 								message={message}
 								isGroup={isGroup}
 								ref={isTarget ? targetMessageRef : null}
-								shouldTrackSeen={!isOwnMessage && !message.isSeen}
+								shouldTrackSeen={shouldTrackSeen}
 								onSeen={queueSeenMessage}
 								observerRoot={scrollContainerRef.current}
+								isSeenByOtherUser={isSeenByOtherUser}
 							/>
 						);
 					})}
