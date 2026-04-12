@@ -5,7 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App.jsx";
 
-import { AuthContextProvider } from "./contexts/AuthContext";
 import { ContactContextProvider } from "./contexts/ContactContext.jsx";
 import { MessagesContextProvider } from "./contexts/MessagesContext.jsx";
 import { SettingContextProvider } from "./contexts/SettingContext.jsx";
@@ -19,22 +18,20 @@ createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<BrowserRouter>
 			<QueryProvider>
-				<AuthContextProvider>
-					<ConversationContextProvider>
-						<ContactContextProvider>
-							<MessagesContextProvider>
-								<SettingContextProvider>
-									<SocketContextProvider>
-										<SheetModalProvider>
-											<App />
-											<Toaster />
-										</SheetModalProvider>
-									</SocketContextProvider>
-								</SettingContextProvider>
-							</MessagesContextProvider>
-						</ContactContextProvider>
-					</ConversationContextProvider>
-				</AuthContextProvider>
+				<ConversationContextProvider>
+					<ContactContextProvider>
+						<MessagesContextProvider>
+							<SettingContextProvider>
+								<SocketContextProvider>
+									<SheetModalProvider>
+										<App />
+										<Toaster />
+									</SheetModalProvider>
+								</SocketContextProvider>
+							</SettingContextProvider>
+						</MessagesContextProvider>
+					</ContactContextProvider>
+				</ConversationContextProvider>
 			</QueryProvider>
 		</BrowserRouter>
 	</StrictMode>,

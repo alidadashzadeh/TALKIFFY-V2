@@ -8,7 +8,7 @@ import { useMessagesContext } from "@/contexts/MessagesContext";
 
 function useSendMessage() {
 	const queryClient = useQueryClient();
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser, loading } = useCurrentUser();
 	const { currentConversationId } = useConversationContext();
 	const { clearMessageState, setReplyTo } = useMessagesContext();
 

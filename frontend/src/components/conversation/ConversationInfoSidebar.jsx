@@ -11,7 +11,7 @@ import SharedFiles from "./SharedFiles";
 
 function ConversationInfoSidebar() {
 	const { currentConversation } = useConversationContext();
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 
 	const { name, avatar, isGroup, isAdmin } = getConversationDisplayData(
 		currentConversation,

@@ -1,19 +1,15 @@
-import { Button } from "@/components/ui/button";
 import { SheetContent } from "../ui/sheet";
 import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
 import ProfileModal from "../profile/ProfileModal";
-import { LogOut } from "lucide-react";
 import SettingsModal from "../settings/SettingsModal";
 import NewGroupModal from "../modals/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
 import ContactsModal from "../contacts/ContactsModal";
-import useLogout from "@/hooks/auth/useLogout";
+import LogoutBtn from "../buttons/LogoutBtn";
 
 function AccountSheetContent() {
-	const { logout } = useLogout();
-
 	return (
 		<SheetContent
 			side="left"
@@ -28,15 +24,7 @@ function AccountSheetContent() {
 					<ContactsModal />
 					<NewGroupModal />
 					<SettingsModal />
-
-					<Button
-						variant="ghost"
-						className="w-full justify-start gap-2"
-						onClick={logout}
-					>
-						<LogOut className="h-4 w-4" />
-						<span>Logout</span>
-					</Button>
+					<LogoutBtn />
 				</div>
 				<Separator />
 			</ScrollArea>

@@ -11,7 +11,7 @@ import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function ChatHeader() {
 	const { currentConversation } = useConversationContext();
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { onlineUsers } = useSocketContext();
 
 	const displayData = getConversationDisplayData(

@@ -7,9 +7,9 @@ import MessageLoading from "./components/chat/ChatLoading.jsx";
 import useCurrentUser from "./hooks/user/useCurrentUser.js";
 
 function App() {
-	const { data: currentUser, isLoading } = useCurrentUser();
+	const { currentUser, loading } = useCurrentUser();
 
-	if (isLoading && !currentUser) return <MessageLoading />;
+	if (loading && !currentUser) return <MessageLoading />;
 
 	return (
 		<div className="min-h-dvh">
@@ -17,7 +17,7 @@ function App() {
 				<Route
 					path="/"
 					element={
-						currentUser && !isLoading ? <HomePage /> : <Navigate to="/login" />
+						currentUser && !loading ? <HomePage /> : <Navigate to="/login" />
 					}
 				/>
 				<Route

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,12 +11,14 @@ import {
 } from "@/components/ui/dialog";
 
 import AddContactForm from "./AddContactForm";
+import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 
 function AddContactModal() {
-	const [open, setOpen] = useState(false);
+	const { addContactModalOpen, setAddContactModalOpen } =
+		useSheetModalContext();
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog open={addContactModalOpen} onOpenChange={setAddContactModalOpen}>
 			<DialogTrigger asChild>
 				<Button className="gap-2">
 					<UserPlus className="h-4 w-4" />
@@ -33,7 +34,7 @@ function AddContactModal() {
 					</DialogDescription>
 				</DialogHeader>
 
-				<AddContactForm onSuccess={() => setOpen(false)} />
+				<AddContactForm onSuccess={() => setAddContactModalOpen(false)} />
 			</DialogContent>
 		</Dialog>
 	);

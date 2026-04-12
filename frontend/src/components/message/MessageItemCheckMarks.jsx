@@ -5,7 +5,7 @@ import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function MessageItemCheckMarks({ message, isSeenByOtherUser }) {
 	const { currentConversation } = useConversationContext();
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 
 	const { isMe: isMyMessage } = getMessageDisplayData(message, currentUser);
 	const isGroupConversation = currentConversation?.type === "group";

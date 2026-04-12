@@ -16,7 +16,7 @@ import ProfileAccountInfo from "./ProfileAccountInfo";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ProfileModal() {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 
 	return (
 		<Dialog>

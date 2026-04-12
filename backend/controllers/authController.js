@@ -1,100 +1,117 @@
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
-
 import User from "../models/userModel.js";
 import { createSendToken } from "../lib/utils.js";
+import catchAsync from "../lib/catchAsync.js";
+import AppError from "../lib/AppError.js";
 
-export const signup = async (req, res) => {
-	try {
-		const newUser = await User.create({
-			email: req.body.email,
-			username: req.body.username,
-			password: req.body.password,
-			passwordConfirm: req.body.passwordConfirm,
-		});
+export const signup = catchAsync(async (req, res, next) => {
+	const { email, username, password, passwordConfirm } = req.body;
 
-		createSendToken(newUser, 201, res);
-	} catch (error) {
-		res.status(400).json({ status: "fail", message: error.message });
+	if (!email || !username || !password || !passwordConfirm) {
+		throw new AppError("Missing information", 400);
 	}
-};
 
-export const login = async (req, res) => {
-	try {
-		const { email, password } = req.body;
-
-		if (!email || !password)
-			throw new Error("Please provide email and password");
-
-		const user = await User.findOne({ email }).select("+password").populate({
-			path: "contacts",
-			select: " username email avatar",
-		});
-
-		if (!user || !(await user.isPasswordCorrect(password, user.password)))
-			throw new Error("Wrong credential!");
-
-		createSendToken(user, 200, res);
-	} catch (error) {
-		res.status(401).json({ status: "fail", message: error.message });
+	if (password !== passwordConfirm) {
+		throw new AppError("Passwords do not match", 400);
 	}
-};
 
-export const logout = async (req, res) => {
-	try {
-		res.cookie("jwt", "", {
-			expiresIn: new Date(Date.now() + 1 * 1000),
-			httpOnly: true,
-		});
-		res.status(200).json({ status: "success" });
-	} catch (error) {
-		res.status(400).json({ status: "fail", message: error.message });
+	const existingUser = await User.findOne({
+		$or: [{ email }, { username }],
+	});
+
+	if (existingUser && existingUser.email === email) {
+		throw new AppError("Email already in use", 400);
 	}
-};
 
-export const protect = async (req, res, next) => {
-	try {
-		let token;
+	const newUser = await User.create({
+		email,
+		username,
+		password,
+		passwordConfirm,
+	});
 
-		if (
-			req.headers.authorization &&
-			req.headers.authorization.startsWith("Bearer")
-		) {
-			token = req.headers.authorization.split(" ")[1];
-		} else if (req.cookies.jwt) {
-			token = req.cookies.jwt;
-		}
+	createSendToken(newUser, 201, res);
+});
 
-		if (!token)
-			throw new Error("You are not logged in, Please login to continue!");
+export const login = catchAsync(async (req, res, next) => {
+	const { email, password } = req.body;
 
-		const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-		const currentUser = await User.findById(decode.id);
-		if (!currentUser)
-			throw new Error("The user belonging to token no longer exist!");
-
-		if (!currentUser.hasChangedPasswordAfter(decode.iat))
-			throw new Error(
-				"The user has changed password recently, PLease login again!",
-			);
-
-		req.user = currentUser;
-
-		next();
-	} catch (error) {
-		res.status(401).json({ status: "fail", message: error.message });
+	if (!email || !password) {
+		throw new AppError("Please provide email and password", 400);
 	}
-};
 
-export const checkAuth = async (req, res) => {
-	try {
-		const user = await User.findById(req.user._id).populate({
-			path: "contacts",
-			select: " username email avatar",
-		});
+	const user = await User.findOne({ email }).select("+password").populate({
+		path: "contacts",
+		select: "username email avatar",
+	});
 
-		res.status(200).json({ status: "success", data: { user } });
-	} catch (error) {
-		res.status(400).json({ status: "fail", message: error.message });
+	if (!user || !(await user.isPasswordCorrect(password, user.password))) {
+		throw new AppError("Wrong credentials!", 401);
 	}
-};
+
+	createSendToken(user, 200, res);
+});
+
+export const logout = catchAsync(async (req, res, next) => {
+	res.cookie("jwt", "", {
+		expires: new Date(Date.now() + 1000),
+		httpOnly: true,
+	});
+
+	res.status(200).json({
+		status: "success",
+	});
+});
+
+export const protect = catchAsync(async (req, res, next) => {
+	let token;
+
+	if (
+		req.headers.authorization &&
+		req.headers.authorization.startsWith("Bearer")
+	) {
+		token = req.headers.authorization.split(" ")[1];
+	} else if (req.cookies.jwt) {
+		token = req.cookies.jwt;
+	}
+
+	if (!token)
+		throw new AppError("You are not logged in, Please login to continue!", 401);
+
+	const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+	const currentUser = await User.findById(decoded.id);
+
+	if (!currentUser)
+		throw new AppError("The user belonging to token no longer exist!", 401);
+
+	if (!currentUser.hasChangedPasswordAfter(decoded.iat))
+		throw new AppError(
+			"The user has changed password recently, Please login again!",
+			401,
+		);
+
+	req.user = currentUser;
+	next();
+});
+
+export const checkAuth = catchAsync(async (req, res, next) => {
+	if (!req.user?._id) {
+		throw new AppError("User not authenticated", 401);
+	}
+
+	const user = await User.findById(req.user._id).populate({
+		path: "contacts",
+		select: "username email avatar",
+	});
+
+	if (!user) {
+		throw new AppError("User no longer exists", 401);
+	}
+
+	res.status(200).json({
+		status: "success",
+		data: { user },
+	});
+});

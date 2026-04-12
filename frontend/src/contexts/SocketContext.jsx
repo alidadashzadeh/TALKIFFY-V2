@@ -15,10 +15,10 @@ export const SocketContextProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
 	const [onlineUsers, setOnlineUsers] = useState([]);
 
-	const { data: currentUser, isLoading } = useCurrentUser();
+	const { currentUser, loading } = useCurrentUser();
 
 	useEffect(() => {
-		if (isLoading) return;
+		if (loading) return;
 
 		if (!currentUser?._id) {
 			setSocket(null);
@@ -47,7 +47,7 @@ export const SocketContextProvider = ({ children }) => {
 			newSocket.off("presence:update", handlePresenceUpdate);
 			newSocket.disconnect();
 		};
-	}, [currentUser?._id, isLoading]);
+	}, [currentUser?._id, loading]);
 
 	useSocketListeners(socket);
 

@@ -17,7 +17,7 @@ export const ContactContextProvider = ({ children }) => {
 	const [currentContact, setCurrentContact] = useState(null);
 	const [filteredBy, setFilteredBy] = useState("");
 
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 
 	useEffect(() => {

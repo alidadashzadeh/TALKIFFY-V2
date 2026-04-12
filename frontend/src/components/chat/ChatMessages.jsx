@@ -15,7 +15,7 @@ import { useConversationContext } from "@/contexts/ConversationContext";
 
 function ChatMessages() {
 	const { data: messages = [], isLoading } = useGetMessages();
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 
 	const { mutateAsync: markMessagesSeen } = useMarkMessagesSeen();

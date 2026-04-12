@@ -3,7 +3,7 @@ import { cn, getMessageDisplayData } from "@/lib/utils";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ReplyMessage({ replyMessage, isMe }) {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 
 	if (!replyMessage) return null;
 

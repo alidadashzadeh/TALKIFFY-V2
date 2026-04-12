@@ -29,7 +29,7 @@ const MessageItem = forwardRef(function MessageItem(
 	},
 	forwardedRef,
 ) {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 	const { setReplyTo, textareaRef } = useMessagesContext();
 

@@ -14,20 +14,24 @@ function useCreateGroupConversation() {
 	const { mutateAsync: createGroupConversation, isPending: loading } =
 		useMutation({
 			mutationFn: async ({ name }) => {
-				if (!name.trim()) return;
+				const trimmedName = name.trim();
+				if (!trimmedName) throw new Error("Group name cannot be empty");
 
 				const { data } = await axiosInstance.post("/conversations/group", {
-					name: name.trim(),
+					name: trimmedName,
 				});
-				return data?.data?.conversation;
+				return data;
 			},
 
-			onSuccess: (conversation) => {
-				if (!conversation) return;
-				selectConversation(conversation);
+			onSuccess: (data) => {
+				if (data.status !== "success") return;
+
+				selectConversation(data?.data?.conversation);
+
 				queryClient.invalidateQueries({
 					queryKey: ["conversations"],
 				});
+
 				setAccountSheetOpen(false);
 				toast.success("Group created successfully");
 			},

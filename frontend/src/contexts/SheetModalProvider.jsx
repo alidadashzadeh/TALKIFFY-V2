@@ -5,6 +5,7 @@ const SheetModalContext = createContext();
 function SheetModalProvider({ children }) {
 	const [accountSheetOpen, setAccountSheetOpen] = useState(false);
 	const [contactModalOpen, setContactModalOpen] = useState(false);
+	const [addContactModalOpen, setAddContactModalOpen] = useState(false);
 	const [groupModalOpen, setGroupModalOpen] = useState(false);
 	const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 	const [conversationInfoOpen, setConversationInfoOpen] = useState(false);
@@ -24,6 +25,8 @@ function SheetModalProvider({ children }) {
 				setConversationInfoOpen,
 				editGroupModalOpen,
 				setEditGroupModalOpen,
+				addContactModalOpen,
+				setAddContactModalOpen,
 			}}
 		>
 			{children}

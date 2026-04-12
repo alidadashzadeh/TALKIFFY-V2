@@ -5,7 +5,7 @@ import { filterContacts } from "@/lib/utils/contact";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ContactsList({ ActionComponent }) {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { filteredBy } = useContactContext();
 
 	const contacts = currentUser?.contacts || [];

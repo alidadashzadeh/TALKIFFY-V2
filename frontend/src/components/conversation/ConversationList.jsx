@@ -10,11 +10,11 @@ import { filterConversations } from "@/lib/utils/conversation";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function ConversationList() {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 	const { currentConversationId, filteredConversationsBy } =
 		useConversationContext();
 
-	const { data: conversations = [], isLoading } = useGetMyConversations();
+	const { conversations, loading } = useGetMyConversations();
 
 	const filteredConversations = filterConversations({
 		conversations,
@@ -22,7 +22,7 @@ function ConversationList() {
 		currentUserId: currentUser?._id,
 	});
 
-	if (isLoading) {
+	if (loading) {
 		return <ConversationLoader />;
 	}
 

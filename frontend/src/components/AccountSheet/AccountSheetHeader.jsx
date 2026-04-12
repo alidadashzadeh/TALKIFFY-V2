@@ -3,7 +3,7 @@ import AvatarGenerator from "../AvatarGenerator";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 
 function AccountSheetHeader() {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
 
 	const shortName =
 		currentUser?.username.length < 16

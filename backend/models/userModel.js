@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
 		},
 		contacts: [{ type: mongoose.Types.ObjectId, ref: "User" }],
 	},
-	{ timestamps: true }
+	{ timestamps: true, versionKey: false },
 );
 
 userSchema.pre("save", async function (next) {
@@ -43,14 +43,13 @@ userSchema.pre("save", async function (next) {
 
 	this.password = await bcrypt.hash(this.password, 12);
 	this.passwordConfirm = undefined;
-	this.avatar = `https://avatar.iran.liara.run/public?username=${this._id}`;
 
 	next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (
 	candidatePassword,
-	userPassword
+	userPassword,
 ) {
 	return await bcrypt.compare(candidatePassword, userPassword);
 };

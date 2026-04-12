@@ -22,7 +22,7 @@ export const ConversationContextProvider = ({ children }) => {
 	const [currentConversationId, setCurrentConversationId] = useState(null);
 	const [filteredConversationsBy, setFilteredConversationsBy] = useState("");
 
-	const { data: conversations = [] } = useGetMyConversations();
+	const { conversations } = useGetMyConversations();
 
 	const currentConversation =
 		conversations.find(

@@ -15,7 +15,8 @@ import { useSocketContext } from "@/contexts/SocketContext";
 import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function ConversationListItem({ conversation, isActive = false }) {
-	const { data: currentUser } = useCurrentUser();
+	const { currentUser } = useCurrentUser();
+
 	const { selectConversation } = useConversationContext();
 	const { onlineUsers } = useSocketContext();
 
@@ -27,6 +28,7 @@ function ConversationListItem({ conversation, isActive = false }) {
 		conversation,
 		currentUser?._id,
 	);
+
 	const isOnline =
 		conversation?.type !== "group" && onlineUsers.includes(displayData?.id);
 

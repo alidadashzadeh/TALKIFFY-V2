@@ -195,7 +195,6 @@ export const createGroupConversation = catchAsync(async (req, res) => {
 
 	await newConversation.populate([
 		{ path: "participants", select: "username avatar email" },
-		{ path: "admins", select: "username avatar email" },
 	]);
 
 	return res.status(201).json({
