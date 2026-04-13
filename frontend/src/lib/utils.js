@@ -169,3 +169,7 @@ export function truncateText(text, maxLength = 40) {
 	if (!text) return "";
 	return text.length > maxLength ? text.slice(0, maxLength) + "…" : text;
 }
+
+export const getUserId = (userId) => {
+	return typeof userId === "string" ? userId : userId?._id;
+};

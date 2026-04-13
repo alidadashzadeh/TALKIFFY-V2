@@ -20,16 +20,29 @@ function useCreateGroupConversation() {
 				const { data } = await axiosInstance.post("/conversations/group", {
 					name: trimmedName,
 				});
-				return data;
+				return {
+					status: data?.status,
+					conversation: data?.data?.conversation,
+				};
 			},
 
-			onSuccess: (data) => {
-				if (data.status !== "success") return;
+			onSuccess: ({ status, conversation }) => {
+				if (status !== "success") return;
 
-				selectConversation(data?.data?.conversation);
+				selectConversation(conversation);
 
-				queryClient.invalidateQueries({
-					queryKey: ["conversations"],
+				queryClient.setQueryData(["conversations"], (oldConversations = []) => {
+					const exists = oldConversations.some(
+						(item) => item._id === conversation._id,
+					);
+
+					if (!exists) {
+						return [conversation, ...oldConversations];
+					}
+
+					return oldConversations.map((item) =>
+						item._id === conversation._id ? conversation : item,
+					);
 				});
 
 				setAccountSheetOpen(false);

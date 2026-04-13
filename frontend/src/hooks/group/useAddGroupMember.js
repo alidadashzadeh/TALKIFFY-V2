@@ -1,5 +1,7 @@
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
+import { getUserId } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -14,8 +16,7 @@ function useAddGroupMember() {
 			}
 
 			const participantIds = currentConversation.participants.map(
-				(participant) =>
-					typeof participant === "string" ? participant : participant._id,
+				(participant) => getUserId(participant),
 			);
 
 			if (participantIds.includes(userId)) {
@@ -26,19 +27,80 @@ function useAddGroupMember() {
 				`/conversations/${currentConversation._id}/participants/${userId}`,
 			);
 
-			return data;
+			return {
+				status: data?.status,
+				conversation: data?.data?.conversation,
+			};
 		},
-		onSuccess: (data) => {
-			queryClient.invalidateQueries({
+
+		onMutate: async (userId) => {
+			await queryClient.cancelQueries({
 				queryKey: ["conversations"],
 			});
 
-			selectConversation(data.data.conversation);
+			const previousConversations =
+				queryClient.getQueryData(["conversations"]) || [];
+			const previousConversation = currentConversation;
+
+			if (!currentConversation?._id) {
+				return { previousConversations, previousConversation };
+			}
+
+			const participantIds = currentConversation.participants.map(
+				(participant) => getUserId(participant),
+			);
+
+			if (participantIds.includes(userId)) {
+				return { previousConversations, previousConversation };
+			}
+
+			const optimisticConversation = {
+				...currentConversation,
+				participants: [...currentConversation.participants, userId],
+			};
+
+			queryClient.setQueryData(["conversations"], (oldConversations = []) =>
+				oldConversations.map((item) =>
+					item._id === optimisticConversation._id
+						? optimisticConversation
+						: item,
+				),
+			);
+
+			selectConversation(optimisticConversation);
+
+			return {
+				previousConversations,
+				previousConversation,
+			};
+		},
+
+		onSuccess: ({ status, conversation }) => {
+			if (status !== "success" || !conversation) return;
+
+			queryClient.setQueryData(["conversations"], (oldConversations = []) => {
+				return oldConversations.map((item) =>
+					item._id === conversation._id ? conversation : item,
+				);
+			});
+
+			selectConversation(conversation);
 			toast.success("Member added successfully");
 		},
-		onError: (error) => {
-			if (error.message === "User is already a member") return;
-			toast.error(error.response?.data?.message || "Failed to add member");
+
+		onError: (error, _userId, context) => {
+			if (context?.previousConversations) {
+				queryClient.setQueryData(
+					["conversations"],
+					context.previousConversations,
+				);
+			}
+
+			if (context?.previousConversation) {
+				selectConversation(context.previousConversation);
+			}
+
+			handleErrorToast(error);
 		},
 	});
 

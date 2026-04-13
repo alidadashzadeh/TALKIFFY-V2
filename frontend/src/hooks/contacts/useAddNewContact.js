@@ -25,12 +25,16 @@ function useAddNewContact() {
 				email: trimmedEmail,
 			});
 
-			return data;
+			return {
+				status: data?.status,
+				user: data?.data?.user,
+			};
 		},
 		retry: false,
-		onSuccess: (data) => {
-			if (data?.status !== "success") return;
-			queryClient.setQueryData(["currentUser"], data?.data?.user);
+		onSuccess: ({ status, user }) => {
+			if (status !== "success") return;
+
+			queryClient.setQueryData(["currentUser"], user);
 
 			setAddContactModalOpen(false);
 

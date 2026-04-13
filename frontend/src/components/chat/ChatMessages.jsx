@@ -14,7 +14,7 @@ import {
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function ChatMessages() {
-	const { data: messages = [], isLoading } = useGetMessages();
+	const { messages = [], loading } = useGetMessages();
 	const { currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
 
@@ -221,7 +221,7 @@ function ChatMessages() {
 		};
 	}, []);
 
-	if (isLoading) {
+	if (loading) {
 		return (
 			<div className="flex h-full items-center justify-center text-sm text-muted-foreground">
 				<Spinner />

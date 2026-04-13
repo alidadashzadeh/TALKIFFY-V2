@@ -1,38 +1,49 @@
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { axiosInstance } from "@/lib/axios";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import { handleErrorToast } from "@/lib/errorHandler";
 
 function useGetOrCreatePrivateConversation() {
-	const [loading, setLoading] = useState(false);
-
 	const queryClient = useQueryClient();
 	const { selectConversation } = useConversationContext();
 
-	const getOrCreatePrivateConversation = async (contactId) => {
-		setLoading(true);
+	const { mutateAsync: getOrCreatePrivateConversation, isPending: loading } =
+		useMutation({
+			mutationFn: async (contactId) => {
+				const { data } = await axiosInstance.get(
+					`/conversations/private/${contactId}`,
+				);
+				return {
+					status: data?.status,
+					conversation: data?.data?.conversation,
+				};
+			},
 
-		try {
-			const { data } = await axiosInstance.get(
-				`/conversations/private/${contactId}`,
-			);
+			onSuccess: ({ status, conversation }) => {
+				if (status !== "success") return;
 
-			const conversation = data?.data?.conversation;
-
-			if (conversation) {
 				selectConversation(conversation);
-			}
 
-			queryClient.invalidateQueries({
-				queryKey: ["conversations"],
-			});
+				queryClient.setQueryData(["conversations"], (oldConversations = []) => {
+					const exists = oldConversations.some(
+						(item) => item._id === conversation._id,
+					);
 
-			return conversation;
-		} finally {
-			setLoading(false);
-		}
-	};
+					if (!exists) {
+						return [conversation, ...oldConversations];
+					}
+
+					return oldConversations.map((item) =>
+						item._id === conversation._id ? conversation : item,
+					);
+				});
+			},
+
+			onError: (error) => {
+				handleErrorToast(error);
+			},
+		});
 
 	return { getOrCreatePrivateConversation, loading };
 }
