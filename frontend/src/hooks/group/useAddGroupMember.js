@@ -9,31 +9,28 @@ function useAddGroupMember() {
 	const queryClient = useQueryClient();
 	const { currentConversation, selectConversation } = useConversationContext();
 
-	const mutation = useMutation({
+	const { mutateAsync: addMemberToGroup, isPending: loading } = useMutation({
 		mutationFn: async (userId) => {
-			if (!currentConversation?._id) {
-				throw new Error("No conversation selected");
-			}
-
-			const participantIds = currentConversation.participants.map(
-				(participant) => getUserId(participant),
-			);
-
-			if (participantIds.includes(userId)) {
-				throw new Error("User is already a member");
-			}
-
 			const { data } = await axiosInstance.post(
 				`/conversations/${currentConversation._id}/participants/${userId}`,
 			);
 
-			return {
-				status: data?.status,
-				conversation: data?.data?.conversation,
-			};
+			if (data?.status !== "success" || !data?.data?.conversation) {
+				throw new Error(data?.message || "Failed to add member");
+			}
+
+			return data.data.conversation;
 		},
 
 		onMutate: async (userId) => {
+			if (!currentConversation?._id) {
+				throw new Error("No conversation selected");
+			}
+
+			if (!userId) {
+				throw new Error("No user selected");
+			}
+
 			await queryClient.cancelQueries({
 				queryKey: ["conversations"],
 			});
@@ -42,16 +39,12 @@ function useAddGroupMember() {
 				queryClient.getQueryData(["conversations"]) || [];
 			const previousConversation = currentConversation;
 
-			if (!currentConversation?._id) {
-				return { previousConversations, previousConversation };
-			}
-
 			const participantIds = currentConversation.participants.map(
 				(participant) => getUserId(participant),
 			);
 
 			if (participantIds.includes(userId)) {
-				return { previousConversations, previousConversation };
+				throw new Error("User is already a member");
 			}
 
 			const optimisticConversation = {
@@ -75,14 +68,12 @@ function useAddGroupMember() {
 			};
 		},
 
-		onSuccess: ({ status, conversation }) => {
-			if (status !== "success" || !conversation) return;
-
-			queryClient.setQueryData(["conversations"], (oldConversations = []) => {
-				return oldConversations.map((item) =>
+		onSuccess: (conversation) => {
+			queryClient.setQueryData(["conversations"], (oldConversations = []) =>
+				oldConversations.map((item) =>
 					item._id === conversation._id ? conversation : item,
-				);
-			});
+				),
+			);
 
 			selectConversation(conversation);
 			toast.success("Member added successfully");
@@ -105,9 +96,8 @@ function useAddGroupMember() {
 	});
 
 	return {
-		addMemberToGroup: mutation.mutateAsync,
-		loading: mutation.isPending,
-		error: mutation.error,
+		addMemberToGroup,
+		loading,
 	};
 }
 

@@ -1,72 +1,95 @@
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
 import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function useLeaveGroup() {
-	const [loading, setLoading] = useState(false);
 	const queryClient = useQueryClient();
 	const { currentConversation, selectConversation } = useConversationContext();
 
-	const leaveGroup = async () => {
-		const conversationId = currentConversation?._id;
-		if (!currentConversation?._id) return;
-		try {
-			setLoading(true);
+	const { mutateAsync: leaveGroup, isPending: loading } = useMutation({
+		mutationFn: async () => {
+			const conversationId = currentConversation?._id;
 
-			const res = await axiosInstance.delete(
+			if (!conversationId) {
+				throw new Error("No conversation selected");
+			}
+
+			const { data } = await axiosInstance.delete(
 				`/conversations/${conversationId}/leave`,
 			);
 
-			const leftConversationId =
-				res?.data?.data?.conversationId || conversationId;
+			return {
+				status: data?.status,
+				conversationId: data?.data?.conversationId || conversationId,
+			};
+		},
 
-			queryClient.setQueryData(["conversations"], (oldData) => {
-				if (!oldData) return oldData;
+		onMutate: async () => {
+			const conversationId = currentConversation?._id;
 
-				// case 1: query data is array
-				if (Array.isArray(oldData)) {
-					return oldData.filter((conv) => conv._id !== leftConversationId);
-				}
+			if (!conversationId) return {};
 
-				// case 2: query data is object with conversations array
-				if (Array.isArray(oldData.conversations)) {
-					return {
-						...oldData,
-						conversations: oldData.conversations.filter(
-							(conv) => conv._id !== leftConversationId,
-						),
-					};
-				}
-
-				return oldData;
+			await queryClient.cancelQueries({
+				queryKey: ["conversations"],
 			});
 
-			if (currentConversation?._id === leftConversationId) {
+			const previousConversations =
+				queryClient.getQueryData(["conversations"]) || [];
+			const previousConversation = currentConversation;
+
+			queryClient.setQueryData(["conversations"], (oldConversations = []) =>
+				oldConversations.filter(
+					(conversation) => conversation._id !== conversationId,
+				),
+			);
+
+			if (currentConversation?._id === conversationId) {
 				selectConversation(null);
 			}
 
-			queryClient.invalidateQueries({ queryKey: ["conversations"] });
+			return {
+				previousConversations,
+				previousConversation,
+			};
+		},
+
+		onSuccess: ({ status, conversationId }) => {
+			if (status !== "success") return;
+
 			queryClient.removeQueries({
-				queryKey: ["conversation", leftConversationId],
+				queryKey: ["conversation", conversationId],
 			});
 
-			toast.success(res?.data?.message || "You left the group");
+			queryClient.removeQueries({
+				queryKey: ["messages", conversationId],
+			});
 
-			return res;
-		} catch (error) {
-			console.error(error);
-			toast.error(
-				error?.response?.data?.message || "Failed to leave the group",
-			);
-			return null;
-		} finally {
-			setLoading(false);
-		}
+			toast.success("You left the group");
+		},
+
+		onError: (error, _variables, context) => {
+			if (context?.previousConversations) {
+				queryClient.setQueryData(
+					["conversations"],
+					context.previousConversations,
+				);
+			}
+
+			if (context?.previousConversation) {
+				selectConversation(context.previousConversation);
+			}
+
+			handleErrorToast(error);
+		},
+	});
+
+	return {
+		leaveGroup,
+		loading,
 	};
-
-	return { leaveGroup, loading };
 }
 
 export default useLeaveGroup;

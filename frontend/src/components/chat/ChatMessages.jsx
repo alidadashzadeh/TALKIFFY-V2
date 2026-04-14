@@ -17,20 +17,15 @@ function ChatMessages() {
 	const { messages = [], loading } = useGetMessages();
 	const { currentUser } = useCurrentUser();
 	const { currentConversation } = useConversationContext();
-
-	const { mutateAsync: markMessagesSeen } = useMarkMessagesSeen();
-
+	const { markMessagesSeen } = useMarkMessagesSeen();
 	const scrollContainerRef = useRef(null);
 	const targetMessageRef = useRef(null);
 	const bottomRef = useRef(null);
-
 	const didInitialScrollRef = useRef(false);
 	const prevLastMessageIdRef = useRef(null);
 	const isNearBottomRef = useRef(false);
-
 	const seenTimeoutRef = useRef(null);
 	const lastSeenMessageRef = useRef(null);
-
 	const getSenderId = useCallback((msg) => {
 		return msg?.senderId?._id || msg?.senderId;
 	}, []);

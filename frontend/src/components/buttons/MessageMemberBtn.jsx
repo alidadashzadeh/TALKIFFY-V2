@@ -5,9 +5,11 @@ import { MessageSquare } from "lucide-react";
 function MessageMemberBtn({ member }) {
 	const { getOrCreatePrivateConversation } =
 		useGetOrCreatePrivateConversation();
-	const handleMessageClick = async () => {
-		await getOrCreatePrivateConversation(member?._id);
+
+	const handleMessageClick = () => {
+		getOrCreatePrivateConversation(member?._id);
 	};
+
 	return (
 		<Button
 			variant="ghost"

@@ -7,44 +7,64 @@ import { toast } from "sonner";
 
 function useRemoveGroupAdmin() {
 	const queryClient = useQueryClient();
-	const { currentConversation, currentConversationId, selectConversation } =
+	const { currentConversationId, selectConversation } =
 		useConversationContext();
 
-	const mutation = useMutation({
-		mutationFn: async ({ userId }) => {
+	const { mutateAsync: removeAdmin, isPending: loading } = useMutation({
+		mutationFn: async (userId) => {
 			const { data } = await axiosInstance.delete(
 				`/conversations/${currentConversationId}/admins/${userId}`,
 			);
 
-			return {
-				status: data?.status,
-				conversation: data?.data?.conversation,
-			};
+			if (data?.status !== "success" || !data?.data?.conversation) {
+				throw new Error(data?.message || "Failed to remove admin");
+			}
+
+			return data.data.conversation;
 		},
 
-		onMutate: async ({ userId }) => {
+		onMutate: async (userId) => {
+			if (!currentConversationId) {
+				throw new Error("No conversation selected");
+			}
+
+			if (!userId) {
+				throw new Error("No user selected");
+			}
+
 			await queryClient.cancelQueries({
 				queryKey: ["conversations"],
 			});
 
 			const previousConversations =
 				queryClient.getQueryData(["conversations"]) || [];
-			const previousConversation = currentConversation;
 
-			if (!currentConversation?._id) {
-				return { previousConversations, previousConversation };
+			const previousConversation = previousConversations.find(
+				(item) => item._id === currentConversationId,
+			);
+
+			if (!previousConversation) {
+				throw new Error("Conversation not found in cache");
+			}
+
+			const isAdmin = (previousConversation.admins || []).some(
+				(admin) => getUserId(admin)?.toString() === userId.toString(),
+			);
+
+			if (!isAdmin) {
+				throw new Error("User is not an admin");
 			}
 
 			const optimisticConversation = {
-				...currentConversation,
-				admins: (currentConversation.admins || []).filter((admin) => {
-					return getUserId(admin) !== getUserId(userId);
-				}),
+				...previousConversation,
+				admins: (previousConversation.admins || []).filter(
+					(admin) => getUserId(admin)?.toString() !== userId.toString(),
+				),
 			};
 
 			queryClient.setQueryData(["conversations"], (oldConversations = []) =>
 				oldConversations.map((item) =>
-					item._id === currentConversation._id ? optimisticConversation : item,
+					item._id === currentConversationId ? optimisticConversation : item,
 				),
 			);
 
@@ -56,20 +76,18 @@ function useRemoveGroupAdmin() {
 			};
 		},
 
-		onSuccess: ({ status, conversation }) => {
-			if (status !== "success" || !conversation) return;
-
-			queryClient.setQueryData(["conversations"], (oldConversations = []) => {
-				return oldConversations.map((item) =>
+		onSuccess: (conversation) => {
+			queryClient.setQueryData(["conversations"], (oldConversations = []) =>
+				oldConversations.map((item) =>
 					item._id === conversation._id ? conversation : item,
-				);
-			});
+				),
+			);
 
 			selectConversation(conversation);
-			toast.success("Admin Removed");
+			toast.success("Admin removed");
 		},
 
-		onError: (error, _variables, context) => {
+		onError: (error, _userId, context) => {
 			if (context?.previousConversations) {
 				queryClient.setQueryData(
 					["conversations"],
@@ -86,9 +104,8 @@ function useRemoveGroupAdmin() {
 	});
 
 	return {
-		removeAdmin: mutation.mutateAsync,
-		loading: mutation.isPending,
-		error: mutation.error,
+		removeAdmin,
+		loading,
 	};
 }
 

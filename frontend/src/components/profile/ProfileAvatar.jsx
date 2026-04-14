@@ -22,7 +22,11 @@ function ProfileAvatar({ currentUser }) {
 	return (
 		<div className="relative flex items-center justify-center py-4">
 			<Avatar className="w-24 h-24 object-cover">
-				<AvatarImage src={currentUser?.avatar} alt={currentUser?.username} />
+				<AvatarImage
+					src={currentUser?.avatar}
+					alt={currentUser?.username}
+					className="object-cover"
+				/>
 				<AvatarFallback className="flex items-center justify-center">
 					{currentUser?.username}
 				</AvatarFallback>

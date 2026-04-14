@@ -5,10 +5,9 @@ import { DropdownMenuItem } from "../ui/dropdown-menu";
 function LeaveGroupBtn() {
 	const { leaveGroup } = useLeaveGroup();
 
-	const handleLeaveGroup = () => leaveGroup();
 	return (
 		<DropdownMenuItem
-			onClick={handleLeaveGroup}
+			onClick={leaveGroup}
 			className="text-red-500 focus:text-red-500"
 		>
 			<LogOut className="mr-2 h-4 w-4" />

@@ -63,7 +63,10 @@ function EditGroupInfoModal() {
 					<div className="relative flex flex-col gap-4 items-center justify-center py-4 ">
 						<div>
 							<Avatar className="w-24 h-24 object-cover">
-								<AvatarImage src={currentConversation?.avatar} alt={name} />
+								<AvatarImage
+									src={currentConversation?.avatar}
+									className="object-cover"
+								/>
 								<AvatarFallback className="flex items-center justify-center">
 									{currentConversation?.name}
 								</AvatarFallback>

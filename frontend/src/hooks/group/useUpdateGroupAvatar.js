@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
 import { useConversationContext } from "@/contexts/ConversationContext";
+import { handleErrorToast } from "@/lib/errorHandler";
 
 function useUpdateGroupAvatar() {
 	const queryClient = useQueryClient();
-	const { currentConversation, selectConversation } = useConversationContext();
+	const { selectConversation } = useConversationContext();
 
 	const { mutateAsync: updateGroupAvatar, isPending: loading } = useMutation({
 		mutationFn: async ({ conversationId, file }) => {
@@ -17,11 +18,17 @@ function useUpdateGroupAvatar() {
 				formData,
 			);
 
-			return data;
+			if (data?.status !== "success" || !data?.data?.conversation) {
+				throw new Error(data?.message || "Failed to update group avatar");
+			}
+
+			return data.data.conversation;
 		},
 
 		onMutate: async ({ conversationId, file }) => {
-			if (!file || !conversationId) return;
+			if (!file || !conversationId) {
+				throw new Error("File and conversation ID are required");
+			}
 
 			const previewUrl = URL.createObjectURL(file);
 
@@ -30,12 +37,16 @@ function useUpdateGroupAvatar() {
 				queryKey: ["conversation", conversationId],
 			});
 
-			const previousConversations = queryClient.getQueryData(["conversations"]);
+			const previousConversations =
+				queryClient.getQueryData(["conversations"]) || [];
 			const previousConversation = queryClient.getQueryData([
 				"conversation",
 				conversationId,
 			]);
-			const previousCurrentConversation = currentConversation;
+
+			const optimisticConversation = previousConversation
+				? { ...previousConversation, avatar: previewUrl }
+				: null;
 
 			queryClient.setQueryData(["conversations"], (oldData = []) =>
 				oldData.map((conversation) =>
@@ -53,14 +64,39 @@ function useUpdateGroupAvatar() {
 						: oldConversation,
 			);
 
+			if (optimisticConversation) {
+				selectConversation(optimisticConversation);
+			}
+
 			return {
 				previousConversations,
 				previousConversation,
-				previousCurrentConversation,
 				previewUrl,
 			};
 		},
 
+		onSuccess: (updatedConversation, variables) => {
+			const realUrl = updatedConversation.avatar;
+
+			const img = new window.Image();
+			img.src = realUrl;
+
+			img.onload = () => {
+				queryClient.setQueryData(["conversations"], (oldData = []) =>
+					oldData.map((conversation) =>
+						conversation._id === variables.conversationId
+							? updatedConversation
+							: conversation,
+					),
+				);
+				queryClient.setQueryData(
+					["conversation", variables.conversationId],
+					updatedConversation,
+				);
+			};
+
+			toast.success("Group avatar updated");
+		},
 		onError: (error, variables, context) => {
 			if (context?.previousConversations) {
 				queryClient.setQueryData(
@@ -78,40 +114,12 @@ function useUpdateGroupAvatar() {
 
 			const message =
 				error?.response?.data?.message || "Failed to update group avatar";
-			toast.error(message);
+			handleErrorToast(message);
 		},
-
-		onSuccess: (data, variables) => {
-			const updatedConversation = data?.data?.conversation;
-			if (!updatedConversation) return;
-
-			queryClient.setQueryData(["conversations"], (oldData = []) =>
-				oldData.map((conversation) =>
-					conversation._id === variables.conversationId
-						? updatedConversation
-						: conversation,
-				),
-			);
-
-			queryClient.setQueryData(
-				["conversation", variables.conversationId],
-				updatedConversation,
-			);
-
-			selectConversation(updatedConversation);
-
-			toast.success("Group avatar updated");
-		},
-
 		onSettled: (data, error, variables, context) => {
 			if (context?.previewUrl) {
 				URL.revokeObjectURL(context.previewUrl);
 			}
-
-			queryClient.invalidateQueries({ queryKey: ["conversations"] });
-			queryClient.invalidateQueries({
-				queryKey: ["conversation", variables.conversationId],
-			});
 		},
 	});
 

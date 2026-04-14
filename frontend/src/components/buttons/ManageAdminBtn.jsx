@@ -13,31 +13,18 @@ function ManageAdminBtn({ member }) {
 		currentConversation,
 		member?._id,
 	);
-	const handleMakeAdmin = async () => {
-		try {
-			await addAdmin({
-				userId: member?._id,
-			});
-		} catch (error) {
-			console.error(error);
-		}
+	const handleAddAdmin = () => {
+		addAdmin(member?._id);
 	};
-
-	const handleRemoveAdmin = async () => {
-		try {
-			await removeAdmin({
-				userId: member?._id,
-			});
-		} catch (error) {
-			console.error(error);
-		}
+	const handleRemoveAdmin = () => {
+		removeAdmin(member?._id);
 	};
 
 	return (
 		<div>
 			{!isAdmin ? (
 				<Button
-					onClick={handleMakeAdmin}
+					onClick={handleAddAdmin}
 					variant="ghost"
 					className="w-full justify-start"
 				>

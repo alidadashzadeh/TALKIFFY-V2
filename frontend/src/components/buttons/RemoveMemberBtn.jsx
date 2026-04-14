@@ -1,21 +1,12 @@
 import { UserMinus } from "lucide-react";
 import { Button } from "../ui/button";
 import useRemoveGroupMember from "@/hooks/group/useRemoveGroupMember";
-import { useConversationContext } from "@/contexts/ConversationContext";
 
 function RemoveMemberBtn({ member }) {
 	const { removeParticipant, loading } = useRemoveGroupMember();
-	const { currentConversationId } = useConversationContext();
 
-	const handleRemoveMember = async () => {
-		try {
-			await removeParticipant({
-				conversationId: currentConversationId,
-				userId: member?._id,
-			});
-		} catch (error) {
-			console.error(error);
-		}
+	const handleRemoveMember = () => {
+		removeParticipant(member?._id);
 	};
 	return (
 		<Button

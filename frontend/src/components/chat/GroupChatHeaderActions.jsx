@@ -1,12 +1,11 @@
 import { useState } from "react";
-import { MoreVertical, Search, X, Volume2Icon } from "lucide-react";
+import { MoreVertical, Search, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -14,6 +13,7 @@ import AddMemberModal from "../group/AddMemberModal";
 import SidePanelAction from "../ui/SidePanelAction";
 
 import LeaveGroupBtn from "../buttons/LeaveGroupBtn";
+import MuteChatBtn from "../buttons/MuteChatBtn";
 function GroupChatHeaderActions() {
 	const [showSearch, setShowSearch] = useState(false);
 	const [searchValue, setSearchValue] = useState("");
@@ -67,13 +67,8 @@ function GroupChatHeaderActions() {
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent align="end" className="w-56">
-					<DropdownMenuItem>
-						<Volume2Icon className="mr-2 h-4 w-4" />
-						Mute Group
-					</DropdownMenuItem>
-
+					<MuteChatBtn />
 					<DropdownMenuSeparator />
-
 					<LeaveGroupBtn />
 				</DropdownMenuContent>
 			</DropdownMenu>

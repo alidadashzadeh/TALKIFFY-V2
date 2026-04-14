@@ -6,22 +6,31 @@ import { toast } from "sonner";
 
 function useAddGroupAdmin() {
 	const queryClient = useQueryClient();
-	const { selectConversation, currentConversationId } =
+	const { currentConversationId, selectConversation } =
 		useConversationContext();
 
-	const mutation = useMutation({
-		mutationFn: async ({ userId }) => {
+	const { mutateAsync: addAdmin, isPending: loading } = useMutation({
+		mutationFn: async (userId) => {
 			const { data } = await axiosInstance.post(
 				`/conversations/${currentConversationId}/admins/${userId}`,
 			);
 
-			return {
-				status: data?.status,
-				conversation: data?.data?.conversation,
-			};
+			if (data?.status !== "success" || !data?.data?.conversation) {
+				throw new Error(data?.message || "Failed to add admin");
+			}
+
+			return data.data.conversation;
 		},
 
-		onMutate: async ({ userId }) => {
+		onMutate: async (userId) => {
+			if (!currentConversationId) {
+				throw new Error("No conversation selected");
+			}
+
+			if (!userId) {
+				throw new Error("No user selected");
+			}
+
 			await queryClient.cancelQueries({ queryKey: ["conversations"] });
 
 			const previousConversations =
@@ -31,48 +40,46 @@ function useAddGroupAdmin() {
 				(item) => item._id === currentConversationId,
 			);
 
-			const optimisticConversation = previousConversation
-				? {
-						...previousConversation,
-						admins: previousConversation.admins?.some(
-							(admin) =>
-								(admin?._id || admin)?.toString() === userId.toString(),
-						)
-							? previousConversation.admins
-							: [...(previousConversation.admins || []), userId],
-					}
-				: null;
-
-			if (optimisticConversation) {
-				queryClient.setQueryData(["conversations"], (oldConversations = []) =>
-					oldConversations.map((item) =>
-						item._id === currentConversationId ? optimisticConversation : item,
-					),
-				);
-
-				selectConversation(optimisticConversation);
+			if (!previousConversation) {
+				throw new Error("Conversation not found in cache");
 			}
 
-			return {
-				previousConversations,
-				previousConversation,
+			const isAlreadyAdmin = previousConversation.admins?.some(
+				(admin) => (admin?._id || admin)?.toString() === userId.toString(),
+			);
+
+			if (isAlreadyAdmin) {
+				throw new Error("User is already an admin");
+			}
+
+			const optimisticConversation = {
+				...previousConversation,
+				admins: [...(previousConversation.admins || []), userId],
 			};
+
+			queryClient.setQueryData(["conversations"], (old = []) =>
+				old.map((item) =>
+					item._id === currentConversationId ? optimisticConversation : item,
+				),
+			);
+
+			selectConversation(optimisticConversation);
+
+			return { previousConversations, previousConversation };
 		},
 
-		onSuccess: ({ status, conversation }) => {
-			if (status !== "success" || !conversation) return;
-
-			queryClient.setQueryData(["conversations"], (oldConversations = []) => {
-				return oldConversations.map((item) =>
+		onSuccess: (conversation) => {
+			queryClient.setQueryData(["conversations"], (old = []) =>
+				old.map((item) =>
 					item._id === conversation._id ? conversation : item,
-				);
-			});
+				),
+			);
 
 			selectConversation(conversation);
-			toast.success("Admin Added");
+			toast.success("Admin added");
 		},
 
-		onError: (error, _variables, context) => {
+		onError: (error, _userId, context) => {
 			if (context?.previousConversations) {
 				queryClient.setQueryData(
 					["conversations"],
@@ -88,11 +95,7 @@ function useAddGroupAdmin() {
 		},
 	});
 
-	return {
-		addAdmin: mutation.mutateAsync,
-		loading: mutation.isPending,
-		error: mutation.error,
-	};
+	return { addAdmin, loading };
 }
 
 export default useAddGroupAdmin;

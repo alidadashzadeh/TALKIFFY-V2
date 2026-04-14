@@ -1,10 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "@/lib/axios";
+import { handleErrorToast } from "@/lib/errorHandler";
 
 function useMarkMessagesSeen() {
 	const queryClient = useQueryClient();
 
-	return useMutation({
+	const { mutateAsync: markMessagesSeen, isPending: loading } = useMutation({
 		mutationFn: async ({ conversationId, lastSeenMessageId }) => {
 			const { data } = await axiosInstance.patch("/conversations/update-seen", {
 				conversationId,
@@ -13,7 +14,7 @@ function useMarkMessagesSeen() {
 
 			return data;
 		},
-		onSuccess: (_, variables) => {
+		onSuccess: (data, variables) => {
 			queryClient.invalidateQueries({
 				queryKey: ["messages", variables.conversationId],
 			});
@@ -22,7 +23,15 @@ function useMarkMessagesSeen() {
 				queryKey: ["conversations"],
 			});
 		},
+		onError: (error) => {
+			handleErrorToast(error);
+		},
 	});
+
+	return {
+		markMessagesSeen,
+		loading,
+	};
 }
 
 export default useMarkMessagesSeen;
