@@ -79,7 +79,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 		content,
 		attachments,
 		replyTo: replyToId,
-	});
+	}).then((doc) => doc.populate("senderId", "username avatar"));
 
 	// update conversation
 	conversation.lastMessageId = newMessage._id;
@@ -117,6 +117,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 			allSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("message:new", {
 					conversationId: conversation._id,
+					newMessage,
 				});
 			});
 		}
@@ -135,6 +136,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 			receiverSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("message:new", {
 					conversationId: conversation._id,
+					newMessage,
 				});
 			});
 

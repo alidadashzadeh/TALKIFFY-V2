@@ -15,21 +15,53 @@ export const createHandleContactAdded = (queryClient) => (payload) => {
 
 export const createHandleNewMessage =
 	(queryClient, currentConversationId, bottomRef, isNearBottom) =>
-	({ conversationId }) => {
-		queryClient.invalidateQueries({
-			queryKey: ["conversations"],
+	({ conversationId, newMessage }) => {
+		// 1. Update messages cache
+		queryClient.setQueryData(["messages", conversationId], (oldData) => {
+			if (!oldData) return oldData;
+
+			return [...oldData, newMessage];
 		});
 
-		queryClient.invalidateQueries({
-			queryKey: ["messages", conversationId],
+		// 2. Update conversations cache (last message + ordering)
+		queryClient.setQueryData(["conversations"], (oldData) => {
+			if (!oldData) return oldData;
+
+			const updated = oldData.map((conv) => {
+				if (conv._id !== conversationId) return conv;
+
+				return {
+					...conv,
+					unreadCount:
+						newMessage?.conversationId === currentConversationId && isNearBottom
+							? conv.unreadCount
+							: conv.unreadCount + 1,
+					lastMessageId: {
+						_id: newMessage?._id,
+						content: newMessage?.content,
+						senderId: {
+							_id: newMessage?.senderId?._id,
+							username: newMessage?.senderId?.username,
+						},
+					},
+					lastMessageAt: newMessage.createdAt,
+				};
+			});
+
+			// move updated convo to top
+			return updated.sort(
+				(a, b) => new Date(b.lastMessageAt) - new Date(a.lastMessageAt),
+			);
 		});
+
+		// 3. Scroll logic
 		if (conversationId === currentConversationId && isNearBottom) {
 			setTimeout(() => {
 				bottomRef.current?.scrollIntoView({
 					behavior: "smooth",
 					block: "end",
 				});
-			}, 1000);
+			}, 100);
 		}
 	};
 
