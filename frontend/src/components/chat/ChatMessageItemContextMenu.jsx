@@ -10,16 +10,22 @@ import { Reply } from "lucide-react";
 import MessageItemCheckMarks from "../message/MessageItemCheckMarks";
 import MessageAttachmentImage from "../message/MessageAttachmentImage";
 import ReplyMessage from "../message/ReplyMessage";
+import { useMessagesContext } from "@/contexts/MessagesContext";
 
-function ChatMessageItemContextMenu({ message }) {
+function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
+	const { setReplyTo, textareaRef } = useMessagesContext();
 	const { currentUser } = useCurrentUser();
 	const isMyMessage = message?.senderId?._id === currentUser?._id;
 	const hasImageAttachment = message?.attachments?.[0]?.type === "image";
+
+	const handleReply = () => {
+		setReplyTo(message);
+	};
+
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
 				<div
-					// ref={bubbleRef}
 					className={cn(
 						"inline-flex max-w-full min-w-0 flex-col gap-2 px-3.5 py-2 text-sm shadow-sm",
 						isMyMessage
@@ -28,11 +34,11 @@ function ChatMessageItemContextMenu({ message }) {
 					)}
 				>
 					{message?.replyTo && (
-						<ReplyMessage replyMessage={message.replyTo} isMe={isMyMessage} />
+						<ReplyMessage replyMessage={message?.replyTo} isMe={isMyMessage} />
 					)}
 
 					{hasImageAttachment && (
-						<MessageAttachmentImage attachment={message?.attachment} />
+						<MessageAttachmentImage attachment={message?.attachments?.[0]} />
 					)}
 
 					<div className="flex max-w-full items-end gap-1.5">
@@ -42,7 +48,7 @@ function ChatMessageItemContextMenu({ message }) {
 						{isMyMessage && (
 							<MessageItemCheckMarks
 								message={message}
-								// isSeenByOtherUser={isSeenByOtherUser}
+								isSeenByOtherUser={isSeenByOtherUser}
 							/>
 						)}
 					</div>
@@ -50,13 +56,12 @@ function ChatMessageItemContextMenu({ message }) {
 			</ContextMenuTrigger>
 
 			<ContextMenuContent
-			// onCloseAutoFocus={(e) => {
-			// 	e.preventDefault();
-			// 	textareaRef?.current?.focus();
-			// }}
+				onCloseAutoFocus={(e) => {
+					e.preventDefault();
+					textareaRef?.current?.focus();
+				}}
 			>
-				{/* <ContextMenuItem onSelect={handleReply}> */}
-				<ContextMenuItem>
+				<ContextMenuItem onSelect={handleReply}>
 					<Reply className="mr-2 h-4 w-4" />
 					Reply
 				</ContextMenuItem>

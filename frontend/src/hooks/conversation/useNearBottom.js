@@ -14,13 +14,7 @@ function useNearBottom(containerRef, threshold = 200) {
 
 			const near = distanceFromBottom <= threshold;
 
-			setIsNearBottom((prev) => {
-				if (prev !== near) {
-					// console.log("isNearBottom changed:", near);
-					return near;
-				}
-				return prev;
-			});
+			setIsNearBottom(near);
 		};
 
 		container.addEventListener("scroll", measure);
@@ -31,7 +25,7 @@ function useNearBottom(containerRef, threshold = 200) {
 		return () => {
 			container.removeEventListener("scroll", measure);
 		};
-	}, [containerRef, threshold]);
+	}, [containerRef.current, threshold]);
 
 	return isNearBottom;
 }

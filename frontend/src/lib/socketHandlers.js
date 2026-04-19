@@ -14,7 +14,7 @@ export const createHandleContactAdded = (queryClient) => (payload) => {
 };
 
 export const createHandleNewMessage =
-	(queryClient) =>
+	(queryClient, currentConversationId, bottomRef, isNearBottom) =>
 	({ conversationId }) => {
 		queryClient.invalidateQueries({
 			queryKey: ["conversations"],
@@ -23,6 +23,14 @@ export const createHandleNewMessage =
 		queryClient.invalidateQueries({
 			queryKey: ["messages", conversationId],
 		});
+		if (conversationId === currentConversationId && isNearBottom) {
+			setTimeout(() => {
+				bottomRef.current?.scrollIntoView({
+					behavior: "smooth",
+					block: "end",
+				});
+			}, 1000);
+		}
 	};
 
 export const createHandleMessageDelivered =

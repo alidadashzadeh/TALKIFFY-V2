@@ -1,4 +1,4 @@
-const BUNDLE_WINDOW_MS = 5 * 60 * 1000;
+const BUNDLE_WINDOW_MS = 1 * 60 * 1000;
 
 export function isBundledMessage(messages, index) {
 	if (!messages || index === 0) return false;
@@ -8,7 +8,8 @@ export function isBundledMessage(messages, index) {
 
 	if (!prev || !current) return false;
 
-	const sameSender = String(current?.senderId) === String(prev?.senderId);
+	const sameSender =
+		String(current?.senderId?._id) === String(prev?.senderId?._id);
 
 	const timeDiff = new Date(current.createdAt) - new Date(prev.createdAt);
 

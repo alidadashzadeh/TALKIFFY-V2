@@ -9,7 +9,7 @@ import { useMessagesContext } from "@/contexts/MessagesContext";
 function useSendMessage() {
 	const queryClient = useQueryClient();
 	const { currentUser } = useCurrentUser();
-	const { currentConversationId } = useConversationContext();
+	const { currentConversationId, bottomRef } = useConversationContext();
 	const { clearMessageState, setReplyTo } = useMessagesContext();
 
 	const mutation = useMutation({
@@ -89,6 +89,13 @@ function useSendMessage() {
 				...old,
 				optimisticMessage,
 			]);
+
+			setTimeout(() => {
+				bottomRef.current?.scrollIntoView({
+					behavior: "smooth",
+					block: "end",
+				});
+			}, 0);
 
 			clearMessageState();
 

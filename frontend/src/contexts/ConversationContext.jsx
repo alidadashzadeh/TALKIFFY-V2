@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 
 import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
 
 const ConversationContext = createContext();
 
@@ -21,6 +21,10 @@ export const useConversationContext = () => {
 export const ConversationContextProvider = ({ children }) => {
 	const [currentConversationId, setCurrentConversationId] = useState(null);
 	const [filteredConversationsBy, setFilteredConversationsBy] = useState("");
+	const bottomRef = useRef(null);
+	const targetMessageRef = useRef(null);
+	const topRef = useRef(null);
+	const containerRef = useRef(null);
 
 	const { conversations } = useGetMyConversations();
 
@@ -46,6 +50,10 @@ export const ConversationContextProvider = ({ children }) => {
 			conversations,
 			filteredConversationsBy,
 			setFilteredConversationsBy,
+			bottomRef,
+			targetMessageRef,
+			topRef,
+			containerRef,
 		}),
 		[
 			currentConversation,

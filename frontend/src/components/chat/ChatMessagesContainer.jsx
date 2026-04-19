@@ -1,21 +1,26 @@
-import { useRef } from "react";
 import ChatMessagesList from "./ChatMessagesList";
-import useNearBottom from "@/hooks/conversation/useNearBottom";
 import useChatScrollBehavior from "@/hooks/conversation/useChatScrollBehavior";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
+import useGetMessages from "@/hooks/messages/useGetMessages";
 
-function ChatMessagesContainer({ messages, currentConversation, currentUser }) {
-	const containerRef = useRef(null);
-	const topRef = useRef(null);
-	const bottomRef = useRef(null);
-	const targetMessageRef = useRef(null);
-	const isNearBottom = useNearBottom(containerRef);
+function ChatMessagesContainer() {
+	const { messages = [] } = useGetMessages();
+	const { currentUser } = useCurrentUser();
+	const {
+		currentConversation,
+		bottomRef,
+		targetMessageRef,
+		containerRef,
+		topRef,
+	} = useConversationContext();
+
 	const { firstUnseenMessageId } = useChatScrollBehavior({
 		messages,
 		currentConversation,
 		currentUser,
 		targetMessageRef,
 		bottomRef,
-		isNearBottom,
 	});
 
 	return (
@@ -28,14 +33,10 @@ function ChatMessagesContainer({ messages, currentConversation, currentUser }) {
 
 				<ChatMessagesList
 					messages={messages}
-					currentConversation={currentConversation}
-					currentUser={currentUser}
 					firstUnseenMessageId={firstUnseenMessageId}
-					containerRef={containerRef}
-					targetMessageRef={targetMessageRef}
 				/>
 
-				<div className="bg-red-500" ref={bottomRef} />
+				<div className="h-px" ref={bottomRef} />
 			</div>
 		</div>
 	);

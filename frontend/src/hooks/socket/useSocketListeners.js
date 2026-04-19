@@ -6,15 +6,25 @@ import {
 	createHandleMessageDelivered,
 	createHandleMessageSeen,
 } from "@/lib/socketHandlers";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import useNearBottom from "../conversation/useNearBottom";
 
 function useSocketListeners(socket) {
 	const queryClient = useQueryClient();
+	const { bottomRef, containerRef, currentConversation } =
+		useConversationContext();
+	const isNearBottom = useNearBottom(containerRef);
 
 	useEffect(() => {
 		if (!socket) return;
 
 		const handleContactAdded = createHandleContactAdded(queryClient);
-		const handleNewMessage = createHandleNewMessage(queryClient);
+		const handleNewMessage = createHandleNewMessage(
+			queryClient,
+			currentConversation?._id,
+			bottomRef,
+			isNearBottom,
+		);
 		const handleMessageDelivered = createHandleMessageDelivered(queryClient);
 		const handleMessageSeen = createHandleMessageSeen(queryClient);
 		const handleInvalidateConversations = createHandleMessageSeen(queryClient);
@@ -40,7 +50,7 @@ function useSocketListeners(socket) {
 			socket.off("group:memberRemoved", handleInvalidateConversations);
 			socket.off("group:memberLeft", handleInvalidateConversations);
 		};
-	}, [socket, queryClient]);
+	}, [socket, queryClient, currentConversation?._id, bottomRef, isNearBottom]);
 }
 
 export default useSocketListeners;
