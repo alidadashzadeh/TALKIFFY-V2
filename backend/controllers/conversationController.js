@@ -125,6 +125,9 @@ export const updateSeen = catchAsync(async (req, res, next) => {
 		conversationId,
 	}).select("_id createdAt");
 
+	if (!conversation) {
+		throw new AppError("Conversation not found", 404);
+	}
 	if (!message) {
 		throw new AppError("Message not found in this conversation", 404);
 	}
@@ -229,12 +232,24 @@ export const addGroupParticipant = catchAsync(async (req, res) => {
 		{ path: "participants", select: "username email avatar" },
 		{ path: "admins", select: "username avatar" },
 	]);
-
+	const addedParticipant = conversation.participants.find(
+		(p) => String(p._id) === String(userId),
+	);
 	emitToConversationParticipants({
 		io,
 		conversation,
 		event: "group:memberAdded",
-		payload: { conversationId },
+		payload: {
+			conversationId,
+			participant: addedParticipant,
+			readStateEntry: {
+				userId: String(userId),
+				lastSeenMessageId: conversation.lastMessageId
+					? conversation.lastMessageId
+					: null,
+				lastSeenAt: conversation.lastMessageAt || new Date(),
+			},
+		},
 	});
 
 	res.status(200).json({
@@ -278,7 +293,7 @@ export const removeGroupParticipant = catchAsync(async (req, res) => {
 		io,
 		conversation,
 		event: "group:memberRemoved",
-		payload: { conversationId },
+		payload: { conversationId, userId },
 	});
 
 	return res.status(200).json({
@@ -315,7 +330,7 @@ export const addGroupAdmin = catchAsync(async (req, res) => {
 		io,
 		conversation,
 		event: "group:adminAdded",
-		payload: { conversationId },
+		payload: { conversationId, userId },
 	});
 
 	await conversation.populate([
@@ -367,7 +382,7 @@ export const removeGroupAdmin = catchAsync(async (req, res) => {
 		io,
 		conversation,
 		event: "group:adminRemoved",
-		payload: { conversationId },
+		payload: { conversationId, userId },
 	});
 
 	return res.status(200).json({
@@ -433,7 +448,6 @@ export const leaveGroup = catchAsync(async (req, res) => {
 		io,
 		conversation,
 		event: "group:memberLeft",
-		payload: { conversationId },
 	});
 
 	res.status(200).json({

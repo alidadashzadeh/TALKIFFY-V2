@@ -5,6 +5,11 @@ import {
 	createHandleNewMessage,
 	createHandleMessageDelivered,
 	createHandleMessageSeen,
+	createHandleAdminAdded,
+	createHandleAdminRemoved,
+	createHandleMemberAdded,
+	createHandleMemberRemoved,
+	createHandleMemberLeft,
 } from "@/lib/socketHandlers";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useNearBottom from "../conversation/useNearBottom";
@@ -27,17 +32,22 @@ function useSocketListeners(socket) {
 		);
 		const handleMessageDelivered = createHandleMessageDelivered(queryClient);
 		const handleMessageSeen = createHandleMessageSeen(queryClient);
+		const handleAdminAdded = createHandleAdminAdded(queryClient);
+		const handleAdminRemoved = createHandleAdminRemoved(queryClient);
+		const handleMemberAdded = createHandleMemberAdded(queryClient);
+		const handleMemberRemoved = createHandleMemberRemoved(queryClient);
+		const handleMemberLeft = createHandleMemberLeft(queryClient);
 		const handleInvalidateConversations = createHandleMessageSeen(queryClient);
 
 		socket.on("contact:added", handleContactAdded);
 		socket.on("message:new", handleNewMessage);
 		socket.on("message:delivered", handleMessageDelivered);
 		socket.on("message:seen", handleMessageSeen);
-		socket.on("group:adminAdded", handleInvalidateConversations);
-		socket.on("group:adminRemoved", handleInvalidateConversations);
-		socket.on("group:memberAdded", handleInvalidateConversations);
-		socket.on("group:memberRemoved", handleInvalidateConversations);
-		socket.on("group:memberLeft", handleInvalidateConversations);
+		socket.on("group:adminAdded", handleAdminAdded);
+		socket.on("group:adminRemoved", handleAdminRemoved);
+		socket.on("group:memberAdded", handleMemberAdded);
+		socket.on("group:memberRemoved", handleMemberRemoved);
+		socket.on("group:memberLeft", handleMemberLeft);
 
 		return () => {
 			socket.off("contact:added", handleContactAdded);

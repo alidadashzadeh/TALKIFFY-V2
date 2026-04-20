@@ -149,9 +149,9 @@ export const sendMessage = catchAsync(async (req, res) => {
 
 			senderSocketIds?.forEach((socketId) => {
 				io.to(socketId).emit("message:delivered", {
-					conversationId: conversation._id,
 					messageId: newMessage._id,
-					userId: receiverId,
+					deliveredAt: newMessage.deliveredAt,
+					conversationId: newMessage.conversationId,
 				});
 			});
 		}

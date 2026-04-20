@@ -90,6 +90,7 @@ const markPrivateMessagesAsDelivered = async (userId) => {
 			for (const socketId of senderSocketIds) {
 				io.to(socketId).emit("message:delivered", {
 					messageId: message._id,
+					deliveredAt: message.deliveredAt,
 					conversationId: message.conversationId,
 				});
 			}
@@ -140,6 +141,7 @@ io.on("connection", async (socket) => {
 	addUserSocket(userId, socket.id);
 	io.emit("presence:update", getOnlineUserIds());
 
+	// mark any undelivered messages as delivered for this user on login
 	await markPrivateMessagesAsDelivered(userId);
 
 	socket.on("presence:get", () => {
