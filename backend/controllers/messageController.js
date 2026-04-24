@@ -165,6 +165,13 @@ export const sendMessage = catchAsync(async (req, res) => {
 				path: "senderId",
 				select: "username avatar",
 			},
+		})
+		.populate({
+			path: "reactions",
+			populate: {
+				path: "userId",
+				select: "username avatar",
+			},
 		});
 
 	res.status(201).json({
@@ -190,11 +197,98 @@ export const getConversationMessages = catchAsync(async (req, res) => {
 				select: "username avatar",
 			},
 		})
+		.populate({
+			path: "reactions",
+			populate: {
+				path: "userId",
+				select: "username avatar",
+			},
+		})
 		.sort({ createdAt: 1 });
 
 	res.status(200).json({
 		status: "success",
 		data: { messages },
+	});
+});
+
+export const reactToMessage = catchAsync(async (req, res, next) => {
+	const { messageId } = req.params;
+	const { emoji } = req.body;
+	const currentUserId = req.user.id;
+
+	if (!emoji || typeof emoji !== "string" || !emoji.trim()) {
+		return next(new AppError("Emoji is required", 400));
+	}
+
+	const message = await Message.findById(messageId);
+
+	if (!message) {
+		return next(new AppError("Message not found", 404));
+	}
+
+	const conversation = await Conversation.findById(message.conversationId);
+
+	if (!conversation) {
+		return next(new AppError("Conversation not found", 404));
+	}
+
+	const isParticipant = conversation.participants.some(
+		(participantId) => String(participantId) === String(currentUserId),
+	);
+
+	if (!isParticipant) {
+		return next(
+			new AppError("You are not allowed to react to this message", 403),
+		);
+	}
+
+	const existingReactionIndex = message.reactions.findIndex(
+		(reaction) => String(reaction.userId) === String(currentUserId),
+	);
+
+	if (existingReactionIndex === -1) {
+		message.reactions.push({
+			userId: currentUserId,
+			emoji: emoji.trim(),
+		});
+	} else {
+		const existingReaction = message.reactions[existingReactionIndex];
+
+		if (existingReaction.emoji === emoji.trim()) {
+			message.reactions.splice(existingReactionIndex, 1);
+		} else {
+			message.reactions[existingReactionIndex].emoji = emoji.trim();
+		}
+	}
+
+	await message.save();
+
+	const updatedMessage = await Message.findById(message._id)
+		.populate({
+			path: "senderId",
+			select: "username avatar",
+		})
+		.populate({
+			path: "replyTo",
+			populate: {
+				path: "senderId",
+				select: "username avatar",
+			},
+		})
+		.populate({
+			path: "reactions",
+			populate: {
+				path: "userId",
+				select: "username avatar",
+			},
+		});
+
+	res.status(200).json({
+		status: "success",
+		data: {
+			message: updatedMessage,
+		},
 	});
 });
 

@@ -8,6 +8,7 @@ import {
 	updateMessage,
 	deleteMessage,
 	getConversationMessages,
+	reactToMessage,
 } from "../controllers/messageController.js";
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
@@ -21,6 +22,7 @@ router
 	.post(protect, upload.single("file"), optimizeMessageImage, sendMessage);
 
 router.route("/").get(getAllMessages).post(createMessage);
+router.patch("/:messageId/reaction", protect, reactToMessage);
 router
 	.route("/:id")
 	.get(getSingleMessage)

@@ -35,3 +35,35 @@ export function getFirstUnseenMessageId({
 
 	return messages[lastSeenMessageIndex + 1]?._id || null;
 }
+
+export function groupMessageReactions(reactions) {
+	if (!Array.isArray(reactions) || reactions.length === 0) {
+		return [];
+	}
+
+	const grouped = reactions.reduce((acc, reaction) => {
+		const emoji = reaction?.emoji;
+		const user = reaction?.userId;
+
+		if (!emoji || !user?._id) return acc;
+
+		if (!acc[emoji]) {
+			acc[emoji] = {
+				emoji,
+				users: [],
+			};
+		}
+
+		const alreadyAdded = acc[emoji].users.some(
+			(existingUser) => String(existingUser._id) === String(user._id),
+		);
+
+		if (!alreadyAdded) {
+			acc[emoji].users.push(user);
+		}
+
+		return acc;
+	}, {});
+
+	return Object.values(grouped);
+}
