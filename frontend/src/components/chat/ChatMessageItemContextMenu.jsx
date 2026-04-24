@@ -11,9 +11,8 @@ import MessageItemCheckMarks from "../message/MessageItemCheckMarks";
 import MessageAttachmentImage from "../message/MessageAttachmentImage";
 import ReplyMessage from "../message/ReplyMessage";
 import { useMessagesContext } from "@/contexts/MessagesContext";
-import AvatarGenerator from "../AvatarGenerator";
-import { useMemo } from "react";
 import MessageReactions from "../message/MessageReactions";
+import { groupMessageReactions } from "@/lib/utils/messages";
 
 function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
 	const { setReplyTo, textareaRef } = useMessagesContext();
@@ -27,48 +26,25 @@ function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
 		setReplyTo(message);
 	};
 
-	const groupedReactions = useMemo(() => {
-		if (!Array.isArray(message?.reactions) || message.reactions.length === 0) {
-			return [];
-		}
+	const groupedReactions = groupMessageReactions(message?.reactions);
 
-		const grouped = message.reactions.reduce((acc, reaction) => {
-			const emoji = reaction?.emoji;
-			const user = reaction?.userId;
-
-			if (!emoji || !user?._id) return acc;
-
-			if (!acc[emoji]) {
-				acc[emoji] = {
-					emoji,
-					users: [],
-				};
-			}
-
-			const alreadyAdded = acc[emoji].users.some(
-				(existingUser) => String(existingUser._id) === String(user._id),
-			);
-
-			if (!alreadyAdded) {
-				acc[emoji].users.push(user);
-			}
-
-			return acc;
-		}, {});
-
-		return Object.values(grouped);
-	}, [message?.reactions]);
-
+	const messageTime = message?.createdAt
+		? new Date(message.createdAt).toLocaleTimeString([], {
+				hour: "2-digit",
+				minute: "2-digit",
+			})
+		: "";
 	return (
 		<ContextMenu>
 			<ContextMenuTrigger asChild>
-				<div className="inline-flex max-w-full min-w-0 flex-col">
+				<div className="group inline-flex max-w-full min-w-0 flex-col">
 					<div
 						className={cn(
-							"inline-flex max-w-full min-w-0 flex-col gap-2 px-3.5 py-2 text-sm shadow-2xl",
+							"relative inline-flex max-w-full min-w-0 flex-col overflow-hidden px-4 py-2 text-sm shadow-lg transition-all duration-200",
+							"before:pointer-events-none before:absolute before:inset-0 before:bg-white/10 before:opacity-0 before:transition-opacity group-hover:before:opacity-100",
 							isMyMessage
-								? "rounded-xl rounded-br-sm bg-primary text-primary-foreground"
-								: "rounded-xl rounded-bl-sm bg-background text-foreground",
+								? "rounded-xl rounded-br-sm  bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-primary/20"
+								: "rounded-xl rounded-bl-sm border border-border/60 bg-card/90 text-card-foreground shadow-black/5 backdrop-blur-md",
 						)}
 					>
 						{message?.replyTo && (
@@ -83,10 +59,28 @@ function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
 						)}
 
 						{!!message?.content && (
-							<div className="flex max-w-full items-end gap-1.5">
-								<p className="max-w-full whitespace-pre-wrap break-words">
-									{message.content}
-								</p>
+							<p className="relative z-10 max-w-full whitespace-pre-wrap break-words leading-relaxed">
+								{message.content}
+							</p>
+						)}
+
+						<div
+							className={cn(
+								"relative z-10 flex items-center justify-between",
+								isMyMessage ? "flex-row" : "flex-row-reverse",
+							)}
+						>
+							<div className="min-w-0">
+								{groupedReactions.length > 0 && (
+									<MessageReactions
+										message={message}
+										isMyMessage={isMyMessage}
+									/>
+								)}
+							</div>
+
+							<div className="ml-auto flex shrink-0 items-center gap-1 text-[10px]">
+								<span>{messageTime}</span>
 
 								{isMyMessage && (
 									<MessageItemCheckMarks
@@ -95,31 +89,22 @@ function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
 									/>
 								)}
 							</div>
-						)}
-
-						{!message?.content && isMyMessage && (
-							<div className="flex justify-end">
-								<MessageItemCheckMarks
-									message={message}
-									isSeenByOtherUser={isSeenByOtherUser}
-								/>
-							</div>
-						)}
+						</div>
 					</div>
-
-					{groupedReactions.length > 0 && (
-						<MessageReactions message={message} isMyMessage={isMyMessage} />
-					)}
 				</div>
 			</ContextMenuTrigger>
 
 			<ContextMenuContent
+				className="min-w-36 rounded-2xl border-border/60 bg-popover/95 p-1.5 shadow-xl backdrop-blur-md"
 				onCloseAutoFocus={(e) => {
 					e.preventDefault();
 					textareaRef?.current?.focus();
 				}}
 			>
-				<ContextMenuItem onSelect={handleReply}>
+				<ContextMenuItem
+					onSelect={handleReply}
+					className="cursor-pointer rounded-xl px-3 py-2"
+				>
 					<Reply className="mr-2 h-4 w-4" />
 					Reply
 				</ContextMenuItem>

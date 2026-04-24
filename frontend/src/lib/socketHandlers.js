@@ -244,3 +244,14 @@ export const createHandleMemberLeft = (queryClient) => {
 		});
 	};
 };
+export const createHandleMessageReactionUpdated = (queryClient) => {
+	return ({ conversationId, message }) => {
+		queryClient.setQueryData(["messages", conversationId], (oldData) => {
+			if (!oldData) return oldData;
+
+			return oldData.map((oldMessage) =>
+				String(oldMessage._id) === String(message._id) ? message : oldMessage,
+			);
+		});
+	};
+};

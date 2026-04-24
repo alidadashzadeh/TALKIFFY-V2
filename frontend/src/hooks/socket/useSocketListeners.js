@@ -10,6 +10,7 @@ import {
 	createHandleMemberAdded,
 	createHandleMemberRemoved,
 	createHandleMemberLeft,
+	createHandleMessageReactionUpdated,
 } from "@/lib/socketHandlers";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useNearBottom from "../conversation/useNearBottom";
@@ -32,17 +33,22 @@ function useSocketListeners(socket) {
 		);
 		const handleMessageDelivered = createHandleMessageDelivered(queryClient);
 		const handleMessageSeen = createHandleMessageSeen(queryClient);
+
 		const handleAdminAdded = createHandleAdminAdded(queryClient);
 		const handleAdminRemoved = createHandleAdminRemoved(queryClient);
 		const handleMemberAdded = createHandleMemberAdded(queryClient);
 		const handleMemberRemoved = createHandleMemberRemoved(queryClient);
 		const handleMemberLeft = createHandleMemberLeft(queryClient);
-		const handleInvalidateConversations = createHandleMessageSeen(queryClient);
+
+		const handleMessageReactionUpdated =
+			createHandleMessageReactionUpdated(queryClient);
 
 		socket.on("contact:added", handleContactAdded);
 		socket.on("message:new", handleNewMessage);
 		socket.on("message:delivered", handleMessageDelivered);
 		socket.on("message:seen", handleMessageSeen);
+		socket.on("message:reactionUpdated", handleMessageReactionUpdated);
+
 		socket.on("group:adminAdded", handleAdminAdded);
 		socket.on("group:adminRemoved", handleAdminRemoved);
 		socket.on("group:memberAdded", handleMemberAdded);
@@ -54,11 +60,13 @@ function useSocketListeners(socket) {
 			socket.off("message:new", handleNewMessage);
 			socket.off("message:delivered", handleMessageDelivered);
 			socket.off("message:seen", handleMessageSeen);
-			socket.off("group:adminAdded", handleInvalidateConversations);
-			socket.off("group:adminRemoved", handleInvalidateConversations);
-			socket.off("group:memberAdded", handleInvalidateConversations);
-			socket.off("group:memberRemoved", handleInvalidateConversations);
-			socket.off("group:memberLeft", handleInvalidateConversations);
+			socket.off("message:reactionUpdated", handleMessageReactionUpdated);
+
+			socket.off("group:adminAdded", handleAdminAdded);
+			socket.off("group:adminRemoved", handleAdminRemoved);
+			socket.off("group:memberAdded", handleMemberAdded);
+			socket.off("group:memberRemoved", handleMemberRemoved);
+			socket.off("group:memberLeft", handleMemberLeft);
 		};
 	}, [socket, queryClient, currentConversation?._id, bottomRef, isNearBottom]);
 }

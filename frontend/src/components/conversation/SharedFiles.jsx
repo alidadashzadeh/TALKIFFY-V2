@@ -1,50 +1,25 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useGetMessages from "@/hooks/messages/useGetMessages";
 import { ScrollArea } from "../ui/scroll-area";
-import { formatDateKey, formatSectionDate } from "@/lib/utils";
+import { formatSectionDate } from "@/lib/utils";
 import { Muted } from "../ui/typography";
+import { getAttachmentsByDate } from "@/lib/utils/conversation";
 
 function SharedFiles() {
-	const { data: messages = [], isLoading } = useGetMessages();
+	const { messages = [], loading } = useGetMessages();
 	const bottomRef = useRef(null);
 
-	const attachmentsByDate = useMemo(() => {
-		return messages.reduce((acc, message) => {
-			if (!message?.attachments?.length) return acc;
+	const attachmentsByDate = getAttachmentsByDate({ messages });
 
-			const dateKey = formatDateKey(message.createdAt);
-
-			if (!acc[dateKey]) {
-				acc[dateKey] = [];
-			}
-
-			message.attachments.forEach((attachment, index) => {
-				acc[dateKey].push({
-					...attachment,
-					messageId: message._id,
-					createdAt: message.createdAt,
-					fallbackKey: `${message._id}-${attachment._id || index}`,
-				});
-			});
-
-			return acc;
-		}, {});
-	}, [messages]);
-
-	const sortedDates = useMemo(() => {
-		return Object.keys(attachmentsByDate).sort(
-			(a, b) => new Date(a) - new Date(b),
-		);
-	}, [attachmentsByDate]);
+	const sortedDates = Object.keys(attachmentsByDate).sort(
+		(a, b) => new Date(a) - new Date(b),
+	);
 
 	useEffect(() => {
-		bottomRef.current?.scrollIntoView({
-			behavior: "auto",
-			block: "end",
-		});
-	}, [sortedDates.length, messages.length]);
+		bottomRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
+	}, [messages.length]);
 
-	if (isLoading) {
+	if (loading) {
 		return (
 			<div className="p-4 text-sm text-muted-foreground">Loading files...</div>
 		);
@@ -52,7 +27,7 @@ function SharedFiles() {
 
 	if (!sortedDates.length) {
 		return (
-			<Muted className="p-4 text-sm text-center">No shared files yet.</Muted>
+			<Muted className="p-4 text-center text-sm">No shared files yet.</Muted>
 		);
 	}
 
@@ -66,31 +41,37 @@ function SharedFiles() {
 						</div>
 
 						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-							{attachmentsByDate[dateKey].map((attachment) => (
-								<div
-									key={attachment._id || attachment.fallbackKey}
-									className="overflow-hidden rounded-xl border bg-background"
-								>
-									{attachment?.type === "image" ? (
-										<img
-											src={attachment.url}
-											alt={attachment.fileName || "attachment"}
-											className="aspect-square h-full w-full object-cover"
-										/>
-									) : (
-										<div className="flex aspect-square items-center justify-center p-3">
-											<div className="w-full space-y-2 text-center">
-												<p className="truncate text-sm font-medium">
-													{attachment?.fileName || "File"}
-												</p>
-												<p className="truncate text-xs text-muted-foreground">
-													{attachment?.type || "attachment"}
-												</p>
+							{attachmentsByDate[dateKey].map((attachment) => {
+								const isImage =
+									attachment?.type === "image" ||
+									attachment?.type?.startsWith("image/");
+
+								return (
+									<div
+										key={attachment._id || attachment.fallbackKey}
+										className="overflow-hidden rounded-xl border bg-background"
+									>
+										{isImage ? (
+											<img
+												src={attachment.url}
+												alt={attachment.fileName || "attachment"}
+												className="aspect-square h-full w-full object-cover"
+											/>
+										) : (
+											<div className="flex aspect-square items-center justify-center p-3">
+												<div className="w-full space-y-2 text-center">
+													<p className="truncate text-sm font-medium">
+														{attachment?.fileName || "File"}
+													</p>
+													<p className="truncate text-xs text-muted-foreground">
+														{attachment?.type || "attachment"}
+													</p>
+												</div>
 											</div>
-										</div>
-									)}
-								</div>
-							))}
+										)}
+									</div>
+								);
+							})}
 						</div>
 					</div>
 				))}

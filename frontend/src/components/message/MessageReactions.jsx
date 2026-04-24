@@ -10,7 +10,7 @@ function MessageReactions({ message, isMyMessage }) {
 	return (
 		<div
 			className={cn(
-				"-mt-1.5 flex flex-wrap gap-1 px-2",
+				"flex flex-wrap gap-1 px-2",
 				isMyMessage ? "justify-end" : "justify-start",
 			)}
 		>

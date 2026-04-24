@@ -243,6 +243,8 @@ export const reactToMessage = catchAsync(async (req, res, next) => {
 		);
 	}
 
+	const cleanEmoji = emoji.trim();
+
 	const existingReactionIndex = message.reactions.findIndex(
 		(reaction) => String(reaction.userId) === String(currentUserId),
 	);
@@ -250,15 +252,15 @@ export const reactToMessage = catchAsync(async (req, res, next) => {
 	if (existingReactionIndex === -1) {
 		message.reactions.push({
 			userId: currentUserId,
-			emoji: emoji.trim(),
+			emoji: cleanEmoji,
 		});
 	} else {
 		const existingReaction = message.reactions[existingReactionIndex];
 
-		if (existingReaction.emoji === emoji.trim()) {
+		if (existingReaction.emoji === cleanEmoji) {
 			message.reactions.splice(existingReactionIndex, 1);
 		} else {
-			message.reactions[existingReactionIndex].emoji = emoji.trim();
+			message.reactions[existingReactionIndex].emoji = cleanEmoji;
 		}
 	}
 
@@ -277,12 +279,20 @@ export const reactToMessage = catchAsync(async (req, res, next) => {
 			},
 		})
 		.populate({
-			path: "reactions",
-			populate: {
-				path: "userId",
-				select: "username avatar",
-			},
+			path: "reactions.userId",
+			select: "username avatar",
 		});
+
+	const socketIds = conversation.participants.flatMap(
+		(participantId) => getUserSocketIds(participantId.toString()) || [],
+	);
+
+	socketIds.forEach((socketId) => {
+		io.to(socketId).emit("message:reactionUpdated", {
+			conversationId: conversation._id,
+			message: updatedMessage,
+		});
+	});
 
 	res.status(200).json({
 		status: "success",

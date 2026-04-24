@@ -1,7 +1,7 @@
 import useSendMessage from "@/hooks/messages/useSendMessage";
 import { useMessagesContext } from "@/contexts/MessagesContext";
-import MessageTextInput from "./MessageTextInput";
-import MessageFileInput from "./MessageFileInput";
+import MessageTextInput from "../message/MessageTextInput";
+import MessageFileInput from "../message/MessageFileInput";
 import FilePreview from "./FilePreview";
 import EmojiPopover from "./EmojiPopover";
 import SendMessageBtn from "../buttons/SendMessageBtn";

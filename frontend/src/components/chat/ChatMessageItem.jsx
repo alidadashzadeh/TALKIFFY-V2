@@ -36,15 +36,6 @@ function ChatMessageItem({
 
 	const isGroupConversation = currentConversation?.type === "group";
 
-	const formattedTime = new Date(message?.createdAt).toLocaleTimeString(
-		"en-US",
-		{
-			hour: "2-digit",
-			minute: "2-digit",
-			hour12: true,
-		},
-	);
-
 	const handleReact = (emoji, msg) => {
 		if (!msg?._id || !currentConversation?._id || loading) return;
 		reactToMessage({
@@ -102,8 +93,6 @@ function ChatMessageItem({
 								isSeenByOtherUser={isSeenByOtherUser}
 							/>
 						</MessageHoverReactions>
-
-						<Muted className="p-1 text-xs">{formattedTime}</Muted>
 					</div>
 				</div>
 			</div>

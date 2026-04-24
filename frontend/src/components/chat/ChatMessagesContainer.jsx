@@ -3,6 +3,7 @@ import useChatScrollBehavior from "@/hooks/conversation/useChatScrollBehavior";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 import useGetMessages from "@/hooks/messages/useGetMessages";
+import ScrollToBottom from "./ScrollToBottom";
 
 function ChatMessagesContainer() {
 	const { messages = [] } = useGetMessages();
@@ -24,20 +25,24 @@ function ChatMessagesContainer() {
 	});
 
 	return (
-		<div
-			ref={containerRef}
-			className="h-full overflow-y-auto px-3 py-4 sm:px-4"
-		>
-			<div className="flex w-full flex-col px-16">
-				<div ref={topRef} />
+		<div className="relative h-full">
+			<div
+				ref={containerRef}
+				className="h-full overflow-y-auto px-3 py-4 sm:px-4"
+			>
+				<div className="flex w-full flex-col px-16">
+					<div ref={topRef} />
 
-				<ChatMessagesList
-					messages={messages}
-					firstUnseenMessageId={firstUnseenMessageId}
-				/>
+					<ChatMessagesList
+						messages={messages}
+						firstUnseenMessageId={firstUnseenMessageId}
+					/>
 
-				<div className="h-px" ref={bottomRef} />
+					<div className="h-px" ref={bottomRef} />
+				</div>
 			</div>
+
+			<ScrollToBottom />
 		</div>
 	);
 }
