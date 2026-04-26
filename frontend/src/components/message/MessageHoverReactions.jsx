@@ -1,12 +1,16 @@
+import { useState } from "react";
 import {
 	HoverCard,
 	HoverCardContent,
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import EmojiPicker from "emoji-picker-react";
 
-const reactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
+const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
 function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
+	const [showPicker, setShowPicker] = useState(false);
+
 	return (
 		<HoverCard openDelay={100} closeDelay={50}>
 			<HoverCardTrigger asChild>
@@ -17,20 +21,41 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 				side={isMyMessage ? "left" : "right"}
 				align="center"
 				sideOffset={8}
-				className="w-fit rounded-full border bg-background px-2 py-1 shadow-md"
+				className="w-fit rounded-2xl border bg-background p-2 shadow-md"
 			>
-				<div className="flex items-center gap-1">
-					{reactions.map((emoji) => (
+				{showPicker ? (
+					<EmojiPicker
+						width={320}
+						height={360}
+						lazyLoadEmojis
+						previewConfig={{ showPreview: false }}
+						onEmojiClick={(emojiData) => {
+							onReact?.(emojiData.emoji, message);
+							setShowPicker(false);
+						}}
+					/>
+				) : (
+					<div className="flex items-center gap-1">
+						{quickReactions.map((emoji) => (
+							<button
+								key={emoji}
+								type="button"
+								className="rounded-full p-1 text-lg transition hover:bg-muted"
+								onClick={() => onReact?.(emoji, message)}
+							>
+								{emoji}
+							</button>
+						))}
+
 						<button
-							key={emoji}
 							type="button"
 							className="rounded-full p-1 text-lg transition hover:bg-muted"
-							onClick={() => onReact?.(emoji, message)}
+							onClick={() => setShowPicker(true)}
 						>
-							{emoji}
+							➕
 						</button>
-					))}
-				</div>
+					</div>
+				)}
 			</HoverCardContent>
 		</HoverCard>
 	);

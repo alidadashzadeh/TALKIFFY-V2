@@ -1,35 +1,24 @@
-import { useEffect, useState } from "react";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import useNearBottom from "@/hooks/conversation/useNearBottom";
+import useAttachmentImage from "@/hooks/messages/useAttachmentImage";
 
 function MessageAttachmentImage({ attachment }) {
-	const localUrl = attachment?.localUrl;
-	const remoteUrl = attachment?.url;
+	const { bottomRef, containerRef } = useConversationContext();
+	const isNearBottom = useNearBottom(containerRef);
 
-	const [displayUrl, setDisplayUrl] = useState(localUrl || remoteUrl || "");
-
-	useEffect(() => {
-		if (!remoteUrl) {
-			setDisplayUrl(localUrl || "");
-			return;
+	const handleScroll = () => {
+		if (isNearBottom) {
+			bottomRef.current?.scrollIntoView({
+				behavior: "auto",
+				block: "end",
+			});
 		}
+	};
 
-		if (!localUrl) {
-			setDisplayUrl(remoteUrl);
-			return;
-		}
-
-		setDisplayUrl(localUrl);
-
-		const img = new Image();
-		img.src = remoteUrl;
-
-		img.onload = () => {
-			setDisplayUrl(remoteUrl);
-		};
-
-		img.onerror = () => {
-			setDisplayUrl(localUrl);
-		};
-	}, [localUrl, remoteUrl]);
+	const { displayUrl, handleLoad } = useAttachmentImage({
+		attachment,
+		onLoad: handleScroll,
+	});
 
 	if (!displayUrl) return null;
 
@@ -38,6 +27,7 @@ function MessageAttachmentImage({ attachment }) {
 			src={displayUrl}
 			alt={attachment?.fileName || "attachment"}
 			className="max-h-40 w-auto max-w-[220px] rounded-xl object-cover"
+			onLoad={handleLoad}
 		/>
 	);
 }
