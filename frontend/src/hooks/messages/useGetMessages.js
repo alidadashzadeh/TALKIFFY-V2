@@ -11,6 +11,7 @@ function useGetMessages() {
 	const {
 		data: messages = [],
 		isPending: loading,
+		isFetching: fetching,
 		isError,
 		error,
 	} = useQuery({
@@ -21,11 +22,15 @@ function useGetMessages() {
 				`/messages/conversation/${currentConversationId}`,
 			);
 
-			return data?.data?.messages || [];
+			const returnedMessages = data?.data?.messages || [];
+
+			return returnedMessages;
 		},
 
 		enabled: !!currentConversationId,
 		retry: false,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
 	});
 
 	useEffect(() => {
@@ -34,7 +39,7 @@ function useGetMessages() {
 		}
 	}, [isError, error]);
 
-	return { messages, loading };
+	return { messages, loading, fetching };
 }
 
 export default useGetMessages;

@@ -13,7 +13,13 @@ function useSendMessage() {
 	const { clearMessageState, setReplyTo } = useMessagesContext();
 
 	const mutation = useMutation({
-		mutationFn: async ({ text, file, clientTempId, replyTo }) => {
+		mutationFn: async ({
+			text,
+			file,
+			clientTempId,
+			replyTo,
+			conversationId,
+		}) => {
 			const formData = new FormData();
 			const trimmedText = text?.trim() || "";
 
@@ -25,22 +31,24 @@ function useSendMessage() {
 				formData.append("file", file);
 			}
 
-			if (replyTo) formData.append("replyToId", replyTo._id);
+			if (replyTo) {
+				formData.append("replyToId", replyTo._id);
+			}
 
 			formData.append("clientTempId", clientTempId);
 
 			const { data } = await axiosInstance.post(
-				`/messages/conversation/${currentConversationId}`,
+				`/messages/conversation/${conversationId}`,
 				formData,
 			);
 
 			return data?.data?.newMessage;
 		},
 
-		onMutate: async ({ text, file, clientTempId, replyTo }) => {
-			if (!currentConversationId) return {};
+		onMutate: async ({ text, file, clientTempId, replyTo, conversationId }) => {
+			if (!conversationId) return {};
 
-			const queryKey = ["messages", currentConversationId];
+			const queryKey = ["messages", conversationId];
 
 			await queryClient.cancelQueries({ queryKey });
 
@@ -51,7 +59,7 @@ function useSendMessage() {
 			const optimisticMessage = {
 				_id: clientTempId,
 				clientTempId,
-				conversationId: currentConversationId,
+				conversationId,
 				senderId: {
 					_id: currentUser?._id,
 					username: currentUser?.username,
@@ -108,11 +116,28 @@ function useSendMessage() {
 		},
 
 		onSuccess: (newMessage, _variables, context) => {
-			if (!context?.queryKey || !context?.clientTempId) return;
+			if (!context?.queryKey || !context?.clientTempId || !newMessage) return;
 
-			queryClient.setQueryData(context.queryKey, (old = []) =>
-				old.map((message) => {
-					if (message.clientTempId !== context.clientTempId) return message;
+			queryClient.setQueryData(context.queryKey, (old = []) => {
+				const exists = old.some(
+					(message) => message.clientTempId === context.clientTempId,
+				);
+
+				if (!exists) {
+					return [
+						...old,
+						{
+							...newMessage,
+							clientTempId: context.clientTempId,
+							optimistic: false,
+						},
+					];
+				}
+
+				return old.map((message) => {
+					if (message.clientTempId !== context.clientTempId) {
+						return message;
+					}
 
 					const optimisticAttachment = message.attachments?.[0];
 					const serverAttachment = newMessage.attachments?.[0];
@@ -120,22 +145,20 @@ function useSendMessage() {
 					return {
 						...message,
 						...newMessage,
-						clientTempId: message.clientTempId,
+						clientTempId: context.clientTempId,
 						createdAt: message.createdAt,
 						optimistic: false,
 						attachments: serverAttachment
 							? [
 									{
 										...serverAttachment,
-										localUrl:
-											optimisticAttachment?.localUrl ||
-											optimisticAttachment?.url,
+										localUrl: optimisticAttachment?.localUrl,
 									},
 								]
 							: [],
 					};
-				}),
-			);
+				});
+			});
 
 			queryClient.invalidateQueries({
 				queryKey: ["conversations"],
@@ -147,7 +170,7 @@ function useSendMessage() {
 				URL.revokeObjectURL(context.localUrl);
 			}
 
-			if (context?.queryKey && context?.previousMessages) {
+			if (context?.queryKey && Array.isArray(context.previousMessages)) {
 				queryClient.setQueryData(context.queryKey, context.previousMessages);
 			}
 
@@ -162,10 +185,6 @@ function useSendMessage() {
 					URL.revokeObjectURL(context.localUrl);
 				}, 30000);
 			}
-
-			queryClient.invalidateQueries({
-				queryKey: context.queryKey,
-			});
 		},
 	});
 
@@ -182,6 +201,7 @@ function useSendMessage() {
 				file,
 				replyTo,
 				clientTempId,
+				conversationId: currentConversationId,
 			});
 		},
 	};

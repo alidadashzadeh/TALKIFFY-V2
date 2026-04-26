@@ -17,7 +17,7 @@ function useLogout() {
 
 		onSuccess: (data) => {
 			if (data.status === "success") {
-				queryClient.setQueryData(["conversations"], []);
+				queryClient.removeQueries({ queryKey: ["conversations"] });
 				queryClient.setQueryData(["currentUser"], null);
 				setAccountSheetOpen(false);
 				selectConversation(null);
