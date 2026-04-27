@@ -4,7 +4,6 @@ import {
 	ContextMenuItem,
 	ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import useCurrentUser from "@/hooks/user/useCurrentUser";
 import { cn } from "@/lib/utils";
 import { Reply } from "lucide-react";
 import MessageItemCheckMarks from "../message/MessageItemCheckMarks";
@@ -14,12 +13,16 @@ import { useMessagesContext } from "@/contexts/MessagesContext";
 import MessageReactions from "../message/MessageReactions";
 import { groupMessageReactions } from "@/lib/utils/messages";
 
-function ChatMessageItemContextMenu({ message, isSeenByOtherUser }) {
+function ChatMessageItemContextMenu({
+	message,
+	isSeenByOtherUser,
+	currentUser,
+}) {
 	const { setReplyTo, textareaRef } = useMessagesContext();
-	const { currentUser } = useCurrentUser();
 
 	const isMyMessage =
 		String(message?.senderId?._id) === String(currentUser?._id);
+
 	const hasImageAttachment = message?.attachments?.[0]?.type === "image";
 
 	const handleReply = () => {

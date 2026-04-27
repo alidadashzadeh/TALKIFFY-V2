@@ -1,21 +1,16 @@
 import ChatMessagesList from "./ChatMessagesList";
 import useChatScrollBehavior from "@/hooks/conversation/useChatScrollBehavior";
-import { useConversationContext } from "@/contexts/ConversationContext";
-import useCurrentUser from "@/hooks/user/useCurrentUser";
-import useGetMessages from "@/hooks/messages/useGetMessages";
 import ScrollToBottom from "./ScrollToBottom";
 
-function ChatMessagesContainer() {
-	const { messages = [] } = useGetMessages();
-	const { currentUser } = useCurrentUser();
-	const {
-		currentConversation,
-		bottomRef,
-		targetMessageRef,
-		containerRef,
-		topRef,
-	} = useConversationContext();
-
+function ChatMessagesContainer({
+	messages,
+	currentUser,
+	currentConversation,
+	bottomRef,
+	targetMessageRef,
+	containerRef,
+	topRef,
+}) {
 	const { firstUnseenMessageId } = useChatScrollBehavior({
 		messages,
 		currentConversation,
@@ -35,6 +30,10 @@ function ChatMessagesContainer() {
 
 					<ChatMessagesList
 						messages={messages}
+						currentUser={currentUser}
+						currentConversation={currentConversation}
+						containerRef={containerRef}
+						targetMessageRef={targetMessageRef}
 						firstUnseenMessageId={firstUnseenMessageId}
 					/>
 

@@ -1,16 +1,15 @@
 import { isBundledMessage } from "@/lib/utils/messages";
 import ChatMessageItem from "./ChatMessageItem";
 import useMessageSeenTracking from "@/hooks/messages/useMessageSeenTracking";
-import useCurrentUser from "@/hooks/user/useCurrentUser";
-import { useConversationContext } from "@/contexts/ConversationContext";
-import useGetMessages from "@/hooks/messages/useGetMessages";
 
-function ChatMessagesList({ firstUnseenMessageId }) {
-	const { messages = [] } = useGetMessages();
-	const { currentUser } = useCurrentUser();
-	const { currentConversation, targetMessageRef, containerRef } =
-		useConversationContext();
-
+function ChatMessagesList({
+	messages,
+	currentUser,
+	currentConversation,
+	containerRef,
+	targetMessageRef,
+	firstUnseenMessageId,
+}) {
 	const { queueSeenMessage, getShouldTrackSeen, otherLastSeenIndex } =
 		useMessageSeenTracking({
 			messages,
@@ -32,6 +31,8 @@ function ChatMessagesList({ firstUnseenMessageId }) {
 					<ChatMessageItem
 						key={message._id}
 						message={message}
+						currentUser={currentUser}
+						currentConversation={currentConversation}
 						isBundled={isBundled}
 						targetMessageRef={isTarget ? targetMessageRef : null}
 						shouldTrackSeen={shouldTrackSeen}

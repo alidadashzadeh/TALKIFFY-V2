@@ -1,24 +1,22 @@
-import useCurrentUser from "@/hooks/user/useCurrentUser";
 import useSeenObserver from "@/hooks/messages/useSeenObserver";
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
 import { Muted } from "../ui/typography";
 import ChatMessageItemContextMenu from "./ChatMessageItemContextMenu";
-import { useConversationContext } from "@/contexts/ConversationContext";
 import MessageHoverReactions from "./../message/MessageHoverReactions";
 import useReactToMessage from "@/hooks/messages/useReactToMessage";
 
 function ChatMessageItem({
 	message,
-	isBundled = false,
+	currentUser,
+	currentConversation,
+	isBundled,
 	targetMessageRef,
 	shouldTrackSeen,
 	onSeen,
 	observerRoot,
 	isSeenByOtherUser,
 }) {
-	const { currentUser } = useCurrentUser();
-	const { currentConversation } = useConversationContext();
 	const { reactToMessage, loading } = useReactToMessage();
 
 	const { bubbleRef } = useSeenObserver({
@@ -90,6 +88,7 @@ function ChatMessageItem({
 						>
 							<ChatMessageItemContextMenu
 								message={message}
+								currentUser={currentUser}
 								isSeenByOtherUser={isSeenByOtherUser}
 							/>
 						</MessageHoverReactions>

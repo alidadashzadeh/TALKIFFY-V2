@@ -98,6 +98,7 @@ function useSendMessage() {
 				optimisticMessage,
 			]);
 
+			// Keep scroll here because send message is the most reliable timing point
 			setTimeout(() => {
 				bottomRef.current?.scrollIntoView({
 					behavior: "smooth",

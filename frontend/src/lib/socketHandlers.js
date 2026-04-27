@@ -55,6 +55,8 @@ export const createHandleNewMessage =
 		});
 
 		// 3. Scroll logic
+		// Keep scroll here because message:new is the most reliable timing point.
+		// useChatScrollBehavior handles initial load; socket handles live messages.
 		if (conversationId === currentConversationId && isNearBottom) {
 			setTimeout(() => {
 				bottomRef.current?.scrollIntoView({
