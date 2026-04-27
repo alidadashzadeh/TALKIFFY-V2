@@ -1,17 +1,19 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
-	createHandleContactAdded,
 	createHandleNewMessage,
 	createHandleMessageDelivered,
 	createHandleMessageSeen,
+	createHandleMessageReactionUpdated,
+} from "@/lib/socketHandlers/messageHandlers";
+import { createHandleContactAdded } from "@/lib/socketHandlers/contactHandlers";
+import {
 	createHandleAdminAdded,
 	createHandleAdminRemoved,
 	createHandleMemberAdded,
 	createHandleMemberRemoved,
 	createHandleMemberLeft,
-	createHandleMessageReactionUpdated,
-} from "@/lib/socketHandlers";
+} from "@/lib/socketHandlers/groupHandlers";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useNearBottom from "../conversation/useNearBottom";
 

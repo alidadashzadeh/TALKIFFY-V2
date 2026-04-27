@@ -4,7 +4,7 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import AccountSheet from "../AccountSheet/Accountheet";
+import AccountSheet from "../AccountSheet/AccountSheet";
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 function SidebarHeader() {
