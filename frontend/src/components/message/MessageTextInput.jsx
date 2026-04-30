@@ -1,9 +1,11 @@
 import { useMessagesContext } from "@/contexts/MessagesContext";
 import { Textarea } from "../ui/textarea";
 import { useEffect } from "react";
+import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 
 function MessageTextInput({ handleSubmit }) {
 	const { text, setText, textareaRef } = useMessagesContext();
+	const { messageSearchOpen } = useSheetModalContext();
 
 	const resizeTextarea = () => {
 		const el = textareaRef.current;
@@ -14,10 +16,12 @@ function MessageTextInput({ handleSubmit }) {
 	};
 
 	useEffect(() => {
+		if (messageSearchOpen) return;
+
 		requestAnimationFrame(() => {
 			textareaRef.current?.focus();
 		});
-	});
+	}, [messageSearchOpen, textareaRef]);
 
 	const handleKeyDown = (e) => {
 		if (e.key === "Enter" && !e.shiftKey) {

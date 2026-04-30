@@ -13,6 +13,7 @@ import { ConversationContextProvider } from "./contexts/ConversationContext";
 import { SheetModalProvider } from "./contexts/SheetModalProvider";
 import { QueryProvider } from "./lib/reactQuery";
 import { Toaster } from "@/components/ui/sonner";
+import { MessageScrollProvider } from "./contexts/MessageScrollContext ";
 
 createRoot(document.getElementById("root")).render(
 	<StrictMode>
@@ -24,8 +25,10 @@ createRoot(document.getElementById("root")).render(
 							<SettingContextProvider>
 								<SocketContextProvider>
 									<SheetModalProvider>
-										<App />
-										<Toaster />
+										<MessageScrollProvider>
+											<App />
+											<Toaster />
+										</MessageScrollProvider>
 									</SheetModalProvider>
 								</SocketContextProvider>
 							</SettingContextProvider>

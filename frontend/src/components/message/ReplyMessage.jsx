@@ -1,9 +1,11 @@
 /* eslint-disable react/prop-types */
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { useMessageScroll } from "@/contexts/MessageScrollContext ";
 
 function ReplyMessage({ replyMessage, isMe }) {
 	const { currentUser } = useCurrentUser();
+	const { scrollToMessage } = useMessageScroll();
 
 	if (!replyMessage) return null;
 
@@ -14,6 +16,7 @@ function ReplyMessage({ replyMessage, isMe }) {
 
 	return (
 		<div
+			onClick={() => scrollToMessage(replyMessage?._id)}
 			className={cn(
 				"rounded-xl border-l-2 px-3 py-2 text-xs",
 				isMe

@@ -5,6 +5,7 @@ import { Muted } from "../ui/typography";
 import ChatMessageItemContextMenu from "./ChatMessageItemContextMenu";
 import MessageHoverReactions from "./../message/MessageHoverReactions";
 import useReactToMessage from "@/hooks/messages/useReactToMessage";
+import { useMessageScroll } from "@/contexts/MessageScrollContext ";
 
 function ChatMessageItem({
 	message,
@@ -18,7 +19,8 @@ function ChatMessageItem({
 	isSeenByOtherUser,
 }) {
 	const { reactToMessage, loading } = useReactToMessage();
-
+	const { registerMessageRef, highlightedMessageId } = useMessageScroll();
+	const isHighlighted = String(highlightedMessageId) === String(message._id);
 	const { bubbleRef } = useSeenObserver({
 		message,
 		shouldTrackSeen,
@@ -45,14 +47,17 @@ function ChatMessageItem({
 
 	return (
 		<div
-			ref={targetMessageRef}
+			ref={(node) => registerMessageRef(message._id, node)}
 			className={cn(
 				"flex w-full",
+				"transition-colors",
+				isHighlighted && "animate-message-highlight",
 				isMyMessage ? "justify-end" : "justify-start",
 				isBundled ? "mt-1" : "mt-4",
 			)}
 		>
 			<div
+				ref={targetMessageRef}
 				className={cn(
 					"flex max-w-[85%] items-end gap-2 sm:max-w-[75%] lg:max-w-[60%]",
 					isMyMessage ? "flex-row-reverse" : "flex-row",
