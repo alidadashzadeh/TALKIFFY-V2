@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useUpdateUserAvatar from "@/hooks/user/useUpdateUserAvatar";

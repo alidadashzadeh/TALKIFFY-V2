@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import { useSocketContext } from "@/contexts/SocketContext";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";

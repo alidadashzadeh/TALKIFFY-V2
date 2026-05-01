@@ -36,7 +36,12 @@ function EmojiPopover() {
 	return (
 		<Popover open={open} onOpenChange={handleOpenChange}>
 			<PopoverTrigger asChild>
-				<Button type="button" size="icon" variant="ghost">
+				<Button
+					type="button"
+					size="icon"
+					variant="ghost"
+					onMouseEnter={() => import("emoji-picker-react")}
+				>
 					<Smile className="h-5 w-5 text-muted-foreground" />
 				</Button>
 			</PopoverTrigger>

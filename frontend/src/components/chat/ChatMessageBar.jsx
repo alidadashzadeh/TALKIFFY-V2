@@ -9,7 +9,7 @@ import ReplyToPreview from "./ReplyToPreview";
 
 function ChatMessageBar() {
 	const { text, file, replyTo } = useMessagesContext();
-	const { sendMessage, loading } = useSendMessage();
+	const { sendMessage } = useSendMessage();
 
 	const onSubmit = async () => {
 		const trimmedMessage = text?.trim();
@@ -19,7 +19,7 @@ function ChatMessageBar() {
 
 	return (
 		<div className="mx-auto w-full max-w-4xl p-2">
-			{file && !loading && <FilePreview />}
+			{file && <FilePreview />}
 			{replyTo && <ReplyToPreview />}
 			<form
 				className="mx-auto flex w-full max-w-4xl items-start gap-2 p-2"
@@ -31,7 +31,7 @@ function ChatMessageBar() {
 				<EmojiPopover />
 				<MessageFileInput />
 				<MessageTextInput handleSubmit={onSubmit} />
-				<SendMessageBtn loading={loading} />
+				<SendMessageBtn />
 			</form>
 		</div>
 	);

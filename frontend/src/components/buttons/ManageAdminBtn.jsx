@@ -9,39 +9,33 @@ function ManageAdminBtn({ member }) {
 	const { currentConversation } = useConversationContext();
 	const { addAdmin } = useAddGroupAdmin();
 	const { removeAdmin } = useRemoveGroupAdmin();
-	const { isAdmin } = getConversationDisplayData(
-		currentConversation,
-		member?._id,
-	);
-	const handleAddAdmin = () => {
-		addAdmin(member?._id);
-	};
-	const handleRemoveAdmin = () => {
-		removeAdmin(member?._id);
+
+	const memberId = member?._id;
+	if (!memberId) return null;
+
+	const { isAdmin } = getConversationDisplayData(currentConversation, memberId);
+	const handleClick = () => {
+		isAdmin ? removeAdmin(memberId) : addAdmin(memberId);
 	};
 
 	return (
-		<div>
-			{!isAdmin ? (
-				<Button
-					onClick={handleAddAdmin}
-					variant="ghost"
-					className="w-full justify-start"
-				>
-					<Shield className="mr-2 h-4 w-4" />
-					Make admin
-				</Button>
-			) : (
-				<Button
-					onClick={handleRemoveAdmin}
-					variant="ghost"
-					className="w-full justify-start"
-				>
+		<Button
+			onClick={handleClick}
+			variant="ghost"
+			className="w-full justify-start"
+		>
+			{isAdmin ? (
+				<>
 					<ShieldXIcon className="mr-2 h-4 w-4" />
 					Remove admin
-				</Button>
+				</>
+			) : (
+				<>
+					<Shield className="mr-2 h-4 w-4" />
+					Make admin
+				</>
 			)}
-		</div>
+		</Button>
 	);
 }
 

@@ -1,5 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable react/prop-types */
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 const MessagesContext = createContext();
@@ -9,8 +7,6 @@ export const useMessagesContext = () => {
 };
 
 export const MessagesContextProvider = ({ children }) => {
-	const [messages, setMessages] = useState([]);
-	const [unseenMessages, setUnseenMessages] = useState([]);
 	const [text, setText] = useState("");
 	const [file, setFile] = useState(null);
 	const [previewUrl, setPreviewUrl] = useState("");
@@ -41,10 +37,6 @@ export const MessagesContextProvider = ({ children }) => {
 	return (
 		<MessagesContext.Provider
 			value={{
-				messages,
-				setMessages,
-				unseenMessages,
-				setUnseenMessages,
 				text,
 				setText,
 				previewUrl,

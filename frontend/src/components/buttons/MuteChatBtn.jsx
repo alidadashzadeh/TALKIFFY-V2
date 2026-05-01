@@ -1,4 +1,4 @@
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuItem } from "../ui/dropdown-menu";
 import { Volume2Icon } from "lucide-react";
 
 function MuteChatBtn() {

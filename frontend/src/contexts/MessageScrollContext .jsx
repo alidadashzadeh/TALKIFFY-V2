@@ -1,4 +1,3 @@
-// contexts/MessageScrollContext.jsx
 import {
 	createContext,
 	useCallback,
@@ -11,6 +10,7 @@ const MessageScrollContext = createContext(null);
 
 export function MessageScrollProvider({ children }) {
 	const messageRefs = useRef(new Map());
+	const highlightTimeoutRef = useRef(null);
 	const [highlightedMessageId, setHighlightedMessageId] = useState(null);
 
 	const registerMessageRef = useCallback((messageId, node) => {
@@ -26,7 +26,9 @@ export function MessageScrollProvider({ children }) {
 	}, []);
 
 	const scrollToMessage = useCallback((messageId) => {
-		const node = messageRefs.current.get(String(messageId));
+		const id = String(messageId);
+		const node = messageRefs.current.get(id);
+
 		if (!node) return;
 
 		node.scrollIntoView({
@@ -34,11 +36,20 @@ export function MessageScrollProvider({ children }) {
 			block: "center",
 		});
 
-		setHighlightedMessageId(String(messageId));
+		if (highlightTimeoutRef.current) {
+			clearTimeout(highlightTimeoutRef.current);
+		}
 
-		setTimeout(() => {
-			setHighlightedMessageId(null);
-		}, 1500);
+		setHighlightedMessageId(null);
+
+		requestAnimationFrame(() => {
+			setHighlightedMessageId(id);
+
+			highlightTimeoutRef.current = setTimeout(() => {
+				setHighlightedMessageId(null);
+				highlightTimeoutRef.current = null;
+			}, 2500);
+		});
 	}, []);
 
 	return (
@@ -56,8 +67,10 @@ export function MessageScrollProvider({ children }) {
 
 export function useMessageScroll() {
 	const ctx = useContext(MessageScrollContext);
+
 	if (!ctx) {
 		throw new Error("useMessageScroll must be used inside provider");
 	}
+
 	return ctx;
 }

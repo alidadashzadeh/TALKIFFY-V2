@@ -1,6 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable react/prop-types */
-
 import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";
 import { createContext, useContext, useMemo, useRef, useState } from "react";
 

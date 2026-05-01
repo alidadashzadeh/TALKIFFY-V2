@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import { useConversationContext } from "@/contexts/ConversationContext";
 
 import useGetMyConversations from "@/hooks/conversation/useGetMyConversations";

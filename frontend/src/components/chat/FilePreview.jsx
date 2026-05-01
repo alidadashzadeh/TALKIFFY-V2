@@ -1,14 +1,14 @@
+import { useState } from "react";
 import { X } from "lucide-react";
+
 import { Button } from "../ui/button";
 import { useMessagesContext } from "@/contexts/MessagesContext";
 
 function FilePreview() {
 	const { file, previewUrl, setFile } = useMessagesContext();
+	const [imageLoaded, setImageLoaded] = useState(false);
 
-	if (!file) return null;
-
-	const isImage = file.type.startsWith("image/");
-	const isVideo = file.type.startsWith("video/");
+	if (!file || !file.type.startsWith("image/")) return null;
 
 	return (
 		<div className="mb-2 rounded-2xl border bg-background p-3">
@@ -24,25 +24,16 @@ function FilePreview() {
 				</Button>
 
 				<div className="pr-10">
-					{isImage && (
-						<img
-							src={previewUrl}
-							alt={file.name}
-							className="max-h-32 w-auto rounded-xl object-cover"
-						/>
-					)}
+					{!imageLoaded && <div className="h-32 w-32 rounded-xl bg-muted" />}
 
-					{isVideo && (
-						<video
-							src={previewUrl}
-							controls
-							className="max-h-64 w-auto rounded-xl"
-						/>
-					)}
-
-					{!isImage && !isVideo && (
-						<div className="text-sm text-muted-foreground">{file.name}</div>
-					)}
+					<img
+						src={previewUrl}
+						alt=""
+						onLoad={() => setImageLoaded(true)}
+						className={`max-h-32 w-auto rounded-xl object-cover ${
+							imageLoaded ? "block" : "hidden"
+						}`}
+					/>
 				</div>
 			</div>
 		</div>

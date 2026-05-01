@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-
 import { MessageSquare } from "lucide-react";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";

@@ -5,7 +5,13 @@ import useAddGroupMember from "@/hooks/group/useAddGroupMember";
 
 function AddMemberBtn({ contact }) {
 	const { addMemberToGroup, loading } = useAddGroupMember();
-	const handleAddMember = () => addMemberToGroup(contact._id);
+
+	const contactId = contact?._id;
+	if (!contactId) return null;
+
+	const handleAddMember = () => {
+		addMemberToGroup(contactId);
+	};
 
 	return (
 		<Button
@@ -14,7 +20,7 @@ function AddMemberBtn({ contact }) {
 			variant="ghost"
 			onClick={handleAddMember}
 			disabled={loading}
-			aria-label={`Add ${contact?.username}`}
+			aria-label={`Add ${contact.username}`}
 		>
 			{loading ? <Spinner /> : <UserPlus className="h-5 w-5" />}
 		</Button>
