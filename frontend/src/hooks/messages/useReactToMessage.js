@@ -1,12 +1,6 @@
 import { axiosInstance } from "@/lib/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-function updateMessageReaction(messages = [], messageId, updatedMessage) {
-	return messages.map((message) =>
-		String(message._id) === String(messageId) ? updatedMessage : message,
-	);
-}
-
 function useReactToMessage() {
 	const queryClient = useQueryClient();
 
@@ -28,8 +22,8 @@ function useReactToMessage() {
 			return data;
 		},
 
-		onMutate: async ({ messageId, emoji, conversationId, currentUserId }) => {
-			if (!conversationId || !currentUserId) return {};
+		onMutate: async ({ messageId, emoji, conversationId, currentUser }) => {
+			if (!conversationId || !currentUser) return {};
 
 			await queryClient.cancelQueries({
 				queryKey: ["messages", conversationId],
@@ -48,13 +42,19 @@ function useReactToMessage() {
 						? [...message.reactions]
 						: [];
 
-					const existingReactionIndex = message.reactions.findIndex(
-						(reaction) => String(reaction.userId) === String(currentUserId),
+					const existingReactionIndex = reactions.findIndex(
+						(reaction) =>
+							String(reaction.userId?._id || reaction.userId) ===
+							String(currentUser._id),
 					);
 
 					if (existingReactionIndex === -1) {
 						reactions.push({
-							userId: currentUserId,
+							userId: {
+								_id: currentUser._id,
+								username: currentUser.username,
+								avatar: currentUser.avatar,
+							},
 							emoji,
 						});
 					} else {
@@ -80,15 +80,6 @@ function useReactToMessage() {
 			return { previousMessages, conversationId };
 		},
 
-		onError: (_error, _variables, context) => {
-			if (context?.previousMessages && context?.conversationId) {
-				queryClient.setQueryData(
-					["messages", context.conversationId],
-					context.previousMessages,
-				);
-			}
-		},
-
 		onSuccess: (data, variables) => {
 			const updatedMessage = data?.data?.message || data?.message;
 			const conversationId = variables?.conversationId;
@@ -96,15 +87,20 @@ function useReactToMessage() {
 			if (!updatedMessage || !conversationId) return;
 
 			queryClient.setQueryData(["messages", conversationId], (old = []) =>
-				updateMessageReaction(old, updatedMessage._id, updatedMessage),
+				old.map((message) =>
+					String(message._id) === String(updatedMessage._id)
+						? updatedMessage
+						: message,
+				),
 			);
 		},
 
-		onSettled: (_data, _error, variables) => {
-			if (variables?.conversationId) {
-				queryClient.invalidateQueries({
-					queryKey: ["messages", variables.conversationId],
-				});
+		onError: (_error, _variables, context) => {
+			if (context?.previousMessages && context?.conversationId) {
+				queryClient.setQueryData(
+					["messages", context.conversationId],
+					context.previousMessages,
+				);
 			}
 		},
 	});

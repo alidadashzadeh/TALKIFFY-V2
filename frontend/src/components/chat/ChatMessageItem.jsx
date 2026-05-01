@@ -42,6 +42,7 @@ function ChatMessageItem({
 			messageId: msg._id,
 			emoji,
 			conversationId: currentConversation._id,
+			currentUser,
 		});
 	};
 
