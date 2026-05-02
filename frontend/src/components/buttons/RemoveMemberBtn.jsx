@@ -6,9 +6,9 @@ function RemoveMemberBtn({ member }) {
 	const { removeParticipant } = useRemoveGroupMember();
 
 	const memberId = member?._id;
-	if (!memberId) return null;
 
 	const handleRemoveMember = () => {
+		if (!memberId) return;
 		removeParticipant(memberId);
 	};
 	return (

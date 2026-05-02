@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
-import MessageLoading from "./components/chat/ChatLoading.jsx";
+import MessageLoading from "./components/ChatLoading.jsx";
 import useCurrentUser from "./hooks/user/useCurrentUser.js";
 
 function App() {

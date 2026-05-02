@@ -25,7 +25,7 @@ function useNearBottom(containerRef, threshold = 200) {
 		return () => {
 			container.removeEventListener("scroll", measure);
 		};
-	}, [containerRef.current, threshold]);
+	}, [containerRef?.current, threshold]);
 
 	return isNearBottom;
 }

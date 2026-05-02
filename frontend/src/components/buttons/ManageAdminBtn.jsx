@@ -11,10 +11,10 @@ function ManageAdminBtn({ member }) {
 	const { removeAdmin } = useRemoveGroupAdmin();
 
 	const memberId = member?._id;
-	if (!memberId) return null;
 
 	const { isAdmin } = getConversationDisplayData(currentConversation, memberId);
 	const handleClick = () => {
+		if (!memberId) return;
 		isAdmin ? removeAdmin(memberId) : addAdmin(memberId);
 	};
 

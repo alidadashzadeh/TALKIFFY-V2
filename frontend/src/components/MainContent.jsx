@@ -1,11 +1,11 @@
 import { useConversationContext } from "@/contexts/ConversationContext";
-import ChatEmptyState from "./chat/ChatEmptyState";
+import NoConversationSelected from "./conversation/NoConversationSelected";
 import ChatMessages from "./chat/ChatMessages";
-import ChatHeader from "./chat/ChatHeader";
 import ChatMessageBar from "./chat/ChatMessageBar";
 import GroupInfoSidebar from "./conversation/ConversationInfoSidebar";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import { AnimatePresence, motion } from "framer-motion";
+import ChatHeader from "./chat/ChatHeader";
 
 function MainContent() {
 	const { currentConversation } = useConversationContext();
@@ -14,7 +14,7 @@ function MainContent() {
 	if (!currentConversation?._id) {
 		return (
 			<main className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-muted/20">
-				<ChatEmptyState />
+				<NoConversationSelected />
 			</main>
 		);
 	}

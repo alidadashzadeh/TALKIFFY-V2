@@ -1,4 +1,4 @@
-function ChatEmptyState() {
+function NoConversationSelected() {
 	return (
 		<div className="flex h-full items-center justify-center px-6 text-center">
 			<div className="space-y-2">
@@ -13,4 +13,4 @@ function ChatEmptyState() {
 	);
 }
 
-export default ChatEmptyState;
+export default NoConversationSelected;

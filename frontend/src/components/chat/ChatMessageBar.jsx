@@ -11,10 +11,10 @@ function ChatMessageBar() {
 	const { text, file, replyTo } = useMessagesContext();
 	const { sendMessage } = useSendMessage();
 
-	const onSubmit = async () => {
+	const onSubmit = () => {
 		const trimmedMessage = text?.trim();
 		if (!trimmedMessage && !file) return;
-		await sendMessage({ text: trimmedMessage, file, replyTo });
+		sendMessage({ text: trimmedMessage, file, replyTo });
 	};
 
 	return (

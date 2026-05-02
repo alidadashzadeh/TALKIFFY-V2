@@ -7,9 +7,9 @@ function MessageMemberBtn({ member }) {
 		useGetOrCreatePrivateConversation();
 
 	const memberId = member?._id;
-	if (!memberId) return null;
 
 	const handleMessageClick = () => {
+		if (!memberId) return;
 		getOrCreatePrivateConversation(memberId);
 	};
 

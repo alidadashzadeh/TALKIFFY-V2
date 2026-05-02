@@ -1,16 +1,24 @@
 import ChatMessagesList from "./ChatMessagesList";
 import useChatScrollBehavior from "@/hooks/conversation/useChatScrollBehavior";
-import ScrollToBottom from "./ScrollToBottom";
+import useGetMessages from "@/hooks/messages/useGetMessages";
+import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { useConversationContext } from "@/contexts/ConversationContext";
+import useNearBottom from "@/hooks/conversation/useNearBottom";
+import ScrollToBottomArrow from "./ScrollToBottomArrow";
 
-function ChatMessagesContainer({
-	messages,
-	currentUser,
-	currentConversation,
-	bottomRef,
-	targetMessageRef,
-	containerRef,
-	topRef,
-}) {
+function ChatMessagesContainer() {
+	const { messages = [] } = useGetMessages();
+	const { currentUser } = useCurrentUser();
+	const {
+		currentConversation,
+		containerRef,
+		targetMessageRef,
+		bottomRef,
+		topRef,
+	} = useConversationContext();
+
+	const isNearBottom = useNearBottom(containerRef);
+
 	const { firstUnseenMessageId } = useChatScrollBehavior({
 		messages,
 		currentConversation,
@@ -41,7 +49,7 @@ function ChatMessagesContainer({
 				</div>
 			</div>
 
-			<ScrollToBottom />
+			{currentConversation && !isNearBottom && <ScrollToBottomArrow />}
 		</div>
 	);
 }

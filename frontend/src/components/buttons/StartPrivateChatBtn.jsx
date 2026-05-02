@@ -3,33 +3,27 @@ import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import useGetOrCreatePrivateConversation from "@/hooks/conversation/useGetOrCreatePrivateConversation";
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
-import { useConversationContext } from "@/contexts/ConversationContext";
 
 function StartPrivateChatBtn({ contact }) {
-	const { selectConversation } = useConversationContext();
 	const { setAccountSheetOpen, setContactModalOpen } = useSheetModalContext();
 	const { getOrCreatePrivateConversation, loading } =
 		useGetOrCreatePrivateConversation();
 
-	const handleMessageClick = async () => {
-		try {
-			const conversation = await getOrCreatePrivateConversation(contact?._id);
-			setAccountSheetOpen(false);
-			setContactModalOpen(false);
+	const contactId = contact?._id;
 
-			if (conversation?.data?.conversation?._id) {
-				selectConversation(conversation);
-			}
-		} catch (error) {
-			console.error("Failed to get or create conversation:", error);
-		}
+	const handleClick = () => {
+		if (!contactId) return;
+
+		getOrCreatePrivateConversation(contactId);
+		setAccountSheetOpen(false);
+		setContactModalOpen(false);
 	};
 	return (
 		<Button
 			type="button"
 			size="icon"
 			variant="ghost"
-			onClick={handleMessageClick}
+			onClick={handleClick}
 			aria-label={`Message ${contact?.username}`}
 		>
 			{loading ? <Spinner /> : <MessageSquare className="h-5 w-5" />}

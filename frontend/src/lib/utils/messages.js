@@ -1,4 +1,4 @@
-const BUNDLE_WINDOW_MS = 1 * 60 * 1000;
+const BUNDLE_WINDOW_MS = 2 * 60 * 1000;
 
 export function isBundledMessage(messages, index) {
 	if (!messages || index === 0) return false;

@@ -1,28 +1,26 @@
-import { cn, getConversationDisplayData } from "@/lib/utils";
+import { getConversationDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
-
 import { useConversationContext } from "@/contexts/ConversationContext";
-
 import GroupChatHeaderActions from "./GroupChatHeaderActions";
 import PrivateChatHeaderActions from "./PrivateChatHeaderActions";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 import { useSocketContext } from "@/contexts/SocketContext";
 import OnlineStatusDot from "../ui/OnlineStatusDot";
+import { H4 } from "../ui/typography";
 
 function ChatHeader() {
 	const { currentConversation } = useConversationContext();
 	const { currentUser } = useCurrentUser();
 	const { onlineUsers } = useSocketContext();
 
-	const displayData = getConversationDisplayData(
+	// conversation party information
+	const { name, avatar, id } = getConversationDisplayData(
 		currentConversation,
 		currentUser?._id,
 	);
 	const isOnline =
-		currentConversation?.type !== "group" &&
-		onlineUsers.includes(displayData?.id);
-
-	if (!currentConversation) return null;
+		currentConversation?.type !== "group" && onlineUsers?.includes(id);
+	const isGroup = currentConversation?.type === "group";
 
 	return (
 		<header className="w-full border-b bg-background px-16 py-3">
@@ -30,27 +28,17 @@ function ChatHeader() {
 				{/* LEFT SIDE */}
 				<div className="flex min-w-0 items-center gap-3 ">
 					<div className="relative">
-						<AvatarGenerator
-							avatar={displayData?.avatar}
-							name={displayData?.name}
-						/>
+						<AvatarGenerator avatar={avatar} name={name} />
 						{currentConversation?.type !== "group" && (
 							<OnlineStatusDot isOnline={isOnline} />
 						)}
 					</div>
-
-					<div className="min-w-0">
-						<h2 className="truncate font-semibold">{displayData?.name}</h2>
-					</div>
+					<H4 className="truncate font-semibold">{name}</H4>
 				</div>
 
 				{/* RIGHT SIDE ACTIONS */}
 				<div className="flex items-center">
-					{currentConversation.type === "group" ? (
-						<GroupChatHeaderActions />
-					) : (
-						<PrivateChatHeaderActions />
-					)}
+					{isGroup ? <GroupChatHeaderActions /> : <PrivateChatHeaderActions />}
 				</div>
 			</div>
 		</header>

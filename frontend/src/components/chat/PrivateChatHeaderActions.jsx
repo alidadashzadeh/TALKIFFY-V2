@@ -1,4 +1,4 @@
-import { MoreVertical, Folder, BellOff, Trash2 } from "lucide-react";
+import { MoreVertical, BellOff, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -9,11 +9,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import MessageSearchPopover from "../message/MessageSearchPopover";
+import SidePanelAction from "../ui/SidePanelAction";
 
 function PrivateChatHeaderActions() {
 	return (
 		<div className="flex items-center gap-1">
 			<MessageSearchPopover />
+			<SidePanelAction />
 
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
@@ -23,11 +25,6 @@ function PrivateChatHeaderActions() {
 				</DropdownMenuTrigger>
 
 				<DropdownMenuContent align="end" className="w-52">
-					<DropdownMenuItem>
-						<Folder className="mr-2 h-4 w-4" />
-						Shared Files
-					</DropdownMenuItem>
-
 					<DropdownMenuItem>
 						<BellOff className="mr-2 h-4 w-4" />
 						Mute Chat

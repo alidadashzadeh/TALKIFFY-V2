@@ -5,6 +5,7 @@ import {
 	HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import EmojiPicker from "emoji-picker-react";
+import { Plus } from "lucide-react";
 
 const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
@@ -40,7 +41,7 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 							<button
 								key={emoji}
 								type="button"
-								className="rounded-full p-1 text-lg transition hover:bg-muted"
+								className="w-8 h-8 flex items-center justify-center rounded-full p-1 text-lg transition hover:bg-muted"
 								onClick={() => onReact?.(emoji, message)}
 							>
 								{emoji}
@@ -49,10 +50,10 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 
 						<button
 							type="button"
-							className="rounded-full p-1 text-lg transition hover:bg-muted"
+							className=" w-8 h-8 flex items-center justify-center  rounded-full p-1 text-lg transition hover:bg-muted"
 							onClick={() => setShowPicker(true)}
 						>
-							➕
+							<Plus />
 						</button>
 					</div>
 				)}

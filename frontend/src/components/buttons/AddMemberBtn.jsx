@@ -7,9 +7,9 @@ function AddMemberBtn({ contact }) {
 	const { addMemberToGroup, loading } = useAddGroupMember();
 
 	const contactId = contact?._id;
-	if (!contactId) return null;
 
 	const handleAddMember = () => {
+		if (!contactId) return;
 		addMemberToGroup(contactId);
 	};
 
