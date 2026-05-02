@@ -5,37 +5,37 @@ import {
 	truncateText,
 } from "@/lib/utils";
 
-import { useConversationContext } from "@/contexts/ConversationContext";
-import AvatarGenerator from "../AvatarGenerator";
-import { Muted, P } from "../ui/typography";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { useConversationContext } from "@/contexts/ConversationContext";
 import { useSocketContext } from "@/contexts/SocketContext";
+
+import AvatarGenerator from "../AvatarGenerator";
 import OnlineStatusDot from "../ui/OnlineStatusDot";
+import { Muted, P } from "../ui/typography";
 
 function ConversationListItem({ conversation, isActive = false }) {
 	const { currentUser } = useCurrentUser();
-
 	const { selectConversation } = useConversationContext();
 	const { onlineUsers } = useSocketContext();
-
-	const handleSelectConversation = () => {
-		selectConversation(conversation);
-	};
 
 	const displayData = getConversationDisplayData(
 		conversation,
 		currentUser?._id,
 	);
 
-	const isOnline =
-		conversation?.type !== "group" && onlineUsers.includes(displayData?.id);
+	const isGroup = conversation?.type === "group";
+	const lastMessage = conversation?.lastMessageId;
+	const senderName = lastMessage?.senderId?.username;
+	const unreadCount = conversation?.unreadCount || 0;
+
+	const isOnline = !isGroup && onlineUsers.includes(displayData?.id);
 
 	return (
 		<button
 			type="button"
-			onClick={handleSelectConversation}
+			onClick={() => selectConversation(conversation)}
 			className={cn(
-				"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent relative",
+				"relative flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition hover:bg-accent",
 				isActive && "bg-accent",
 			)}
 		>
@@ -44,43 +44,37 @@ function ConversationListItem({ conversation, isActive = false }) {
 					avatar={displayData?.avatar}
 					name={displayData?.name}
 				/>
-				{conversation?.type !== "group" && (
-					<OnlineStatusDot isOnline={isOnline} />
-				)}
+
+				{!isGroup && <OnlineStatusDot isOnline={isOnline} />}
 			</div>
-			<div className="flex-col w-full">
-				<div className="min-w-0 flex-1 flex justify-between items-center ">
-					<P className="truncate font-medium">
-						{truncateText(displayData?.name, 15)}
-					</P>
+
+			<div className="min-w-0 flex-1">
+				<div className="flex items-center justify-between gap-2">
+					<P className="truncate font-medium">{displayData?.name}</P>
 
 					<Muted className="shrink-0 text-xs">
 						{formatMessageTime(conversation?.lastMessageAt)}
 					</Muted>
 				</div>
-				<div className=" flex gap-2 items-baseline">
-					{conversation?.type === "group" && (
-						<P className="text-blue-500 text-sm">
-							@
-							{truncateText(
-								conversation?.lastMessageId?.senderId?.username,
-								10,
-							)}{" "}
-							:
+
+				<div className="flex min-w-0 items-baseline gap-1">
+					{isGroup && senderName && (
+						<P className="shrink-0 text-sm text-blue-500">
+							@{truncateText(senderName, 10)}:
 						</P>
 					)}
-					<Muted className="truncate text-sm text-muted-foreground">
-						{truncateText(conversation?.lastMessageId?.content, 10)}
+
+					<Muted className="truncate text-sm">
+						{lastMessage?.content || "No messages yet"}
 					</Muted>
 				</div>
 			</div>
-			<div>
-				{conversation?.unreadCount > 0 && (
-					<div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500 text-white text-xs">
-						{conversation.unreadCount}
-					</div>
-				)}
-			</div>
+
+			{unreadCount > 0 && (
+				<div className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 px-1.5 text-xs text-white">
+					{unreadCount}
+				</div>
+			)}
 		</button>
 	);
 }

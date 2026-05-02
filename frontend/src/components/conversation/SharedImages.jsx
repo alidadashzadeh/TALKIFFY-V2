@@ -4,8 +4,9 @@ import { ScrollArea } from "../ui/scroll-area";
 import { formatSectionDate } from "@/lib/utils";
 import { Muted } from "../ui/typography";
 import { getAttachmentsByDate } from "@/lib/utils/conversation";
+import { Spinner } from "../ui/spinner";
 
-function SharedFiles() {
+function SharedImages() {
 	const { messages = [], loading } = useGetMessages();
 	const bottomRef = useRef(null);
 
@@ -21,7 +22,10 @@ function SharedFiles() {
 
 	if (loading) {
 		return (
-			<div className="p-4 text-sm text-muted-foreground">Loading files...</div>
+			<div className="p-4 text-sm text-muted-foreground flex justify-center items-center">
+				<Spinner />
+				<span className="px-4">Loading Images...</span>
+			</div>
 		);
 	}
 
@@ -32,7 +36,7 @@ function SharedFiles() {
 	}
 
 	return (
-		<ScrollArea className="h-[60vh]">
+		<ScrollArea className="h-full">
 			<div className="space-y-6 p-4">
 				{sortedDates.map((dateKey) => (
 					<div key={dateKey} className="space-y-3">
@@ -42,33 +46,16 @@ function SharedFiles() {
 
 						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
 							{attachmentsByDate[dateKey].map((attachment) => {
-								const isImage =
-									attachment?.type === "image" ||
-									attachment?.type?.startsWith("image/");
-
 								return (
 									<div
 										key={attachment._id || attachment.fallbackKey}
 										className="overflow-hidden rounded-xl border bg-background"
 									>
-										{isImage ? (
-											<img
-												src={attachment.url}
-												alt={attachment.fileName || "attachment"}
-												className="aspect-square h-full w-full object-cover"
-											/>
-										) : (
-											<div className="flex aspect-square items-center justify-center p-3">
-												<div className="w-full space-y-2 text-center">
-													<p className="truncate text-sm font-medium">
-														{attachment?.fileName || "File"}
-													</p>
-													<p className="truncate text-xs text-muted-foreground">
-														{attachment?.type || "attachment"}
-													</p>
-												</div>
-											</div>
-										)}
+										<img
+											src={attachment.url}
+											alt={attachment.fileName || "attachment"}
+											className="aspect-square h-full w-full object-cover"
+										/>
 									</div>
 								);
 							})}
@@ -82,4 +69,4 @@ function SharedFiles() {
 	);
 }
 
-export default SharedFiles;
+export default SharedImages;

@@ -24,7 +24,7 @@ function ContactsList({ ActionComponent }) {
 	}
 
 	return (
-		<div className="flex h-full flex-col gap-1 overflow-y-auto p-1 pr-1">
+		<div className="flex h-full flex-col gap-1 overflow-y-auto p-1">
 			{filteredContacts.map((contact) => (
 				<ContactListItem
 					key={contact._id}

@@ -9,13 +9,13 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import MessageSearchPopover from "../message/MessageSearchPopover";
-import SidePanelAction from "../ui/SidePanelAction";
+import SidePanelActionBtn from "../buttons/SidePanelActionBtn";
 
 function PrivateChatHeaderActions() {
 	return (
 		<div className="flex items-center gap-1">
 			<MessageSearchPopover />
-			<SidePanelAction />
+			<SidePanelActionBtn />
 
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>

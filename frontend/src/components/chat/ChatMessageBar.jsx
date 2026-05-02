@@ -5,7 +5,7 @@ import MessageFileInput from "../message/MessageFileInput";
 import FilePreview from "./FilePreview";
 import EmojiPopover from "./EmojiPopover";
 import SendMessageBtn from "../buttons/SendMessageBtn";
-import ReplyToPreview from "./ReplyToPreview";
+import ReplyPreview from "./ReplyPreview";
 
 function ChatMessageBar() {
 	const { text, file, replyTo } = useMessagesContext();
@@ -20,7 +20,7 @@ function ChatMessageBar() {
 	return (
 		<div className="mx-auto w-full max-w-4xl p-2">
 			{file && <FilePreview />}
-			{replyTo && <ReplyToPreview />}
+			{replyTo && <ReplyPreview />}
 			<form
 				className="mx-auto flex w-full max-w-4xl items-start gap-2 p-2"
 				onSubmit={(e) => {

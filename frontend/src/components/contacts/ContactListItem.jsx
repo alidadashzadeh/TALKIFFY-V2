@@ -6,7 +6,7 @@ import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function ContactListItem({ contact, ActionComponent }) {
 	const { onlineUsers } = useSocketContext();
-	const isOnline = onlineUsers.includes(contact._id);
+	const isOnline = onlineUsers.includes(contact?._id);
 
 	return (
 		<>
@@ -17,19 +17,21 @@ function ContactListItem({ contact, ActionComponent }) {
 				)}
 			>
 				<div className="relative shrink-0">
-					<AvatarGenerator avatar={contact.avatar} name={contact.username} />
+					<AvatarGenerator avatar={contact?.avatar} name={contact?.username} />
 					<OnlineStatusDot isOnline={isOnline} />
 				</div>
 				<div className="min-w-0 flex-1">
 					<div className="flex items-center justify-between gap-2">
-						<p className="truncate font-medium">{contact.username}</p>
+						<p className="truncate font-medium">{contact?.username}</p>
 					</div>
 
 					<p className="truncate text-sm text-muted-foreground">
-						{contact.email}
+						{contact?.email}
 					</p>
 				</div>
-				{ActionComponent ? <ActionComponent contact={contact} /> : null}
+				{contact && ActionComponent ? (
+					<ActionComponent contact={contact} />
+				) : null}
 			</div>
 			<Separator />
 		</>

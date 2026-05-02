@@ -1,8 +1,8 @@
 import { useSheetModalContext } from "@/contexts/SheetModalProvider";
-import { Button } from "./button";
+import { Button } from "../ui/button";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 
-function SidePanelAction() {
+function SidePanelActionBtn() {
 	const { conversationInfoOpen, setConversationInfoOpen } =
 		useSheetModalContext();
 	return (
@@ -20,4 +20,4 @@ function SidePanelAction() {
 	);
 }
 
-export default SidePanelAction;
+export default SidePanelActionBtn;

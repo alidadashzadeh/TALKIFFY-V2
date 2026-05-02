@@ -7,7 +7,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AddMemberModal from "../group/AddMemberModal";
-import SidePanelAction from "../ui/SidePanelAction";
+import SidePanelActionBtn from "../buttons/SidePanelActionBtn";
 
 import LeaveGroupBtn from "../buttons/LeaveGroupBtn";
 import MuteChatBtn from "../buttons/MuteChatBtn";
@@ -17,7 +17,7 @@ function GroupChatHeaderActions() {
 		<div className="flex items-center gap-1">
 			<AddMemberModal />
 			<MessageSearchPopover />
-			<SidePanelAction />
+			<SidePanelActionBtn />
 
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>

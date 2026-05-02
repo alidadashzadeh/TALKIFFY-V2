@@ -7,7 +7,7 @@ import GroupInfoActions from "../group/GroupInfoActions";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
 import GroupMembersCount from "../group/GroupMembersCount";
 import GroupInfoContent from "../group/GroupInfoContent";
-import SharedFiles from "./SharedFiles";
+import SharedImages from "./SharedImages";
 
 function ConversationInfoSidebar() {
 	const { currentConversation } = useConversationContext();
@@ -19,12 +19,12 @@ function ConversationInfoSidebar() {
 	);
 
 	return (
-		<div>
-			<div className="relative flex flex-col items-center justify-center gap-4 py-4">
+		<div className="flex h-full flex-col">
+			<div className="flex flex-col items-center justify-center gap-4 py-4">
 				<AvatarGenerator avatar={avatar} name={name} size="w-24 h-24" />
-				<div className=" flex flex-col justify-center items-center">
+				<div className="flex flex-col items-center">
 					<H4>{name}</H4>
-					<GroupMembersCount />
+					{isGroup && <GroupMembersCount />}
 				</div>
 			</div>
 
@@ -32,7 +32,9 @@ function ConversationInfoSidebar() {
 
 			<Separator />
 
-			{isGroup ? <GroupInfoContent /> : <SharedFiles />}
+			<div className="flex-1 min-h-0">
+				{isGroup ? <GroupInfoContent /> : <SharedImages />}
+			</div>
 		</div>
 	);
 }
