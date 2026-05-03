@@ -1,4 +1,4 @@
-import { getConversationDisplayData } from "@/lib/utils";
+import { getConversationDisplayData, truncateText } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import GroupChatHeaderActions from "./GroupChatHeaderActions";
@@ -33,7 +33,7 @@ function ChatHeader() {
 							<OnlineStatusDot isOnline={isOnline} />
 						)}
 					</div>
-					<H4 className="truncate font-semibold">{name}</H4>
+					<H4 className="font-semibold">{truncateText(name, 20)}</H4>
 				</div>
 
 				{/* RIGHT SIDE ACTIONS */}

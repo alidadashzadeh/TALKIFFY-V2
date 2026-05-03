@@ -1,6 +1,6 @@
 import AvatarGenerator from "../AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
-import { getConversationDisplayData } from "@/lib/utils";
+import { getConversationDisplayData, truncateText } from "@/lib/utils";
 import GroupAdminActions from "./GroupAdminActions";
 import GroupMemberActions from "./GroupMemberActions";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
@@ -36,7 +36,9 @@ function GroupMembersListItem({ member }) {
 
 				<div className="min-w-0">
 					<div className="flex items-center gap-2">
-						<p className="truncate text-sm font-medium">{member?.username}</p>
+						<p className="text-sm font-medium">
+							{truncateText(member?.username, 20)}
+						</p>
 
 						{isAdmin && (
 							<span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
@@ -51,8 +53,8 @@ function GroupMembersListItem({ member }) {
 					</div>
 
 					{member?.email && (
-						<p className="truncate text-xs text-muted-foreground">
-							{member.email}
+						<p className="text-xs text-muted-foreground">
+							{truncateText(member.email, 35)}
 						</p>
 					)}
 				</div>

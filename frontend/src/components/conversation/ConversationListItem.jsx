@@ -50,7 +50,7 @@ function ConversationListItem({ conversation, isActive = false }) {
 
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center justify-between gap-2">
-					<P className="truncate font-medium">{displayData?.name}</P>
+					<P className=" font-medium">{truncateText(displayData?.name, 20)}</P>
 
 					<Muted className="shrink-0 text-xs">
 						{formatMessageTime(conversation?.lastMessageAt)}
@@ -64,8 +64,8 @@ function ConversationListItem({ conversation, isActive = false }) {
 						</P>
 					)}
 
-					<Muted className="truncate text-sm">
-						{lastMessage?.content || "No messages yet"}
+					<Muted className="text-sm">
+						{truncateText(lastMessage?.content || "No messages yet", 10)}
 					</Muted>
 				</div>
 			</div>

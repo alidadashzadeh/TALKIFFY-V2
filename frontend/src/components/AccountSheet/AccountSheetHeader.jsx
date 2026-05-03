@@ -1,6 +1,7 @@
 import { SheetHeader, SheetTitle } from "../ui/sheet";
 import AvatarGenerator from "../AvatarGenerator";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
+import { truncateText } from "@/lib/utils";
 
 function AccountSheetHeader() {
 	const { currentUser } = useCurrentUser();
@@ -19,9 +20,9 @@ function AccountSheetHeader() {
 				/>
 
 				<div className="min-w-0 leading-tight">
-					<p className="truncate text-sm font-semibold">{shortName}</p>
-					<p className="truncate text-xs text-muted-foreground">
-						{currentUser?.email || " "}
+					<p className="text-sm font-semibold">{truncateText(shortName, 20)}</p>
+					<p className=" text-xs text-muted-foreground">
+						{truncateText(currentUser?.email || " ", 35)}
 					</p>
 				</div>
 			</SheetTitle>

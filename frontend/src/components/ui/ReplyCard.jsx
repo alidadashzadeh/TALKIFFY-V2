@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, truncateText } from "@/lib/utils";
 
 function ReplyCard({ username, message, isMe = false, className, onClick }) {
 	if (!message) return null;
@@ -46,11 +46,11 @@ function ReplyCard({ username, message, isMe = false, className, onClick }) {
 					{message?.content ? (
 						<p
 							className={cn(
-								"truncate text-sm",
+								"text-sm",
 								isMe ? "text-primary-foreground" : "text-foreground",
 							)}
 						>
-							{message.content}
+							{truncateText(message.content, 10)}
 						</p>
 					) : (
 						<p

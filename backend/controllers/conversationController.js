@@ -529,11 +529,15 @@ export const updateGroupName = catchAsync(async (req, res) => {
 
 	await conversation.save();
 
+	const updatedConversation = await Conversation.findById(conversationId)
+		.populate("participants", "username email avatar")
+		.populate("admins", "username email avatar");
+
 	res.status(200).json({
 		message: "Group name updated successfully",
 		status: "success",
 		data: {
-			conversation,
+			conversation: updatedConversation,
 		},
 	});
 });
