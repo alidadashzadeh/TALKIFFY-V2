@@ -14,9 +14,7 @@ function GroupMemberActions({ member }) {
 			</PopoverTrigger>
 
 			<PopoverContent align="end" className="w-48 p-2">
-				<div className="space-y-1">
-					<MessageMemberBtn member={member} />
-				</div>
+				<MessageMemberBtn member={member} />
 			</PopoverContent>
 		</Popover>
 	);

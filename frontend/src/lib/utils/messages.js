@@ -16,6 +16,29 @@ export function isBundledMessage(messages, index) {
 	return sameSender && timeDiff < BUNDLE_WINDOW_MS;
 }
 
+export function getMessageGroupsByDate(messages = []) {
+	const groups = [];
+
+	let currentDateKey = null;
+
+	messages.forEach((message, index) => {
+		const dateKey = new Date(message.createdAt).toDateString();
+
+		if (dateKey !== currentDateKey) {
+			groups.push({
+				dateKey,
+				messages: [],
+			});
+
+			currentDateKey = dateKey;
+		}
+
+		groups[groups.length - 1].messages.push({ message, index });
+	});
+
+	return groups;
+}
+
 export function getFirstUnseenMessageId({
 	messages,
 	currentConversation,
