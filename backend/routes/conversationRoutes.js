@@ -9,6 +9,7 @@ import {
 	removeGroupAdmin,
 	removeGroupParticipant,
 	updateGroupAvatar,
+	updateGroupName,
 	updateSeen,
 } from "../controllers/conversationController.js";
 import { protect } from "../controllers/authController.js";
@@ -40,6 +41,8 @@ router.patch(
 	optimizeGroupAvatar,
 	updateGroupAvatar,
 );
+router.patch("/:conversationId/name", protect, updateGroupName);
+
 router.patch("/update-seen", protect, updateSeen);
 
 export default router;

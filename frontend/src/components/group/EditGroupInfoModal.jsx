@@ -17,11 +17,14 @@ import { Camera } from "lucide-react";
 import { P } from "../ui/typography";
 import useUpdateGroupAvatar from "@/hooks/group/useUpdateGroupAvatar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import useUpdateGroupName from "@/hooks/group/useUpdateGroupName";
 
 function EditGroupInfoModal() {
 	const { currentConversation } = useConversationContext();
 	const { editGroupModalOpen, setEditGroupModalOpen } = useSheetModalContext();
 	const { updateGroupAvatar, loading } = useUpdateGroupAvatar();
+
+	const { updateGroupName } = useUpdateGroupName();
 
 	const handleImageUpload = async (e) => {
 		const file = e.target.files?.[0];
@@ -43,11 +46,10 @@ function EditGroupInfoModal() {
 		},
 	});
 
-	const onSubmit = (data) => {
-		console.log(data);
+	const onSubmit = async (data) => {
+		await updateGroupName(data.name);
+		setEditGroupModalOpen(false);
 	};
-
-	if (currentConversation?.type !== "group") return null;
 
 	return (
 		<Dialog open={editGroupModalOpen} onOpenChange={setEditGroupModalOpen}>
@@ -98,8 +100,7 @@ function EditGroupInfoModal() {
 						<Label htmlFor="name">Group Name</Label>
 						<Input
 							id="name"
-							defaultValues={currentConversation?.name}
-							placeholder="Enter group name"
+							placeholder="Enter new group name"
 							{...register("name", {
 								required: "Group name is required",
 								validate: (v) =>

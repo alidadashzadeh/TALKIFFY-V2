@@ -490,3 +490,50 @@ export const updateGroupAvatar = catchAsync(async (req, res) => {
 		},
 	});
 });
+
+export const updateGroupName = catchAsync(async (req, res) => {
+	const { conversationId } = req.params;
+	const { name } = req.body;
+
+	if (!name || !name.trim()) {
+		return res.status(400).json({
+			message: "Group name is required",
+		});
+	}
+
+	const conversation = await Conversation.findById(conversationId);
+
+	if (!conversation) {
+		return res.status(404).json({
+			message: "Conversation not found",
+		});
+	}
+
+	if (!conversation.type === "group") {
+		return res.status(400).json({
+			message: "This conversation is not a group",
+		});
+	}
+
+	const isAdmin = conversation.admins.some(
+		(userId) => userId.toString() === req.user._id.toString(),
+	);
+
+	if (!isAdmin) {
+		return res.status(403).json({
+			message: "You are not allowed to update this group",
+		});
+	}
+
+	conversation.name = name.trim();
+
+	await conversation.save();
+
+	res.status(200).json({
+		message: "Group name updated successfully",
+		status: "success",
+		data: {
+			conversation,
+		},
+	});
+});

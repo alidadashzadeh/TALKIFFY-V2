@@ -33,9 +33,6 @@ function useUpdateGroupAvatar() {
 			const previewUrl = URL.createObjectURL(file);
 
 			await queryClient.cancelQueries({ queryKey: ["conversations"] });
-			await queryClient.cancelQueries({
-				queryKey: ["conversation", conversationId],
-			});
 
 			const previousConversations =
 				queryClient.getQueryData(["conversations"]) || [];

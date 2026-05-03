@@ -21,9 +21,7 @@ function AddMemberModal() {
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>
-					<DialogDescription>
-						Search your contacts or add a new one.
-					</DialogDescription>
+					<DialogDescription>Search your contacts.</DialogDescription>
 				</DialogHeader>
 
 				<div className="flex flex-col gap-4">
