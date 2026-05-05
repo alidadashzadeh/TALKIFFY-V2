@@ -10,7 +10,6 @@ function SheetModalProvider({ children }) {
 	const [addMemberModalOpen, setAddMemberModalOpen] = useState(false);
 	const [conversationInfoOpen, setConversationInfoOpen] = useState(false);
 	const [editGroupModalOpen, setEditGroupModalOpen] = useState(false);
-
 	const [messageSearchOpen, setMessageSearchOpen] = useState(false);
 	const [messageSearchValue, setMessageSearchValue] = useState("");
 
@@ -31,7 +30,6 @@ function SheetModalProvider({ children }) {
 				setEditGroupModalOpen,
 				addContactModalOpen,
 				setAddContactModalOpen,
-
 				messageSearchOpen,
 				setMessageSearchOpen,
 				messageSearchValue,

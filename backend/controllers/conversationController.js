@@ -423,8 +423,10 @@ export const leaveGroup = catchAsync(async (req, res) => {
 	);
 
 	if (conversation.participants.length === 0) {
-		await Conversation.findByIdAndDelete(conversationId);
-
+		await Promise.all([
+			Message.deleteMany({ conversationId }),
+			Conversation.findByIdAndDelete(conversationId),
+		]);
 		return res.status(200).json({
 			status: "success",
 			message: "You left the group and it was deleted because it became empty",

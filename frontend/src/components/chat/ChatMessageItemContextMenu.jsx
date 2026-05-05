@@ -82,7 +82,12 @@ function ChatMessageItemContextMenu({
 								)}
 							</div>
 
-							<div className="ml-auto flex shrink-0 items-center gap-1 text-[10px]">
+							<div
+								className={cn(
+									" flex shrink-0 items-center gap-1 text-[10px]",
+									isMyMessage ? "ml-auto" : "mr-auto",
+								)}
+							>
 								<span>{messageTime}</span>
 
 								{isMyMessage && (
