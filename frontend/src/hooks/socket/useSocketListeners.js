@@ -1,21 +1,10 @@
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-	createHandleNewMessage,
-	createHandleMessageDelivered,
-	createHandleMessageSeen,
-	createHandleMessageReactionUpdated,
-} from "@/lib/socketHandlers/messageHandlers";
-import { createHandleContactAdded } from "@/lib/socketHandlers/contactHandlers";
-import {
-	createHandleAdminAdded,
-	createHandleAdminRemoved,
-	createHandleMemberAdded,
-	createHandleMemberRemoved,
-	createHandleMemberLeft,
-} from "@/lib/socketHandlers/groupHandlers";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import useNearBottom from "../conversation/useNearBottom";
+import useGroupSocketHandlers from "./handlers/useGroupSocketHandlers";
+import useMessageSocketHandlers from "./handlers/useMessageSocketHandlers";
+import useContactSocketHandlers from "./handlers/useContactSocketHandlers";
 
 function useSocketListeners(socket) {
 	const queryClient = useQueryClient();
@@ -23,34 +12,34 @@ function useSocketListeners(socket) {
 		useConversationContext();
 	const isNearBottom = useNearBottom(containerRef);
 
+	const {
+		handleNewMessage,
+		handleMessageDelivered,
+		handleMessageSeen,
+		handleMessageReactionUpdated,
+	} = useMessageSocketHandlers({
+		queryClient,
+		currentConversationId: currentConversation?._id,
+		bottomRef,
+		isNearBottom,
+	});
+	const handleContactAdded = useContactSocketHandlers(queryClient);
+	const {
+		handleAdminAdded,
+		handleAdminRemoved,
+		handleMemberAdded,
+		handleMemberRemoved,
+		handleMemberLeft,
+	} = useGroupSocketHandlers(queryClient);
+
 	useEffect(() => {
 		if (!socket) return;
-
-		const handleContactAdded = createHandleContactAdded(queryClient);
-		const handleNewMessage = createHandleNewMessage(
-			queryClient,
-			currentConversation?._id,
-			bottomRef,
-			isNearBottom,
-		);
-		const handleMessageDelivered = createHandleMessageDelivered(queryClient);
-		const handleMessageSeen = createHandleMessageSeen(queryClient);
-
-		const handleAdminAdded = createHandleAdminAdded(queryClient);
-		const handleAdminRemoved = createHandleAdminRemoved(queryClient);
-		const handleMemberAdded = createHandleMemberAdded(queryClient);
-		const handleMemberRemoved = createHandleMemberRemoved(queryClient);
-		const handleMemberLeft = createHandleMemberLeft(queryClient);
-
-		const handleMessageReactionUpdated =
-			createHandleMessageReactionUpdated(queryClient);
 
 		socket.on("contact:added", handleContactAdded);
 		socket.on("message:new", handleNewMessage);
 		socket.on("message:delivered", handleMessageDelivered);
 		socket.on("message:seen", handleMessageSeen);
 		socket.on("message:reactionUpdated", handleMessageReactionUpdated);
-
 		socket.on("group:adminAdded", handleAdminAdded);
 		socket.on("group:adminRemoved", handleAdminRemoved);
 		socket.on("group:memberAdded", handleMemberAdded);
@@ -63,14 +52,25 @@ function useSocketListeners(socket) {
 			socket.off("message:delivered", handleMessageDelivered);
 			socket.off("message:seen", handleMessageSeen);
 			socket.off("message:reactionUpdated", handleMessageReactionUpdated);
-
 			socket.off("group:adminAdded", handleAdminAdded);
 			socket.off("group:adminRemoved", handleAdminRemoved);
 			socket.off("group:memberAdded", handleMemberAdded);
 			socket.off("group:memberRemoved", handleMemberRemoved);
 			socket.off("group:memberLeft", handleMemberLeft);
 		};
-	}, [socket, queryClient, currentConversation?._id, bottomRef, isNearBottom]);
+	}, [
+		socket,
+		handleNewMessage,
+		handleContactAdded,
+		handleMessageDelivered,
+		handleMessageSeen,
+		handleMessageReactionUpdated,
+		handleAdminAdded,
+		handleAdminRemoved,
+		handleMemberAdded,
+		handleMemberRemoved,
+		handleMemberLeft,
+	]);
 }
 
 export default useSocketListeners;

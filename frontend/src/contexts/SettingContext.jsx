@@ -1,8 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
 import notifSound1 from "./../sounds/notifSound1.mp3";
-import notifSound2 from "./../sounds/notifSound2.mp3";
-import notifSound3 from "./../sounds/notifSound3.mp3";
+import soynoviembre from "./../sounds/soynoviembre.mp3";
+import bell1 from "./../sounds/bell1.mp3";
+import bell2 from "./../sounds/bell2.mp3";
+import bell3 from "./../sounds/bell3.mp3";
+import bell4 from "./../sounds/bell4.mp3";
+import quiandrea from "./../sounds/quiandrea.mp3";
 
 const SettingContext = createContext();
 
@@ -10,9 +14,34 @@ export const useSettingContext = () => useContext(SettingContext);
 
 export const SettingContextProvider = ({ children }) => {
 	const sounds = {
-		notif1: notifSound1,
-		notif2: notifSound2,
-		notif3: notifSound3,
+		notif1: {
+			src: notifSound1,
+			label: "Notification 1",
+		},
+		soynoviembre: {
+			src: soynoviembre,
+			label: "Soy Noviembre",
+		},
+		bell1: {
+			src: bell1,
+			label: "Bell 1",
+		},
+		bell2: {
+			src: bell2,
+			label: "Bell 2",
+		},
+		bell3: {
+			src: bell3,
+			label: "Bell 3",
+		},
+		bell4: {
+			src: bell4,
+			label: "Bell 4",
+		},
+		quiandrea: {
+			src: quiandrea,
+			label: "Qui Andrea",
+		},
 	};
 
 	const [theme, setTheme] = useState(() => {
@@ -35,15 +64,6 @@ export const SettingContextProvider = ({ children }) => {
 	const [enterToSend, setEnterToSend] = useState(() => {
 		const saved = localStorage.getItem("enterToSend");
 		return saved ? JSON.parse(saved) : true;
-	});
-
-	const [timeFormat, setTimeFormat] = useState(() => {
-		return localStorage.getItem("timeFormat") || "24h";
-	});
-
-	const [compactMode, setCompactMode] = useState(() => {
-		const saved = localStorage.getItem("compactMode");
-		return saved ? JSON.parse(saved) : false;
 	});
 
 	useEffect(() => {
@@ -69,14 +89,6 @@ export const SettingContextProvider = ({ children }) => {
 		localStorage.setItem("enterToSend", JSON.stringify(enterToSend));
 	}, [enterToSend]);
 
-	useEffect(() => {
-		localStorage.setItem("timeFormat", timeFormat);
-	}, [timeFormat]);
-
-	useEffect(() => {
-		localStorage.setItem("compactMode", JSON.stringify(compactMode));
-	}, [compactMode]);
-
 	return (
 		<SettingContext.Provider
 			value={{
@@ -90,10 +102,6 @@ export const SettingContextProvider = ({ children }) => {
 				setSoundEnabled,
 				enterToSend,
 				setEnterToSend,
-				timeFormat,
-				setTimeFormat,
-				compactMode,
-				setCompactMode,
 				sounds,
 			}}
 		>

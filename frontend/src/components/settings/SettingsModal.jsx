@@ -12,7 +12,6 @@ import {
 
 import ThemeSettings from "./ThemeSettings";
 import NotificationSettings from "./NotificationSettings";
-import ChatSettings from "./ChatSettings";
 
 function SettingsModal() {
 	return (
@@ -33,7 +32,6 @@ function SettingsModal() {
 				<div className="flex max-h-[70vh] flex-col gap-6 overflow-y-auto pr-1">
 					<ThemeSettings />
 					<NotificationSettings />
-					<ChatSettings />
 				</div>
 			</DialogContent>
 		</Dialog>
