@@ -23,7 +23,7 @@ function SettingsModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md border-muted">
 				<DialogHeader>
 					<DialogTitle>Settings</DialogTitle>
 					<DialogDescription>Manage your app preferences</DialogDescription>

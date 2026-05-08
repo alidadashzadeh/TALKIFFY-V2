@@ -13,7 +13,7 @@ function ChatHeader() {
 	const { currentUser } = useCurrentUser();
 	const { onlineUsers } = useSocketContext();
 
-	// conversation party information
+	// conversation information
 	const { name, avatar, id } = getConversationDisplayData(
 		currentConversation,
 		currentUser?._id,
@@ -23,7 +23,7 @@ function ChatHeader() {
 	const isGroup = currentConversation?.type === "group";
 
 	return (
-		<header className="w-full border-b bg-background px-16 py-3">
+		<header className="w-full bg-background px-16 py-3 shadow-sm">
 			<div className="flex items-center justify-between">
 				{/* LEFT SIDE */}
 				<div className="flex min-w-0 items-center gap-3 ">

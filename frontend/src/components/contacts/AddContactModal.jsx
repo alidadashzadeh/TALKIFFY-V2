@@ -26,7 +26,7 @@ function AddContactModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-sm">
+			<DialogContent className="sm:max-w-sm border-muted">
 				<DialogHeader>
 					<DialogTitle>Add new contact</DialogTitle>
 					<DialogDescription>

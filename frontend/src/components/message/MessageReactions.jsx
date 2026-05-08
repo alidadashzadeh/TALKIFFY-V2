@@ -20,7 +20,7 @@ function MessageReactions({ message, isMyMessage }) {
 				return (
 					<div
 						key={reactionGroup.emoji}
-						className="flex items-center gap-1 rounded-full border bg-background px-2 py-1 shadow-sm"
+						className="flex items-center gap-1 rounded-full bg-muted/90 px-2 py-1 shadow-sm "
 					>
 						<span className="text-sm leading-none">{reactionGroup.emoji}</span>
 
@@ -28,7 +28,7 @@ function MessageReactions({ message, isMyMessage }) {
 							{reactionGroup.users.slice(0, 3).map((user) => (
 								<div
 									key={user._id}
-									className="rounded-full ring-1 ring-background"
+									className="rounded-full"
 									title={user.username}
 								>
 									<AvatarGenerator

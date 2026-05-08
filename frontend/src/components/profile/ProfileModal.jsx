@@ -27,7 +27,7 @@ function ProfileModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md border-muted">
 				<DialogHeader>
 					<DialogTitle>Profile</DialogTitle>
 					<DialogDescription>Your information</DialogDescription>

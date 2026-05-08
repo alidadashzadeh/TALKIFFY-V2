@@ -15,8 +15,10 @@ function MessageItemCheckMarks({ message, isSeenByOtherUser }) {
 			{isMyMessage && !isGroupConversation && message?.isDelivered ? (
 				<CheckCheck
 					className={cn(
-						"h-4 w-4 stroke-[2.6]",
-						isSeenByOtherUser ? "text-blue-600" : "text-primary-foreground/70",
+						"h-4 w-4 stroke-[2.4]",
+						isSeenByOtherUser
+							? "text-sky-400 drop-shadow-[0_0_3px_rgba(56,189,248,0.45)]"
+							: "text-primary-foreground/70",
 					)}
 				/>
 			) : (

@@ -53,7 +53,7 @@ function EditGroupInfoModal() {
 
 	return (
 		<Dialog open={editGroupModalOpen} onOpenChange={setEditGroupModalOpen}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md border-muted">
 				<DialogHeader>
 					<DialogTitle>Edit Group Info</DialogTitle>
 					<DialogDescription>

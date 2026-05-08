@@ -10,7 +10,7 @@ function ReplyCard({ username, message, isMe = false, className, onClick }) {
 		<div
 			onClick={onClick}
 			className={cn(
-				"rounded-xl border-l-4 px-3 py-2 text-xs",
+				"rounded-2xl border-l-2 px-3 py-2 text-xs",
 				onClick && "cursor-pointer",
 				isMe
 					? "border-primary-foreground/40 bg-primary-foreground/10 text-primary-foreground"
@@ -21,11 +21,11 @@ function ReplyCard({ username, message, isMe = false, className, onClick }) {
 			{username && (
 				<p
 					className={cn(
-						"mb-1 font-medium",
+						"mb-1 ",
 						isMe ? "text-primary-foreground" : "text-foreground",
 					)}
 				>
-					{username}
+					Replying to <span className="font-bold">{username}</span>
 				</p>
 			)}
 

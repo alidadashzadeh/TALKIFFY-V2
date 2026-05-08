@@ -8,7 +8,7 @@ function ConversationSlidingPanel() {
 			animate={{ width: 360, opacity: 1 }}
 			exit={{ width: 0, opacity: 0 }}
 			transition={{ duration: 0.25, ease: "easeInOut" }}
-			className="h-full shrink-0 overflow-hidden border-l bg-background"
+			className="h-full shrink-0 overflow-hidden border-l border-muted shadow-sm bg-background"
 		>
 			<div className="h-full w-[360px]">
 				<GroupInfoSidebar />

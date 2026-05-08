@@ -13,7 +13,7 @@ function AccountSheetContent() {
 	return (
 		<SheetContent
 			side="left"
-			className=" [&>button]:hidden flex h-dvh w-[320px] flex-col p-0 sm:w-[360px]"
+			className=" [&>button]:hidden flex h-dvh w-[320px] flex-col p-0 sm:w-[360px] border-none"
 		>
 			<AccountSheetHeader />
 			<Separator />

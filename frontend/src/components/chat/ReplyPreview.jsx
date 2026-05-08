@@ -18,7 +18,8 @@ function ReplyPreview() {
 			<div className="flex min-w-0 flex-1 items-start gap-3">
 				<div className="min-w-0 flex-1">
 					<p className="text-xs font-medium text-primary">
-						Replying to {replyTo?.senderId?.username}
+						Replying to{" "}
+						<span className="font-bold">{replyTo?.senderId?.username}</span>
 					</p>
 
 					<ReplyCard message={replyTo} className="mt-1" />

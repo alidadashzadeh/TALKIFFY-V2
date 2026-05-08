@@ -4,9 +4,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 function Sidebar() {
 	return (
-		<aside className="h-full w-full border-r bg-background">
+		<aside className="h-full w-full bg-background border-none">
 			<div className="flex h-full flex-col">
-				<div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<div className="flex justify-center items-center">
 					<SidebarHeader />
 				</div>
 

@@ -20,7 +20,7 @@ function AccountSheetHeader() {
 				/>
 
 				<div className="min-w-0 leading-tight">
-					<p className="text-sm font-semibold">{truncateText(shortName, 20)}</p>
+					<p className="text-md font-semibold">{truncateText(shortName, 20)}</p>
 					<p className=" text-xs text-muted-foreground">
 						{truncateText(currentUser?.email || " ", 35)}
 					</p>

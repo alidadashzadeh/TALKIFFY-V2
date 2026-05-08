@@ -11,7 +11,7 @@ function FilePreview() {
 	if (!file || !file.type.startsWith("image/")) return null;
 
 	return (
-		<div className="mb-2 rounded-2xl border bg-background p-3">
+		<div className="mb-2 rounded-2xl bg-background p-3 shadow-sm">
 			<div className="relative">
 				<Button
 					type="button"

@@ -28,7 +28,7 @@ function ChatMessagesContainer() {
 	});
 
 	return (
-		<div className="relative h-full">
+		<div className="relative h-full ">
 			<div
 				ref={containerRef}
 				className="h-full overflow-y-auto px-3 py-4 sm:px-4"

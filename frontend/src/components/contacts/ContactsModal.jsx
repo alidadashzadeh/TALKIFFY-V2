@@ -28,7 +28,7 @@ function ContactsModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md border-muted">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>
 					<DialogDescription>

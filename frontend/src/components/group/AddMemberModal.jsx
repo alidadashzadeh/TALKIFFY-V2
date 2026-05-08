@@ -18,13 +18,13 @@ function AddMemberModal() {
 
 	return (
 		<Dialog open={addMemberModalOpen} onOpenChange={setAddMemberModalOpen}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md border-muted">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>
 					<DialogDescription>Search your contacts.</DialogDescription>
 				</DialogHeader>
 
-				<div className="flex flex-col gap-4">
+				<div className="flex flex-col gap-4 ">
 					<div className="flex items-center gap-3">
 						<div className="relative flex-1">
 							<Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

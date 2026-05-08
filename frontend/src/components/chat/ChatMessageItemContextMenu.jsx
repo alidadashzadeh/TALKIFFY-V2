@@ -43,11 +43,11 @@ function ChatMessageItemContextMenu({
 				<div className="group inline-flex max-w-full min-w-0 flex-col">
 					<div
 						className={cn(
-							"relative inline-flex max-w-full min-w-0 flex-col overflow-hidden px-4 py-2 text-sm shadow-lg transition-all duration-200",
+							"relative inline-flex max-w-full min-w-0 flex-col overflow-hidden px-4 py-2 text-sm shadow-sm transition-all duration-200",
 							"before:pointer-events-none before:absolute before:inset-0 before:bg-white/10 before:opacity-0 before:transition-opacity group-hover:before:opacity-100",
 							isMyMessage
-								? "rounded-xl rounded-br-sm  bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-primary/20"
-								: "rounded-xl rounded-bl-sm border border-border/60 bg-card/90 text-card-foreground shadow-black/5 backdrop-blur-md",
+								? "rounded-xl rounded-br-none  bg-primary text-primary-foreground"
+								: "rounded-xl rounded-bl-none border border-border/60 bg-card text-card-foreground",
 						)}
 					>
 						{message?.replyTo && (

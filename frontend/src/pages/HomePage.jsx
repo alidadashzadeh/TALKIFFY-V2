@@ -4,7 +4,7 @@ import Sidebar from "@/components/Sidebar/Sidebar";
 function HomePage() {
 	return (
 		<div className="flex h-screen overflow-hidden bg-background">
-			<div className="w-[320px] shrink-0 border-r">
+			<div className="w-[320px] shrink-0 border-r border-muted shadow-sm">
 				<Sidebar />
 			</div>
 

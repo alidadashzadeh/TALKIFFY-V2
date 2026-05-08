@@ -51,11 +51,11 @@ function MessageSearchPopover() {
 
 			<PopoverContent
 				align="end"
-				className="w-80 p-0"
+				className="w-80 p-0 border-muted"
 				onInteractOutside={(e) => e.preventDefault()}
 				onEscapeKeyDown={(e) => e.preventDefault()}
 			>
-				<div className="flex items-center gap-2 border-b p-2">
+				<div className="flex items-center gap-2 border-b border-muted p-2">
 					<Input
 						autoFocus
 						value={messageSearchValue}
