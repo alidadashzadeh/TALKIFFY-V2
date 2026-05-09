@@ -23,11 +23,11 @@ function ChatHeader() {
 	const isGroup = currentConversation?.type === "group";
 
 	return (
-		<header className="w-full bg-background px-16 py-3 shadow-sm">
+		<header className="w-full bg-background px-2 md:px-16 py-3 shadow-sm">
 			<div className="flex items-center justify-between">
 				{/* LEFT SIDE */}
 				<div className="flex min-w-0 items-center gap-3 ">
-					<div className="relative">
+					<div className="relative hidden md:block">
 						<AvatarGenerator avatar={avatar} name={name} />
 						{currentConversation?.type !== "group" && (
 							<OnlineStatusDot isOnline={isOnline} />

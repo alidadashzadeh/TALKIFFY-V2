@@ -31,9 +31,9 @@ function ChatMessagesContainer() {
 		<div className="relative h-full ">
 			<div
 				ref={containerRef}
-				className="h-full overflow-y-auto px-3 py-4 sm:px-4"
+				className="h-full  overflow-y-auto px-3 py-4 sm:px-4"
 			>
-				<div className="flex w-full flex-col px-16">
+				<div className="flex w-full flex-col md:px-16">
 					<div ref={topRef} />
 
 					<ChatMessagesList

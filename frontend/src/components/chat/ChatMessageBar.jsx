@@ -18,11 +18,11 @@ function ChatMessageBar() {
 	};
 
 	return (
-		<div className="mx-auto w-full max-w-4xl p-2">
+		<div className="mx-auto w-full max-w-4xl p-2 ">
 			{file && <FilePreview />}
 			{replyTo && <ReplyPreview />}
 			<form
-				className="mx-auto flex w-full max-w-4xl items-start gap-2 p-2"
+				className="mx-auto flex w-full max-w-4xl items-center gap-2 md:p-2 p-0 "
 				onSubmit={(e) => {
 					e.preventDefault();
 					onSubmit();

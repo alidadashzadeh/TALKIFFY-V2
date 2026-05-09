@@ -3,7 +3,7 @@ import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
 import ProfileModal from "../profile/ProfileModal";
 import SettingsModal from "../settings/SettingsModal";
-import NewGroupModal from "../modals/NewGroupModal";
+import NewGroupModal from "../group/NewGroupModal";
 import AccountSheetHeader from "./AccountSheetHeader";
 import AccountSheetFooter from "./AccountSheetFooter";
 import ContactsModal from "../contacts/ContactsModal";

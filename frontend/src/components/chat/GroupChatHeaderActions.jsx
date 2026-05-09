@@ -14,7 +14,7 @@ import MuteChatBtn from "../buttons/MuteChatBtn";
 import MessageSearchPopover from "../message/MessageSearchPopover";
 function GroupChatHeaderActions() {
 	return (
-		<div className="flex items-center gap-1">
+		<div className="flex items-center  md:gap-1">
 			<AddMemberModal />
 			<MessageSearchPopover />
 			<SidePanelActionBtn />

@@ -36,7 +36,7 @@ function NewGroupModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-sm border-muted">
+			<DialogContent className="w-[calc(100vw-2rem)] max-w-md border-muted sm:w-full">
 				<form onSubmit={handleCreateGroup}>
 					<DialogHeader>
 						<DialogTitle>Create new group</DialogTitle>

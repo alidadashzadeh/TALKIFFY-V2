@@ -1,11 +1,14 @@
 import { ScrollArea } from "../ui/scroll-area";
 import GroupMembersListItem from "./GroupMembersListItem";
+import { useConversationContext } from "@/contexts/ConversationContext";
 
-function GroupMembersList({ members = [] }) {
+function GroupMembersList() {
+	const { currentConversation } = useConversationContext();
+	console.log("memeber liest render");
 	return (
-		<ScrollArea className=" space-y-3 h-[60vh]">
+		<ScrollArea className="h-[60vh]">
 			<div className="space-y-1 p-2">
-				{members.map((member) => (
+				{currentConversation?.participants?.map((member) => (
 					<GroupMembersListItem key={member._id} member={member} />
 				))}
 			</div>

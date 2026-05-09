@@ -9,17 +9,37 @@ import { Plus } from "lucide-react";
 
 const quickReactions = ["👍", "❤️", "😂", "😮", "😢", "🙏"];
 
-function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
+function MessageHoverReactions({
+	isMyMessage,
+	message,
+	children,
+	onReact,
+	open,
+	onOpenChange,
+}) {
 	const [showPicker, setShowPicker] = useState(false);
 
+	const handleReact = (emoji) => {
+		onReact?.(emoji, message);
+		setShowPicker(false);
+		onOpenChange?.(false);
+	};
+
 	return (
-		<HoverCard openDelay={100} closeDelay={50}>
+		<HoverCard
+			open={open}
+			onOpenChange={onOpenChange}
+			openDelay={100}
+			closeDelay={50}
+		>
 			<HoverCardTrigger asChild>
 				<div className="inline-block">{children}</div>
 			</HoverCardTrigger>
 
 			<HoverCardContent
-				side={isMyMessage ? "left" : "right"}
+				side={
+					window.innerWidth < 768 ? "bottom" : isMyMessage ? "left" : "right"
+				}
 				align="center"
 				sideOffset={8}
 				className="w-fit rounded-2xl border bg-background p-2 shadow-md"
@@ -30,10 +50,7 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 						height={360}
 						lazyLoadEmojis
 						previewConfig={{ showPreview: false }}
-						onEmojiClick={(emojiData) => {
-							onReact?.(emojiData.emoji, message);
-							setShowPicker(false);
-						}}
+						onEmojiClick={(emojiData) => handleReact(emojiData.emoji)}
 					/>
 				) : (
 					<div className="flex items-center gap-1">
@@ -41,8 +58,8 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 							<button
 								key={emoji}
 								type="button"
-								className="w-8 h-8 flex items-center justify-center rounded-full p-1 text-lg transition hover:bg-muted"
-								onClick={() => onReact?.(emoji, message)}
+								className="flex h-8 w-8 items-center justify-center rounded-full p-1 text-lg transition hover:bg-muted"
+								onClick={() => handleReact(emoji)}
 							>
 								{emoji}
 							</button>
@@ -50,7 +67,7 @@ function MessageHoverReactions({ isMyMessage, message, children, onReact }) {
 
 						<button
 							type="button"
-							className=" w-8 h-8 flex items-center justify-center  rounded-full p-1 text-lg transition hover:bg-muted"
+							className="flex h-8 w-8 items-center justify-center rounded-full p-1 text-lg transition hover:bg-muted"
 							onClick={() => setShowPicker(true)}
 						>
 							<Plus />

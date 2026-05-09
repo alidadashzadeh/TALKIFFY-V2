@@ -20,13 +20,13 @@ function AddContactModal() {
 	return (
 		<Dialog open={addContactModalOpen} onOpenChange={setAddContactModalOpen}>
 			<DialogTrigger asChild>
-				<Button className="gap-2">
+				<Button className="gap-2 w-full">
 					<UserPlus className="h-4 w-4" />
 					Add Contact
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-sm border-muted">
+			<DialogContent className="w-[calc(100vw-2rem)] max-w-md border-muted sm:w-full">
 				<DialogHeader>
 					<DialogTitle>Add new contact</DialogTitle>
 					<DialogDescription>

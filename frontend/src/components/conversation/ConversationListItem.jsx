@@ -48,8 +48,8 @@ function ConversationListItem({ conversation, isActive = false }) {
 				{!isGroup && <OnlineStatusDot isOnline={isOnline} />}
 			</div>
 
-			<div className="min-w-0 flex-1">
-				<div className="flex items-center justify-between gap-2">
+			<div className=" hidden md:block w-full">
+				<div className="w-full flex items-center justify-between gap-2 ">
 					<P className=" font-medium">{truncateText(displayData?.name, 20)}</P>
 
 					<Muted className="shrink-0 text-xs">

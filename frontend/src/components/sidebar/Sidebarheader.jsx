@@ -16,7 +16,7 @@ function SidebarHeader() {
 	return (
 		<div className="flex items-center gap-2 px-2">
 			<AccountSheet />
-			<InputGroup className="m-2">
+			<InputGroup className="m-2 h-10 hidden md:flex">
 				<InputGroupInput placeholder="Search" onChange={handleChange} />
 				<InputGroupAddon align="inline-start">
 					<Search />

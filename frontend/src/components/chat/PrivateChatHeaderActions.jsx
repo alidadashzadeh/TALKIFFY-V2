@@ -13,7 +13,7 @@ import SidePanelActionBtn from "../buttons/SidePanelActionBtn";
 
 function PrivateChatHeaderActions() {
 	return (
-		<div className="flex items-center gap-1">
+		<div className="flex items-center md:gap-1">
 			<MessageSearchPopover />
 			<SidePanelActionBtn />
 

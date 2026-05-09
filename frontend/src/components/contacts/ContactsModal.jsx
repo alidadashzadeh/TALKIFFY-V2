@@ -28,7 +28,7 @@ function ContactsModal() {
 				</Button>
 			</DialogTrigger>
 
-			<DialogContent className="sm:max-w-md border-muted">
+			<DialogContent className="w-[calc(100vw-2rem)] max-w-md border-muted sm:w-full">
 				<DialogHeader>
 					<DialogTitle>Your contacts</DialogTitle>
 					<DialogDescription>
@@ -36,22 +36,25 @@ function ContactsModal() {
 					</DialogDescription>
 				</DialogHeader>
 
-				<div className="flex flex-col gap-4">
-					<div className="flex items-center gap-3">
-						<div className="relative flex-1">
-							<Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<div className="flex min-w-0 flex-col gap-4">
+					<div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
+						<div className="relative w-full min-w-0 flex-1">
+							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
 							<Input
 								value={filteredBy}
 								onChange={(e) => setFilteredBy(e.target.value)}
 								placeholder="Search contacts"
-								className="pl-9"
+								className="w-full pl-9"
 							/>
 						</div>
 
-						<AddContactModal />
+						<div className="w-full sm:w-auto">
+							<AddContactModal />
+						</div>
 					</div>
 
-					<div className="h-[350px] overflow-hidden rounded-xl ">
+					<div className="h-[350px] min-w-0 overflow-hidden rounded-xl">
 						<ContactsList ActionComponent={StartPrivateChatBtn} />
 					</div>
 				</div>

@@ -20,21 +20,25 @@ function MainContent() {
 	}
 
 	return (
-		<div className="flex h-full w-full overflow-hidden">
-			<main className="flex h-full min-w-0 min-h-0 flex-1 flex-col overflow-hidden bg-muted/20">
+		<div className="relative flex h-full w-full overflow-hidden">
+			<main className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-muted/20">
 				<ChatHeader />
 
-				<div className="min-h-0 flex-1 ">
+				<div className="min-h-0 flex-1">
 					<ChatMessages />
 				</div>
 
-				<div className="shrink-0 p-3 sm:p-4 ">
+				<div className="shrink-0 p-3 sm:p-4">
 					<ChatMessageBar />
 				</div>
 			</main>
 
 			<AnimatePresence initial={false}>
-				{conversationInfoOpen && <ConversationSlidingPanel />}
+				{conversationInfoOpen && (
+					<div className="absolute inset-y-0 right-0 z-50 xl:static">
+						<ConversationSlidingPanel />
+					</div>
+				)}
 			</AnimatePresence>
 		</div>
 	);

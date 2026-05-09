@@ -6,7 +6,7 @@ function Sidebar() {
 	return (
 		<aside className="h-full w-full bg-background border-none">
 			<div className="flex h-full flex-col">
-				<div className="flex justify-center items-center">
+				<div className="flex justify-center items-center p-2">
 					<SidebarHeader />
 				</div>
 

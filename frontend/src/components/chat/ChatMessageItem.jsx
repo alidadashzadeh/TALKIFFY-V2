@@ -1,3 +1,4 @@
+import { useState } from "react";
 import useSeenObserver from "@/hooks/messages/useSeenObserver";
 import { cn, getMessageDisplayData } from "@/lib/utils";
 import AvatarGenerator from "../AvatarGenerator";
@@ -20,7 +21,11 @@ function ChatMessageItem({
 }) {
 	const { reactToMessage, loading } = useReactToMessage();
 	const { registerMessageRef, highlightedMessageId } = useMessageScroll();
+
+	const [mobileReactionsOpen, setMobileReactionsOpen] = useState(false);
+
 	const isHighlighted = String(highlightedMessageId) === String(message._id);
+
 	const { bubbleRef } = useSeenObserver({
 		message,
 		shouldTrackSeen,
@@ -38,12 +43,15 @@ function ChatMessageItem({
 
 	const handleReact = (emoji, msg) => {
 		if (!msg?._id || !currentConversation?._id || loading) return;
+
 		reactToMessage({
 			messageId: msg._id,
 			emoji,
 			conversationId: currentConversation._id,
 			currentUser,
 		});
+
+		setMobileReactionsOpen(false);
 	};
 
 	return (
@@ -83,7 +91,7 @@ function ChatMessageItem({
 					<div
 						ref={bubbleRef}
 						className={cn(
-							"flex items-end gap-2",
+							"relative flex items-end gap-2",
 							isMyMessage ? "flex-row-reverse" : "flex-row",
 						)}
 					>
@@ -91,12 +99,21 @@ function ChatMessageItem({
 							isMyMessage={isMyMessage}
 							message={message}
 							onReact={handleReact}
+							open={mobileReactionsOpen}
+							onOpenChange={setMobileReactionsOpen}
 						>
-							<ChatMessageItemContextMenu
-								message={message}
-								currentUser={currentUser}
-								isSeenByOtherUser={isSeenByOtherUser}
-							/>
+							<div
+								onClick={() =>
+									window.innerWidth < 768 &&
+									setMobileReactionsOpen((prev) => !prev)
+								}
+							>
+								<ChatMessageItemContextMenu
+									message={message}
+									currentUser={currentUser}
+									isSeenByOtherUser={isSeenByOtherUser}
+								/>
+							</div>
 						</MessageHoverReactions>
 					</div>
 				</div>
