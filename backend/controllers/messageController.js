@@ -157,11 +157,13 @@ export const sendMessage = catchAsync(async (req, res) => {
 				});
 			});
 
+			const deliveredAt = new Date();
 			await Message.findByIdAndUpdate(newMessage._id, {
 				isDelivered: true,
-				deliveredAt: new Date(),
+				deliveredAt,
 			});
-
+			populatedMessage.isDelivered = true;
+			populatedMessage.deliveredAt = deliveredAt;
 			const senderSocketIds = getUserSocketIds(senderIdStr);
 
 			senderSocketIds?.forEach((socketId) => {

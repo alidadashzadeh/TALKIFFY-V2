@@ -41,7 +41,7 @@ function EmojiPopover() {
 					size="icon"
 					variant="ghost"
 					onMouseEnter={() => import("emoji-picker-react")}
-					className="hidden md:block"
+					className="hidden md:flex"
 				>
 					<Smile className="h-5 w-5 text-muted-foreground" />
 				</Button>
