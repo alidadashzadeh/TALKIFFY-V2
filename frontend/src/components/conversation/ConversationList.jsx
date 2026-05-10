@@ -6,6 +6,7 @@ import ConversationListItem from "./ConversationListItem";
 import ConversationLoader from "./ConversationLoader";
 import { filterConversations } from "@/lib/utils/conversation";
 import useCurrentUser from "@/hooks/user/useCurrentUser";
+import EmptyConversationList from "./EmptyConversationList";
 
 function ConversationList() {
 	const { currentUser } = useCurrentUser();
@@ -13,7 +14,6 @@ function ConversationList() {
 		useConversationContext();
 
 	const { conversations, loading } = useGetMyConversations();
-
 	const filteredConversations = filterConversations({
 		conversations,
 		search: filteredConversationsBy || "",
@@ -25,7 +25,7 @@ function ConversationList() {
 	}
 
 	if (!filteredConversations.length) {
-		return <div className="p-8 text-center">No conversations found</div>;
+		return <EmptyConversationList />;
 	}
 
 	return (

@@ -35,7 +35,7 @@ function AddContactForm() {
 				) : (
 					<UserPlus className="h-4 w-4" />
 				)}
-				Add contact
+				Add New Contact
 			</Button>
 		</form>
 	);

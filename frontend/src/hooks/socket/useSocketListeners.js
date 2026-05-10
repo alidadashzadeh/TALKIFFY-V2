@@ -5,6 +5,7 @@ import useNearBottom from "../conversation/useNearBottom";
 import useGroupSocketHandlers from "./handlers/useGroupSocketHandlers";
 import useMessageSocketHandlers from "./handlers/useMessageSocketHandlers";
 import useContactSocketHandlers from "./handlers/useContactSocketHandlers";
+import usePrivateConversationSocketHandlers from "./handlers/usePrivateConversationSocketHandlers";
 
 function useSocketListeners(socket) {
 	const queryClient = useQueryClient();
@@ -31,11 +32,13 @@ function useSocketListeners(socket) {
 		handleMemberRemoved,
 		handleMemberLeft,
 	} = useGroupSocketHandlers(queryClient);
-
+	const handlePrivateConversationCreated =
+		usePrivateConversationSocketHandlers(queryClient);
 	useEffect(() => {
 		if (!socket) return;
 
 		socket.on("contact:added", handleContactAdded);
+		socket.on("chat:new", handlePrivateConversationCreated);
 		socket.on("message:new", handleNewMessage);
 		socket.on("message:delivered", handleMessageDelivered);
 		socket.on("message:seen", handleMessageSeen);
@@ -48,6 +51,7 @@ function useSocketListeners(socket) {
 
 		return () => {
 			socket.off("contact:added", handleContactAdded);
+			socket.off("chat:new", handlePrivateConversationCreated);
 			socket.off("message:new", handleNewMessage);
 			socket.off("message:delivered", handleMessageDelivered);
 			socket.off("message:seen", handleMessageSeen);
@@ -70,6 +74,7 @@ function useSocketListeners(socket) {
 		handleMemberAdded,
 		handleMemberRemoved,
 		handleMemberLeft,
+		handlePrivateConversationCreated,
 	]);
 }
 

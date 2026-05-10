@@ -1,145 +1,124 @@
 import User from "../models/userModel.js";
-
+import catchAsync from "../lib/catchAsync.js";
+import AppError from "../lib/AppError.js";
 import { createOne, deleteOne, getAll, getOne } from "./handleFactory.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
 
-export const updateUserAvatar = async (req, res) => {
-	try {
-		const { id } = req.params;
+export const updateUserAvatar = catchAsync(async (req, res) => {
+	const { id } = req.params;
 
-		if (String(req.user._id) !== String(id)) {
-			return res.status(403).json({
-				status: "fail",
-				message: "You are not allowed to update this user",
-			});
-		}
+	if (String(req.user._id) !== String(id)) {
+		throw new AppError("You are not allowed to update this user", 403);
+	}
 
-		if (!req.file) {
-			return res.status(400).json({
-				status: "fail",
-				message: "Please upload an image",
-			});
-		}
+	if (!req.file) {
+		throw new AppError("Please upload an image", 400);
+	}
 
-		const uploaded = await uploadBufferToCloudinary(
-			req.file.buffer,
-			"talkiffy/users",
-		);
+	const uploaded = await uploadBufferToCloudinary(
+		req.file.buffer,
+		"talkiffy/users",
+	);
 
-		const updatedUser = await User.findByIdAndUpdate(
-			id,
-			{ avatar: uploaded.secure_url },
-			{ new: true, runValidators: true },
-		).select("-password");
-
-		return res.status(200).json({
-			status: "success",
-			data: {
-				user: updatedUser,
-			},
+	const updatedUser = await User.findByIdAndUpdate(
+		id,
+		{ avatar: uploaded.secure_url },
+		{ new: true, runValidators: true },
+	)
+		.select("-password")
+		.populate({
+			path: "contacts",
+			select: "email username avatar",
 		});
-	} catch (error) {
-		return res.status(500).json({
-			status: "error",
-			message: error.message || "Something went wrong",
+
+	if (!updatedUser) {
+		throw new AppError("User not found", 404);
+	}
+
+	res.status(200).json({
+		status: "success",
+		data: {
+			user: updatedUser,
+		},
+	});
+});
+
+export const addNewContact = catchAsync(async (req, res) => {
+	const currentUserId = req.user._id;
+	const { email } = req.body;
+
+	const normalizedEmail = email?.trim().toLowerCase();
+
+	if (!normalizedEmail) {
+		throw new AppError("Please provide an email address", 400);
+	}
+
+	const currentUser = await User.findById(currentUserId);
+
+	if (!currentUser) {
+		throw new AppError("Current user not found", 404);
+	}
+
+	if (currentUser.email?.toLowerCase() === normalizedEmail) {
+		throw new AppError("You cannot add yourself to contacts", 400);
+	}
+
+	const newContact = await User.findOne({ email: normalizedEmail });
+
+	if (!newContact) {
+		throw new AppError("There is no user with the provided email", 404);
+	}
+
+	if (
+		currentUser.contacts.some(
+			(contact) => String(contact) === String(newContact._id),
+		)
+	) {
+		throw new AppError("This user is already in your contact list", 400);
+	}
+
+	await User.findByIdAndUpdate(currentUserId, {
+		$addToSet: { contacts: newContact._id },
+	});
+
+	await User.findByIdAndUpdate(newContact._id, {
+		$addToSet: { contacts: currentUserId },
+	});
+
+	const [updatedCurrentUser] = await Promise.all([
+		User.findById(currentUserId).populate({
+			path: "contacts",
+			select: "username email avatar",
+		}),
+		User.findById(newContact._id).populate({
+			path: "contacts",
+			select: "username email avatar",
+		}),
+	]);
+
+	const newContactSocketIds = getUserSocketIds(newContact._id);
+
+	if (newContactSocketIds?.length) {
+		newContactSocketIds.forEach((socketId) => {
+			io.to(socketId).emit("contact:added", {
+				addedBy: {
+					_id: currentUser._id,
+					username: currentUser.username,
+					email: currentUser.email,
+					avatar: currentUser.avatar,
+				},
+			});
 		});
 	}
-};
-export const addNewContact = async (req, res) => {
-	try {
-		const currentUserId = req.user._id;
-		const { email } = req.body;
 
-		const normalizedEmail = email?.trim().toLowerCase();
-
-		if (!normalizedEmail) {
-			return res.status(400).json({
-				status: "fail",
-				message: "Please provide an email address",
-			});
-		}
-
-		const currentUser = await User.findById(currentUserId);
-
-		if (!currentUser) {
-			return res.status(404).json({
-				status: "fail",
-				message: "Current user not found",
-			});
-		}
-
-		if (currentUser.email?.toLowerCase() === normalizedEmail) {
-			return res.status(400).json({
-				status: "fail",
-				message: "You cannot add yourself to contacts",
-			});
-		}
-
-		const newContact = await User.findOne({ email: normalizedEmail });
-
-		if (!newContact) {
-			return res.status(404).json({
-				status: "fail",
-				message: "There is no user with the provided email",
-			});
-		}
-
-		if (
-			currentUser.contacts.some(
-				(contact) => String(contact) === String(newContact._id),
-			)
-		) {
-			return res.status(400).json({
-				status: "fail",
-				message: "This user is already in your contact list",
-			});
-		}
-
-		await User.findByIdAndUpdate(currentUserId, {
-			$addToSet: { contacts: newContact._id },
-		});
-
-		await User.findByIdAndUpdate(newContact._id, {
-			$addToSet: { contacts: currentUserId },
-		});
-
-		const [updatedCurrentUser, updatedNewContact] = await Promise.all([
-			User.findById(currentUserId).populate({
-				path: "contacts",
-				select: "username email avatar",
-			}),
-			User.findById(newContact._id).populate({
-				path: "contacts",
-				select: "username email avatar",
-			}),
-		]);
-		const newContactSocketIds = getUserSocketIds(newContact._id);
-		if (newContactSocketIds?.length !== 0 && newContactSocketIds) {
-			newContactSocketIds.forEach((socketId) => {
-				io.to(socketId).emit("contact:added", {
-					addedBy: {
-						_id: currentUser._id,
-						username: currentUser.username,
-						email: currentUser.email,
-						avatar: currentUser.avatar,
-					},
-				});
-			});
-		}
-		return res.status(200).json({
-			status: "success",
-			data: {
-				user: updatedCurrentUser,
-			},
-		});
-	} catch (error) {
-		return res.status(500).json({
-			status: "error",
-			message: error.message || "Failed to add contact",
-		});
-	}
-};
+	res.status(200).json({
+		status: "success",
+		data: {
+			user: updatedCurrentUser,
+		},
+	});
+});
 
 export const getAllUsers = getAll(User);
 export const createUser = createOne(User);

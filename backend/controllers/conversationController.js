@@ -33,17 +33,29 @@ export const getOrCreatePrivateConversation = catchAsync(async (req, res) => {
 	}).populate("participants", "username email avatar");
 
 	if (!conversation) {
+		const now = new Date();
 		conversation = await Conversation.create({
 			type: "private",
 			conversationKey,
 			participants: [currentUserId, userId],
 			readState: [
-				{ userId: currentUserId, lastSeenMessageId: null, lastSeenAt: null },
-				{ userId, lastSeenMessageId: null, lastSeenAt: null },
+				{ userId: currentUserId, lastSeenMessageId: null, lastSeenAt: now },
+				{ userId, lastSeenMessageId: null, lastSeenAt: now },
 			],
 		});
 
 		await conversation.populate("participants", "username email avatar");
+		emitToConversationParticipants({
+			io,
+			conversation,
+			event: "chat:new",
+			payload: {
+				conversation: {
+					...conversation.toObject(),
+					unreadCount: 0,
+				},
+			},
+		});
 	}
 
 	res.status(200).json({

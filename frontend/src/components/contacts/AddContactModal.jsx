@@ -22,7 +22,7 @@ function AddContactModal() {
 			<DialogTrigger asChild>
 				<Button className="gap-2 w-full">
 					<UserPlus className="h-4 w-4" />
-					Add Contact
+					Add New Contact
 				</Button>
 			</DialogTrigger>
 

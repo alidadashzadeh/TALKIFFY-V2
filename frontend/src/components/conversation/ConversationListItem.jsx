@@ -71,7 +71,13 @@ function ConversationListItem({ conversation, isActive = false }) {
 			</div>
 
 			{unreadCount > 0 && (
-				<div className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 px-1.5 text-xs text-white">
+				<div
+					className={cn(
+						"flex min-w-5 items-center justify-center rounded-full bg-blue-500 px-1.5 text-xs text-white",
+						"absolute h-5",
+						"left-1 bottom-1 md:bottom-3 md:left-auto md:right-3",
+					)}
+				>
 					{unreadCount}
 				</div>
 			)}

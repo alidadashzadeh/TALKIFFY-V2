@@ -15,7 +15,7 @@ function AccountSheetFooter() {
 					<H2 className="text-base">Talkiffy</H2>
 
 					<Small className="text-xs text-muted-foreground">
-						Talk, but clean.
+						chatting without the clutter.
 					</Small>
 				</div>
 			</div>

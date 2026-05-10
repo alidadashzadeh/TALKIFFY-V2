@@ -109,6 +109,23 @@ export const sendMessage = catchAsync(async (req, res) => {
 
 	await conversation.save();
 
+	const populatedMessage = await Message.findById(newMessage._id)
+		.populate("senderId", "username avatar")
+		.populate({
+			path: "replyTo",
+			populate: {
+				path: "senderId",
+				select: "username avatar",
+			},
+		})
+		.populate({
+			path: "reactions",
+			populate: {
+				path: "userId",
+				select: "username avatar",
+			},
+		});
+
 	if (conversation?.type === "group") {
 		const allSocketIds = conversation.participants
 			.filter((p) => p.toString() !== senderId.toString())
@@ -117,7 +134,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 			allSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("message:new", {
 					conversationId: conversation._id,
-					newMessage,
+					newMessage: populatedMessage,
 				});
 			});
 		}
@@ -136,7 +153,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 			receiverSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("message:new", {
 					conversationId: conversation._id,
-					newMessage,
+					newMessage: populatedMessage,
 				});
 			});
 
@@ -156,23 +173,6 @@ export const sendMessage = catchAsync(async (req, res) => {
 			});
 		}
 	}
-
-	const populatedMessage = await Message.findById(newMessage._id)
-		.populate("senderId", "username avatar")
-		.populate({
-			path: "replyTo",
-			populate: {
-				path: "senderId",
-				select: "username avatar",
-			},
-		})
-		.populate({
-			path: "reactions",
-			populate: {
-				path: "userId",
-				select: "username avatar",
-			},
-		});
 
 	res.status(201).json({
 		status: "success",

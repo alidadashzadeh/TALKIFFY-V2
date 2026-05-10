@@ -22,7 +22,7 @@ export function getMessageGroupsByDate(messages = []) {
 	let currentDateKey = null;
 
 	messages.forEach((message, index) => {
-		const dateKey = new Date(message.createdAt).toDateString();
+		const dateKey = new Date(message?.createdAt).toDateString();
 
 		if (dateKey !== currentDateKey) {
 			groups.push({

@@ -30,7 +30,7 @@ function ContactsModal() {
 
 			<DialogContent className="w-[calc(100vw-2rem)] max-w-md border-muted sm:w-full">
 				<DialogHeader>
-					<DialogTitle>Your contacts</DialogTitle>
+					<DialogTitle>Your Contacts</DialogTitle>
 					<DialogDescription>
 						Search your contacts or add a new one.
 					</DialogDescription>
