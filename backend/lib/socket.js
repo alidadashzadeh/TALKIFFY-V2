@@ -14,7 +14,7 @@ const io = new Server(server, {
 	cors: {
 		origin:
 			process.env.NODE_ENV === "production"
-				? "https://talkiffy-frontend.onrender.com"
+				? "https://talkiffy.vercel.app"
 				: "http://localhost:5173",
 		credentials: true,
 	},
