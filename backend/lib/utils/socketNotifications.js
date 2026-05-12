@@ -1,4 +1,3 @@
-// utils/socket.utils.js
 import { getUserSocketIds } from "../socket.js";
 
 const normalizeId = (id) => id?.toString();

@@ -79,7 +79,7 @@ export const ensureParticipant = (conversation, userId) => {
 		throw new AppError("User is not a participant", 400);
 	}
 };
-export const alreadyParticipant = (conversation, userId) => {
+export const ensureNotParticipant = (conversation, userId) => {
 	if (isParticipant(conversation, userId)) {
 		throw new AppError("User is already a participant", 400);
 	}

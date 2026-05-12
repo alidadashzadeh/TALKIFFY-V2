@@ -31,6 +31,8 @@ function useSocketListeners(socket) {
 		handleMemberAdded,
 		handleMemberRemoved,
 		handleMemberLeft,
+		handleAddedToGroup,
+		handleRemovedFromGroup,
 	} = useGroupSocketHandlers(queryClient);
 	const handlePrivateConversationCreated =
 		usePrivateConversationSocketHandlers(queryClient);
@@ -48,7 +50,8 @@ function useSocketListeners(socket) {
 		socket.on("group:memberAdded", handleMemberAdded);
 		socket.on("group:memberRemoved", handleMemberRemoved);
 		socket.on("group:memberLeft", handleMemberLeft);
-
+		socket.on("group:addedToGroup", handleAddedToGroup);
+		socket.on("group:removedFromGroup", handleRemovedFromGroup);
 		return () => {
 			socket.off("contact:added", handleContactAdded);
 			socket.off("chat:new", handlePrivateConversationCreated);
@@ -59,7 +62,9 @@ function useSocketListeners(socket) {
 			socket.off("group:adminAdded", handleAdminAdded);
 			socket.off("group:adminRemoved", handleAdminRemoved);
 			socket.off("group:memberAdded", handleMemberAdded);
+			socket.off("group:addedToGroup", handleAddedToGroup);
 			socket.off("group:memberRemoved", handleMemberRemoved);
+			socket.off("group:removedFromGroup", handleRemovedFromGroup);
 			socket.off("group:memberLeft", handleMemberLeft);
 		};
 	}, [
@@ -75,6 +80,8 @@ function useSocketListeners(socket) {
 		handleMemberRemoved,
 		handleMemberLeft,
 		handlePrivateConversationCreated,
+		handleAddedToGroup,
+		handleRemovedFromGroup,
 	]);
 }
 

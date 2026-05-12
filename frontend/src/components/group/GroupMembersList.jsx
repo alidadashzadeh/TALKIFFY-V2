@@ -4,7 +4,6 @@ import { useConversationContext } from "@/contexts/ConversationContext";
 
 function GroupMembersList() {
 	const { currentConversation } = useConversationContext();
-	console.log("memeber liest render");
 	return (
 		<ScrollArea className="h-[60vh]">
 			<div className="space-y-1 p-2">

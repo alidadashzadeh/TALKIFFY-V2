@@ -16,7 +16,7 @@ class ApiFeature {
 		let queryString = JSON.stringify(queryObj);
 		queryString = queryString.replace(
 			/\b(gte|gt|lte|lt|all)\b/g,
-			(match) => `$${match}`
+			(match) => `$${match}`,
 		);
 
 		this.query = this.query.find(JSON.parse(queryString));
@@ -38,7 +38,6 @@ class ApiFeature {
 	limitFields() {
 		if (this.queryObject.fields) {
 			const fields = this.queryObject.fields.split(",").join(" ");
-			console.log(fields);
 			this.query = this.query.select(fields);
 		} else {
 			this.query = this.query.select("-__v");
@@ -46,7 +45,6 @@ class ApiFeature {
 		return this;
 		// {query:User.find().find().sort().select(),quryObject:{email:test@example.com}}
 	}
-	// paginate() {}
 }
 
 export default ApiFeature;

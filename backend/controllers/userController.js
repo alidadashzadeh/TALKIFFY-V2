@@ -78,24 +78,22 @@ export const addNewContact = catchAsync(async (req, res) => {
 		throw new AppError("This user is already in your contact list", 400);
 	}
 
-	await User.findByIdAndUpdate(currentUserId, {
-		$addToSet: { contacts: newContact._id },
-	});
-
-	await User.findByIdAndUpdate(newContact._id, {
-		$addToSet: { contacts: currentUserId },
-	});
-
-	const [updatedCurrentUser] = await Promise.all([
-		User.findById(currentUserId).populate({
-			path: "contacts",
-			select: "username email avatar",
+	await Promise.all([
+		User.findByIdAndUpdate(currentUserId, {
+			$addToSet: { contacts: newContact._id },
 		}),
-		User.findById(newContact._id).populate({
-			path: "contacts",
-			select: "username email avatar",
+
+		User.findByIdAndUpdate(newContact._id, {
+			$addToSet: { contacts: currentUserId },
 		}),
 	]);
+
+	const updatedCurrentUser = await User.findById(currentUserId)
+		.select("-password")
+		.populate({
+			path: "contacts",
+			select: "username email avatar",
+		});
 
 	const newContactSocketIds = getUserSocketIds(newContact._id);
 

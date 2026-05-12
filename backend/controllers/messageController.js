@@ -13,7 +13,7 @@ import {
 } from "./handleFactory.js";
 
 export const sendMessage = catchAsync(async (req, res) => {
-	const senderId = req.user.id;
+	const senderId = req.user._id;
 	const { conversationId } = req.params;
 	const content = req.body.content?.trim() || "";
 	const clientTempId = req.body.clientTempId || null;
@@ -217,7 +217,7 @@ export const getConversationMessages = catchAsync(async (req, res) => {
 export const reactToMessage = catchAsync(async (req, res, next) => {
 	const { messageId } = req.params;
 	const { emoji } = req.body;
-	const currentUserId = req.user.id;
+	const currentUserId = req.user._id;
 
 	if (!emoji || typeof emoji !== "string" || !emoji.trim()) {
 		return next(new AppError("Emoji is required", 400));

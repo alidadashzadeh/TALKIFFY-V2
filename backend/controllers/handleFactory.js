@@ -7,7 +7,6 @@ export const getAll = (Model) => {
 				.filter()
 				.sort()
 				.limitFields();
-			// .paginate()
 
 			const doc = await features.query;
 

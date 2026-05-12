@@ -13,8 +13,6 @@ import globalErrorHandler from "./lib/middleware/error.middleware.js";
 import AppError from "./lib/AppError.js";
 
 dotenv.config();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
@@ -31,8 +29,6 @@ app.use(
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/conversations", conversationRouter);
-
-app.use("/avatars", express.static(path.join(__dirname, "/avatars")));
 
 app.all("*", (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl} on this server.`, 404));

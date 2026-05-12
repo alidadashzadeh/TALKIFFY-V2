@@ -1,6 +1,5 @@
-// hooks/socket/useGroupSocketHandlers.js
-
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 function useGroupSocketHandlers(queryClient) {
 	const handleAdminAdded = useCallback(
@@ -50,33 +49,15 @@ function useGroupSocketHandlers(queryClient) {
 	);
 
 	const handleMemberAdded = useCallback(
-		({ conversationId, participant, readStateEntry }) => {
+		({ conversation }) => {
 			queryClient.setQueryData(["conversations"], (oldData) => {
 				if (!oldData) return oldData;
 
-				return oldData.map((conversation) => {
-					if (String(conversation._id) !== String(conversationId)) {
-						return conversation;
-					}
-
-					const alreadyParticipant = conversation.participants.some(
-						(p) => String(p._id) === String(participant._id),
-					);
-
-					const alreadyInReadState = conversation.readState.some(
-						(r) => String(r.userId) === String(readStateEntry.userId),
-					);
-
-					return {
-						...conversation,
-						participants: alreadyParticipant
-							? conversation.participants
-							: [...conversation.participants, participant],
-						readState: alreadyInReadState
-							? conversation.readState
-							: [...conversation.readState, readStateEntry],
-					};
-				});
+				return oldData.map((oldConversation) =>
+					String(oldConversation._id) === String(conversation._id)
+						? conversation
+						: oldConversation,
+				);
 			});
 		},
 		[queryClient],
@@ -123,12 +104,49 @@ function useGroupSocketHandlers(queryClient) {
 		});
 	}, [queryClient]);
 
+	const handleAddedToGroup = useCallback(
+		({ conversation }) => {
+			queryClient.setQueryData(["conversations"], (oldData = []) => {
+				const exists = oldData.some(
+					(c) => String(c._id) === String(conversation._id),
+				);
+
+				if (exists) return oldData;
+
+				return [conversation, ...oldData];
+			});
+			toast.success(`You were added to "${conversation.name}"`);
+		},
+		[queryClient],
+	);
+
+	const handleRemovedFromGroup = useCallback(
+		({ conversationId }) => {
+			queryClient.setQueryData(["conversations"], (oldData = []) => {
+				const conversation = oldData.find(
+					(c) => String(c._id) === String(conversationId),
+				);
+
+				if (conversation) {
+					toast.info(
+						`You were removed from "${conversation.name || "a group"}"`,
+					);
+				}
+
+				return oldData.filter((c) => String(c._id) !== String(conversationId));
+			});
+		},
+		[queryClient],
+	);
+
 	return {
 		handleAdminAdded,
 		handleAdminRemoved,
 		handleMemberAdded,
 		handleMemberRemoved,
 		handleMemberLeft,
+		handleAddedToGroup,
+		handleRemovedFromGroup,
 	};
 }
 

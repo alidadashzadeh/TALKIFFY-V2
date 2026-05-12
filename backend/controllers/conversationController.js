@@ -1,7 +1,7 @@
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
 import {
-	alreadyParticipant,
+	ensureNotParticipant,
 	buildPrivateConversationKey,
 	ensureAdmin,
 	ensureConversationExists,
@@ -229,7 +229,7 @@ export const addGroupParticipant = catchAsync(async (req, res) => {
 	ensureConversationExists(conversation);
 	ensureGroupConversation(conversation);
 	ensureAdmin(conversation, currentUserId);
-	alreadyParticipant(conversation, userId);
+	ensureNotParticipant(conversation, userId);
 
 	conversation.participants.push(userId);
 	conversation.readState.push({
@@ -241,26 +241,40 @@ export const addGroupParticipant = catchAsync(async (req, res) => {
 	await conversation.save();
 
 	await conversation.populate([
-		{ path: "participants", select: "username email avatar" },
-		{ path: "admins", select: "username avatar" },
+		{
+			path: "participants",
+			select: "username email avatar",
+		},
+		{
+			path: "admins",
+			select: "username avatar",
+		},
+		{
+			path: "lastMessageId",
+			select: "content attachments senderId createdAt",
+			populate: {
+				path: "senderId",
+				select: "username avatar",
+			},
+		},
 	]);
-	const addedParticipant = conversation.participants.find(
-		(p) => String(p._id) === String(userId),
-	);
+
 	emitToConversationParticipants({
 		io,
 		conversation,
 		event: "group:memberAdded",
 		payload: {
-			conversationId,
-			participant: addedParticipant,
-			readStateEntry: {
-				userId: String(userId),
-				lastSeenMessageId: conversation.lastMessageId
-					? conversation.lastMessageId
-					: null,
-				lastSeenAt: conversation.lastMessageAt || new Date(),
-			},
+			conversation,
+		},
+		excludeUserIds: [userId],
+	});
+
+	emitToUsers({
+		io,
+		userIds: [userId],
+		event: "group:addedToGroup",
+		payload: {
+			conversation,
 		},
 	});
 
@@ -306,6 +320,15 @@ export const removeGroupParticipant = catchAsync(async (req, res) => {
 		conversation,
 		event: "group:memberRemoved",
 		payload: { conversationId, userId },
+	});
+
+	emitToUsers({
+		io,
+		userIds: [userId],
+		event: "group:removedFromGroup",
+		payload: {
+			conversationId,
+		},
 	});
 
 	return res.status(200).json({
