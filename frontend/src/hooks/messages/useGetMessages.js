@@ -19,12 +19,10 @@ function useGetMessages() {
 
 		queryFn: async () => {
 			const { data } = await axiosInstance.get(
-				`/messages/conversation/${currentConversationId}`,
+				`/conversations/${currentConversationId}/messages`,
 			);
 
-			const returnedMessages = data?.data?.messages || [];
-
-			return returnedMessages;
+			return data?.data?.messages || [];
 		},
 
 		enabled: !!currentConversationId,

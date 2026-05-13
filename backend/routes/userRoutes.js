@@ -8,10 +8,6 @@ import {
 	signup,
 } from "../controllers/authController.js";
 import {
-	getAllUsers,
-	createUser,
-	getUser,
-	deleteUser,
 	updateUserAvatar,
 	addNewContact,
 } from "../controllers/userController.js";
@@ -25,11 +21,13 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.post("/contacts", protect, addNewContact);
 router.get("/check", protect, checkAuth);
-router.route("/").get(getAllUsers).post(createUser);
 router
 	.route("/:id")
-	.get(getUser)
-	.patch(protect, upload.single("avatar"), optimizeUserAvatar, updateUserAvatar)
-	.delete(deleteUser);
+	.patch(
+		protect,
+		upload.single("avatar"),
+		optimizeUserAvatar,
+		updateUserAvatar,
+	);
 
 export default router;

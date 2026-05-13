@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
 	addGroupAdmin,
 	addGroupParticipant,
@@ -12,28 +13,51 @@ import {
 	updateGroupName,
 	updateSeen,
 } from "../controllers/conversationController.js";
+
+import {
+	getConversationMessages,
+	sendMessage,
+} from "../controllers/messageController.js";
+
 import { protect } from "../controllers/authController.js";
 import upload from "../lib/middleware/upload.js";
-import { optimizeGroupAvatar } from "../lib/middleware/OptimizeImage.js";
+
+import {
+	optimizeGroupAvatar,
+	optimizeMessageImage,
+} from "../lib/middleware/OptimizeImage.js";
 
 const router = express.Router();
 
-router.route("/").get(protect, getMyConversations);
+router.get("/", protect, getMyConversations);
+
 router.get("/private/:userId", protect, getOrCreatePrivateConversation);
 router.post("/group", protect, createGroupConversation);
+router.patch("/update-seen", protect, updateSeen);
+
+router
+	.route("/:conversationId/messages")
+	.get(protect, getConversationMessages)
+	.post(protect, upload.single("file"), optimizeMessageImage, sendMessage);
+
 router.post("/:conversationId/admins/:userId", protect, addGroupAdmin);
+router.delete("/:conversationId/admins/:userId", protect, removeGroupAdmin);
+
 router.post(
 	"/:conversationId/participants/:userId",
 	protect,
 	addGroupParticipant,
 );
-router.delete("/:conversationId/leave", protect, leaveGroup);
 router.delete(
 	"/:conversationId/participants/:userId",
 	protect,
 	removeGroupParticipant,
 );
-router.delete("/:conversationId/admins/:userId", protect, removeGroupAdmin);
+
+router.delete("/:conversationId/leave", protect, leaveGroup);
+
+router.patch("/:conversationId/name", protect, updateGroupName);
+
 router.patch(
 	"/:conversationId/avatar",
 	protect,
@@ -41,8 +65,5 @@ router.patch(
 	optimizeGroupAvatar,
 	updateGroupAvatar,
 );
-router.patch("/:conversationId/name", protect, updateGroupName);
-
-router.patch("/update-seen", protect, updateSeen);
 
 export default router;

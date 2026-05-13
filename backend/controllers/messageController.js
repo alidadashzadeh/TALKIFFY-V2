@@ -4,13 +4,6 @@ import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
-import {
-	createOne,
-	deleteOne,
-	getAll,
-	getOne,
-	updateOne,
-} from "./handleFactory.js";
 
 export const sendMessage = catchAsync(async (req, res) => {
 	const senderId = req.user._id;
@@ -303,9 +296,3 @@ export const reactToMessage = catchAsync(async (req, res, next) => {
 		},
 	});
 });
-
-export const getAllMessages = getAll(Message);
-export const getSingleMessage = getOne(Message);
-export const createMessage = createOne(Message);
-export const deleteMessage = deleteOne(Message);
-export const updateMessage = updateOne(Message);

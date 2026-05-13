@@ -38,7 +38,7 @@ function useSendMessage() {
 			formData.append("clientTempId", clientTempId);
 
 			const { data } = await axiosInstance.post(
-				`/messages/conversation/${conversationId}`,
+				`/conversations/${conversationId}/messages`,
 				formData,
 			);
 

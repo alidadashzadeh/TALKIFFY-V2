@@ -1,7 +1,6 @@
 import User from "../models/userModel.js";
 import catchAsync from "../lib/catchAsync.js";
 import AppError from "../lib/AppError.js";
-import { createOne, deleteOne, getAll, getOne } from "./handleFactory.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
 
@@ -117,11 +116,3 @@ export const addNewContact = catchAsync(async (req, res) => {
 		},
 	});
 });
-
-export const getAllUsers = getAll(User);
-export const createUser = createOne(User);
-export const getUser = getOne(User, {
-	path: "contacts",
-	select: "email username avatar",
-});
-export const deleteUser = deleteOne(User);
