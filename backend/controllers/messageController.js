@@ -2,6 +2,7 @@ import AppError from "../lib/AppError.js";
 import catchAsync from "../lib/catchAsync.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
 import { getUserSocketIds, io } from "../lib/socket.js";
+import { emitToConversationParticipants } from "../lib/utils/socketNotifications.js";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
 
@@ -28,7 +29,6 @@ export const sendMessage = catchAsync(async (req, res) => {
 		throw new AppError("Conversation not found", 404);
 	}
 
-	// reply validation
 	if (replyToId) {
 		const replyMessage = await Message.findById(replyToId);
 
@@ -40,7 +40,6 @@ export const sendMessage = catchAsync(async (req, res) => {
 		}
 	}
 
-	// file handling
 	if (req.file) {
 		if (!req.file.mimetype.startsWith("image/")) {
 			throw new AppError("Only image uploads are allowed", 400);
@@ -74,7 +73,6 @@ export const sendMessage = catchAsync(async (req, res) => {
 		replyTo: replyToId,
 	}).then((doc) => doc.populate("senderId", "username avatar"));
 
-	// update conversation
 	conversation.lastMessageId = newMessage._id;
 	conversation.lastMessageAt = new Date();
 
@@ -120,17 +118,16 @@ export const sendMessage = catchAsync(async (req, res) => {
 		});
 
 	if (conversation?.type === "group") {
-		const allSocketIds = conversation.participants
-			.filter((p) => p.toString() !== senderId.toString())
-			.flatMap((participant) => getUserSocketIds(participant) || []);
-		if (allSocketIds?.length) {
-			allSocketIds.forEach((socketId) => {
-				io.to(socketId).emit("message:new", {
-					conversationId: conversation._id,
-					newMessage: populatedMessage,
-				});
-			});
-		}
+		emitToConversationParticipants({
+			io,
+			conversation,
+			event: "message:new",
+			payload: {
+				conversationId: conversation._id,
+				newMessage: populatedMessage,
+				clientTempId,
+			},
+		});
 	}
 
 	if (conversation.type === "private") {
@@ -140,35 +137,45 @@ export const sendMessage = catchAsync(async (req, res) => {
 			.find((id) => id.toString() !== senderIdStr)
 			.toString();
 
-		const receiverSocketIds = getUserSocketIds(receiverId);
+		const receiverSocketIds = getUserSocketIds(receiverId) || [];
 
-		if (receiverSocketIds?.length) {
-			receiverSocketIds.forEach((socketId) => {
-				io.to(socketId).emit("message:new", {
-					conversationId: conversation._id,
-					newMessage: populatedMessage,
-				});
-			});
+		let deliveredAt = null;
 
-			const deliveredAt = new Date();
+		if (receiverSocketIds.length) {
+			deliveredAt = new Date();
+
 			await Message.findByIdAndUpdate(newMessage._id, {
 				isDelivered: true,
 				deliveredAt,
 			});
+
 			populatedMessage.isDelivered = true;
 			populatedMessage.deliveredAt = deliveredAt;
-			const senderSocketIds = getUserSocketIds(senderIdStr);
+		}
 
-			senderSocketIds?.forEach((socketId) => {
+		emitToConversationParticipants({
+			io,
+			conversation,
+			event: "message:new",
+			payload: {
+				conversationId: conversation._id,
+				newMessage: populatedMessage,
+				clientTempId,
+			},
+		});
+
+		if (deliveredAt) {
+			const senderSocketIds = getUserSocketIds(senderIdStr) || [];
+
+			senderSocketIds.forEach((socketId) => {
 				io.to(socketId).emit("message:delivered", {
 					messageId: newMessage._id,
-					deliveredAt: newMessage.deliveredAt,
+					deliveredAt,
 					conversationId: newMessage.conversationId,
 				});
 			});
 		}
 	}
-
 	res.status(201).json({
 		status: "success",
 		data: {
