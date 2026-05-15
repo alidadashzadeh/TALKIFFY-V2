@@ -4,8 +4,6 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { server, app } from "./lib/socket/index.js";
-import path from "path";
-import { fileURLToPath } from "url";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
 import conversationRouter from "./routes/conversationRoutes.js";
@@ -16,6 +14,7 @@ dotenv.config();
 
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
+
 app.use(
 	cors({
 		origin:
@@ -26,6 +25,16 @@ app.use(
 	}),
 );
 
+// Health check route
+app.get("/health", (req, res) => {
+	res.status(200).json({
+		status: "success",
+		message: "Talkiffy backend is running",
+		uptime: process.uptime(),
+		timestamp: new Date().toISOString(),
+	});
+});
+
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/conversations", conversationRouter);
@@ -33,6 +42,7 @@ app.use("/api/v1/conversations", conversationRouter);
 app.all("*", (req, res, next) => {
 	next(new AppError(`Can't find ${req.originalUrl} on this server.`, 404));
 });
+
 app.use(globalErrorHandler);
 
 mongoose
@@ -41,6 +51,7 @@ mongoose
 	.catch((err) => console.error("DB connection error:", err));
 
 const port = process.env.PORT || 5001;
+
 server.listen(port, () => {
 	console.log(`App running on port ${port}...`);
 });
