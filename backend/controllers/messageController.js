@@ -1,10 +1,12 @@
 import AppError from "../lib/AppError.js";
 import catchAsync from "../lib/catchAsync.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-import { getUserSocketIds, io } from "../lib/socket.js";
-import { emitToConversationParticipants } from "../lib/utils/socketNotifications.js";
+import { io } from "../lib/socket/index.js";
+import { getUserSocketIds } from "../lib/socket/onlineUsers.js";
+import { emitToConversationParticipants } from "../lib/socket/socketNotifications.js";
 import Conversation from "../models/conversationModel.js";
 import Message from "../models/messageModel.js";
+import { ensureConversationExists, ensureParticipant } from "../lib/utils.js";
 
 export const sendMessage = catchAsync(async (req, res) => {
 	const senderId = req.user._id;
@@ -25,9 +27,7 @@ export const sendMessage = catchAsync(async (req, res) => {
 		participants: senderId,
 	});
 
-	if (!conversation) {
-		throw new AppError("Conversation not found", 404);
-	}
+	ensureConversationExists(conversation);
 
 	if (replyToId) {
 		const replyMessage = await Message.findById(replyToId);
@@ -231,19 +231,8 @@ export const reactToMessage = catchAsync(async (req, res, next) => {
 
 	const conversation = await Conversation.findById(message.conversationId);
 
-	if (!conversation) {
-		return next(new AppError("Conversation not found", 404));
-	}
-
-	const isParticipant = conversation.participants.some(
-		(participantId) => String(participantId) === String(currentUserId),
-	);
-
-	if (!isParticipant) {
-		return next(
-			new AppError("You are not allowed to react to this message", 403),
-		);
-	}
+	ensureConversationExists(conversation);
+	ensureParticipant(conversation, currentUserId);
 
 	const cleanEmoji = emoji.trim();
 

@@ -23,7 +23,11 @@ function useLeaveGroup() {
 
 			return {
 				status: data?.status,
-				conversationId: data?.data?.conversationId || conversationId,
+				message: data?.message,
+				data: {
+					conversationId: data?.data?.conversationId || conversationId,
+					deleted: data?.data?.deleted || false,
+				},
 			};
 		},
 
@@ -56,8 +60,11 @@ function useLeaveGroup() {
 			};
 		},
 
-		onSuccess: ({ status, conversationId }) => {
+		onSuccess: ({ message, status, data }) => {
+			console.log("Leave group response:", { message, status, data });
 			if (status !== "success") return;
+
+			const conversationId = data?.conversationId;
 
 			queryClient.removeQueries({
 				queryKey: ["conversation", conversationId],
@@ -67,7 +74,7 @@ function useLeaveGroup() {
 				queryKey: ["messages", conversationId],
 			});
 
-			toast.success("You left the group");
+			toast.success(message || "You left the group");
 		},
 
 		onError: (error, _variables, context) => {

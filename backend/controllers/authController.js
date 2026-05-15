@@ -76,8 +76,7 @@ export const protect = catchAsync(async (req, res, next) => {
 		token = req.cookies.jwt;
 	}
 
-	if (!token)
-		throw new AppError("You are not logged in, Please login to continue!", 401);
+	if (!token) throw new AppError("Please login to continue!", 401);
 
 	const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 

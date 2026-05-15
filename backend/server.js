@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { server, app } from "./lib/socket.js";
+import { server, app } from "./lib/socket/index.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import userRouter from "./routes/userRoutes.js";

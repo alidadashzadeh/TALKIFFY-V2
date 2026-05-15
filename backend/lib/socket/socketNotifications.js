@@ -1,4 +1,4 @@
-import { getUserSocketIds } from "../socket.js";
+import { getUserSocketIds } from "../socket/onlineUsers.js";
 
 const normalizeId = (id) => id?.toString();
 

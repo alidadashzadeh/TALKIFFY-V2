@@ -2,7 +2,8 @@ import User from "../models/userModel.js";
 import catchAsync from "../lib/catchAsync.js";
 import AppError from "../lib/AppError.js";
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-import { getUserSocketIds, io } from "../lib/socket.js";
+import { io } from "../lib/socket/index.js";
+import { getUserSocketIds } from "../lib/socket/onlineUsers.js";
 
 export const updateUserAvatar = catchAsync(async (req, res) => {
 	const { id } = req.params;

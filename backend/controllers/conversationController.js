@@ -1,5 +1,6 @@
 import { uploadBufferToCloudinary } from "../lib/cloudinaryUpload.js";
-import { getUserSocketIds, io } from "../lib/socket.js";
+import { io } from "../lib/socket/index.js";
+import { getUserSocketIds } from "../lib/socket/onlineUsers.js";
 import {
 	ensureNotParticipant,
 	buildPrivateConversationKey,
@@ -15,7 +16,7 @@ import AppError from "../lib/AppError.js";
 import {
 	emitToConversationParticipants,
 	emitToUsers,
-} from "../lib/utils/socketNotifications.js";
+} from "../lib/socket/socketNotifications.js";
 
 export const getOrCreatePrivateConversation = catchAsync(async (req, res) => {
 	const currentUserId = req.user._id;
@@ -127,19 +128,19 @@ export const updateSeen = catchAsync(async (req, res, next) => {
 		);
 	}
 
-	const conversation = await Conversation.findOne({
-		_id: conversationId,
-		participants: userId,
-	});
+	const [conversation, message] = await Promise.all([
+		Conversation.findOne({
+			_id: conversationId,
+			participants: userId,
+		}),
 
-	const message = await Message.findOne({
-		_id: lastSeenMessageId,
-		conversationId,
-	}).select("_id createdAt");
+		Message.findOne({
+			_id: lastSeenMessageId,
+			conversationId,
+		}).select("_id createdAt"),
+	]);
 
-	if (!conversation) {
-		throw new AppError("Conversation not found", 404);
-	}
+	ensureConversationExists(conversation);
 	if (!message) {
 		throw new AppError("Message not found in this conversation", 404);
 	}
@@ -390,14 +391,7 @@ export const removeGroupAdmin = catchAsync(async (req, res) => {
 	ensureConversationExists(conversation);
 	ensureGroupConversation(conversation);
 	ensureAdmin(conversation, currentUserId);
-
-	const isTargetAdmin = conversation.admins.some(
-		(admin) => String(admin._id || admin) === String(userId),
-	);
-
-	if (!isTargetAdmin) {
-		throw new AppError("User is not an admin", 400);
-	}
+	ensureAdmin(conversation, userId);
 
 	if (conversation.admins.length === 1) {
 		throw new AppError("Cannot remove the last admin", 400);
@@ -436,14 +430,7 @@ export const leaveGroup = catchAsync(async (req, res) => {
 
 	ensureConversationExists(conversation);
 	ensureGroupConversation(conversation);
-
-	const isParticipant = conversation.participants.some(
-		(user) => String(user._id || user) === String(currentUserId),
-	);
-
-	if (!isParticipant) {
-		throw new AppError("You are not a member of this group", 400);
-	}
+	ensureParticipant(conversation, currentUserId);
 
 	conversation.participants = conversation.participants.filter(
 		(user) => String(user._id || user) !== String(currentUserId),
@@ -531,6 +518,7 @@ export const updateGroupAvatar = catchAsync(async (req, res) => {
 export const updateGroupName = catchAsync(async (req, res) => {
 	const { conversationId } = req.params;
 	const { name } = req.body;
+	const currentUserId = req.user._id;
 
 	if (!name || !name.trim()) {
 		return res.status(400).json({
@@ -540,27 +528,9 @@ export const updateGroupName = catchAsync(async (req, res) => {
 
 	const conversation = await Conversation.findById(conversationId);
 
-	if (!conversation) {
-		return res.status(404).json({
-			message: "Conversation not found",
-		});
-	}
-
-	if (!conversation.type === "group") {
-		return res.status(400).json({
-			message: "This conversation is not a group",
-		});
-	}
-
-	const isAdmin = conversation.admins.some(
-		(userId) => userId.toString() === req.user._id.toString(),
-	);
-
-	if (!isAdmin) {
-		return res.status(403).json({
-			message: "You are not allowed to update this group",
-		});
-	}
+	ensureConversationExists(conversation);
+	ensureGroupConversation(conversation);
+	ensureAdmin(conversation, currentUserId);
 
 	conversation.name = name.trim();
 
