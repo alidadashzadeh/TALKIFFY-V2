@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useSeenObserver from "@/hooks/messages/useSeenObserver";
 import { cn, getMessageDisplayData } from "@/lib/utils";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import { Muted } from "../ui/typography";
 import ChatMessageItemContextMenu from "./ChatMessageItemContextMenu";
 import MessageHoverReactions from "./../message/MessageHoverReactions";

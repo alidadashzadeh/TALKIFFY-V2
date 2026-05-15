@@ -31,7 +31,8 @@ function useUpdateGroupAvatar() {
 			}
 
 			const previewUrl = URL.createObjectURL(file);
-
+			const img = new window.Image();
+			img.src = previewUrl;
 			await queryClient.cancelQueries({ queryKey: ["conversations"] });
 
 			const previousConversations =
@@ -45,21 +46,23 @@ function useUpdateGroupAvatar() {
 				? { ...previousConversation, avatar: previewUrl }
 				: null;
 
-			queryClient.setQueryData(["conversations"], (oldData = []) =>
-				oldData.map((conversation) =>
-					conversation._id === conversationId
-						? { ...conversation, avatar: previewUrl }
-						: conversation,
-				),
-			);
+			img.onload = () => {
+				queryClient.setQueryData(["conversations"], (oldData = []) =>
+					oldData.map((conversation) =>
+						conversation._id === conversationId
+							? { ...conversation, avatar: previewUrl }
+							: conversation,
+					),
+				);
 
-			queryClient.setQueryData(
-				["conversation", conversationId],
-				(oldConversation) =>
-					oldConversation
-						? { ...oldConversation, avatar: previewUrl }
-						: oldConversation,
-			);
+				queryClient.setQueryData(
+					["conversation", conversationId],
+					(oldConversation) =>
+						oldConversation
+							? { ...oldConversation, avatar: previewUrl }
+							: oldConversation,
+				);
+			};
 
 			if (optimisticConversation) {
 				selectConversation(optimisticConversation);

@@ -9,7 +9,7 @@ import useCurrentUser from "@/hooks/user/useCurrentUser";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { useSocketContext } from "@/contexts/SocketContext";
 
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import OnlineStatusDot from "../ui/OnlineStatusDot";
 import { Muted, P } from "../ui/typography";
 

@@ -27,13 +27,18 @@ function useUpdateUserAvatar() {
 
 			const previewUrl = URL.createObjectURL(file);
 
+			const img = new window.Image();
+			img.src = previewUrl;
+
 			await queryClient.cancelQueries({ queryKey: ["currentUser"] });
 
 			const previousCurrentUser = queryClient.getQueryData(["currentUser"]);
 
-			queryClient.setQueryData(["currentUser"], (oldUser) =>
-				oldUser ? { ...oldUser, avatar: previewUrl } : oldUser,
-			);
+			img.onload = () => {
+				queryClient.setQueryData(["currentUser"], (oldUser) =>
+					oldUser ? { ...oldUser, avatar: previewUrl } : oldUser,
+				);
+			};
 
 			return {
 				previousCurrentUser,

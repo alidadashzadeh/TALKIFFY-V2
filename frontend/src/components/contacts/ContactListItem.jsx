@@ -1,7 +1,7 @@
 import { useSocketContext } from "@/contexts/SocketContext";
 import { cn, truncateText } from "@/lib/utils";
 import { Separator } from "../ui/separator";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import OnlineStatusDot from "../ui/OnlineStatusDot";
 
 function ContactListItem({ contact, ActionComponent }) {

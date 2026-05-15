@@ -1,4 +1,4 @@
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 
 function MessageItemAvatar({ isGroup, avatar, username }) {
 	return (

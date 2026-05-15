@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import useLogin from "../hooks/auth/useLogin.js";
-import Logo from "@/components/Logo.jsx";
+import Logo from "@/components/ui/Logo.jsx";
 
 function Login() {
 	const { loading, login } = useLogin();

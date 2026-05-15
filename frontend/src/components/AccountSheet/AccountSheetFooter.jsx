@@ -1,5 +1,5 @@
-import Logo from "../Logo";
-import { DarkModeSwitch } from "../DarkModeSwitch";
+import { DarkModeSwitch } from "../ui/DarkModeSwitch";
+import Logo from "../ui/Logo";
 import { SheetFooter } from "../ui/sheet";
 import { H2, Small } from "../ui/typography";
 

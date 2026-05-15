@@ -1,5 +1,5 @@
 import { useConversationContext } from "@/contexts/ConversationContext";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import { getConversationDisplayData } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 import { H4 } from "../ui/typography";

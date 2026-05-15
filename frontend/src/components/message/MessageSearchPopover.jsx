@@ -13,7 +13,7 @@ import { useSheetModalContext } from "@/contexts/SheetModalProvider";
 import useGetMessages from "@/hooks/messages/useGetMessages";
 import useMessageSearch from "@/hooks/messages/useMessageSearch";
 import { useMessageScroll } from "@/contexts/MessageScrollContext ";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 
 function MessageSearchPopover() {
 	const { messages } = useGetMessages();

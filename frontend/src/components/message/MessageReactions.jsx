@@ -1,5 +1,5 @@
 import { groupMessageReactions } from "@/lib/utils/messages.js";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import { cn } from "@/lib/utils";
 
 function MessageReactions({ message, isMyMessage }) {

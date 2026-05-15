@@ -1,5 +1,5 @@
 import { getConversationDisplayData, truncateText } from "@/lib/utils";
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import GroupChatHeaderActions from "./GroupChatHeaderActions";
 import PrivateChatHeaderActions from "./PrivateChatHeaderActions";

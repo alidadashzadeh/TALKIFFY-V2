@@ -1,4 +1,4 @@
-import AvatarGenerator from "../AvatarGenerator";
+import AvatarGenerator from "../ui/AvatarGenerator";
 import { useConversationContext } from "@/contexts/ConversationContext";
 import { getConversationDisplayData, truncateText } from "@/lib/utils";
 import GroupAdminActions from "./GroupAdminActions";

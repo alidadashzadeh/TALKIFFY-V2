@@ -5,28 +5,6 @@ export function cn(...inputs) {
 	return twMerge(clsx(inputs));
 }
 
-export function formatSeparatorDate(dateString) {
-	const date = new Date(dateString);
-	const today = new Date();
-	const yesterday = new Date();
-
-	yesterday.setDate(today.getDate() - 1);
-
-	const isSameDay = (a, b) =>
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate();
-
-	if (isSameDay(date, today)) return "Today";
-	if (isSameDay(date, yesterday)) return "Yesterday";
-
-	return date.toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: "numeric",
-	});
-}
-
 export function formatDateKey(date) {
 	const d = new Date(date);
 	return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
@@ -79,17 +57,6 @@ export function formatMessageTime(date) {
 		month: "short",
 		day: "numeric",
 	});
-}
-
-export function isSameCalendarDay(dateA, dateB) {
-	const a = new Date(dateA);
-	const b = new Date(dateB);
-
-	return (
-		a.getFullYear() === b.getFullYear() &&
-		a.getMonth() === b.getMonth() &&
-		a.getDate() === b.getDate()
-	);
 }
 
 export const getInitials = (text = "") => {
