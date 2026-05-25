@@ -9,9 +9,13 @@ import { Label } from "@/components/ui/label";
 
 import Logo from "@/components/ui/Logo.jsx";
 import useSignup from "../hooks/auth/useSignup.js";
+import useLogin from "@/hooks/auth/useLogin.js";
 
 function SignupPage() {
 	const { loading, signup } = useSignup();
+	// for demo purposes
+	const { login } = useLogin();
+
 	const [showPassword, setShowPassword] = useState(false);
 	const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
@@ -26,6 +30,13 @@ function SignupPage() {
 
 	const onSubmit = async (data) => {
 		signup(data);
+	};
+
+	const handleDemoLogin = () => {
+		login({
+			email: "demo@chat.com",
+			password: "demo1234",
+		});
 	};
 
 	return (
@@ -194,6 +205,15 @@ function SignupPage() {
 
 					<Button type="submit" disabled={loading} className="h-11 w-full">
 						{loading ? "Creating account..." : "Create account"}
+					</Button>
+
+					<Button
+						type="button"
+						onClick={handleDemoLogin}
+						disabled={loading}
+						className="h-11 w-full mt-3 bg-primary text-primary-foreground hover:opacity-90"
+					>
+						Try Demo Account
 					</Button>
 				</form>
 

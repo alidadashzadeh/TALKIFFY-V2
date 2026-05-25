@@ -24,6 +24,13 @@ function Login() {
 		login(data);
 	};
 
+	const handleDemoLogin = () => {
+		login({
+			email: "demo@chat.com",
+			password: "demo1234",
+		});
+	};
+
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
 			<div className="w-full max-w-md rounded-3xl border-muted border bg-card p-6 shadow-xl sm:p-8">
@@ -120,6 +127,15 @@ function Login() {
 
 					<Button type="submit" disabled={loading} className="h-11 w-full">
 						{loading ? "Signing in..." : "Sign in"}
+					</Button>
+
+					<Button
+						type="button"
+						onClick={handleDemoLogin}
+						disabled={loading}
+						className="h-11 w-full mt-3 bg-primary text-primary-foreground hover:opacity-90"
+					>
+						Try Demo Account
 					</Button>
 				</form>
 
