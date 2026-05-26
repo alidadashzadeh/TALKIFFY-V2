@@ -6,64 +6,83 @@ This project was built as a portfolio application to demonstrate practical full-
 
 ---
 
+## Technical Highlights
+
+- Real-time messaging architecture using Socket.IO
+- Optimistic UI updates with automatic cache reconciliation
+- Modular Express backend with centralized error handling
+- Image optimization pipeline using Sharp and Cloudinary
+- TanStack Query caching and async state synchronization
+- Scalable React architecture using Context API and custom hooks
+- Multi-device real-time session synchronization
+
 ## Features
 
-### Authentication
+### Authentication & Security
 
-- User signup and login
-- JWT-based authentication
-- Protected backend routes
-- Cookie-based authentication support
+- JWT-based authentication with HTTP-only cookies
+- Protected API routes using custom authentication middleware
+- Persistent login sessions across refreshes
+- Secure password hashing and credential validation
+- Centralized backend error handling architecture
 
-### Real-Time Chat
+### Real-Time Communication
+
+- Real-time bidirectional communication using Socket.IO
+- Optimistic UI message rendering before server confirmation
+- Instant message synchronization across multiple connected devices
+- Real-time online/offline presence tracking
+- Live message delivery and seen/read state updates
+- Event-driven socket notification architecture
+- Automatic client-side state reconciliation after socket events
+
+### Messaging Features
+
+- Text and image-based messaging
+- Message reply system with scroll-to-message behavior
+- Emoji reaction system for messages
+- Message search functionality within conversations
+- Shared media viewing support
+- Efficient message rendering and scroll management
+
+### Conversation System
 
 - Private one-to-one conversations
-- Group conversations
-- Real-time message updates with Socket.IO
-- Online user tracking
-- Message delivery status
-- Seen/read state tracking
-- Optimistic message sending
+- Dynamic group conversation creation and management
+- Group admin permission handling
+- Add/remove group participants in real time
+- Leave group functionality with live participant updates
+- Real-time group metadata updates (name and avatar)
 
-### Group Chat Management
+### Media Upload Pipeline
 
-- Create group conversations
-- Add and remove group members
-- Add and remove group admins
-- Leave group conversations
-- Update group name
-- Update group avatar
+- Avatar uploads for users and groups
+- Image message upload support
+- Server-side image optimization using Sharp
+- Cloudinary integration for cloud media storage
+- Optimized image compression before upload
 
-### Messages
+### Frontend Architecture
 
-- Send text messages
-- Send image messages
-- Reply to messages
-- React to messages with emojis
-- Search messages
-- View shared images
-- Scroll to replied or searched messages
+- Component-based React architecture
+- Custom reusable React hooks for business logic separation
+- TanStack Query for async server-state management and caching
+- Context API architecture for global state management
+- Modular folder structure for scalability and maintainability
+- Axios-based API abstraction layer
+- Optimized UI state synchronization with server updates
 
-### Media Uploads
+### User Experience & Interface
 
-- User avatar upload
-- Group avatar upload
-- Message image upload
-- Image optimization with Sharp
-- Cloudinary integration for media storage
-
-### User Interface
-
-- Clean chat layout
-- Sidebar conversation list
-- Conversation info panel
-- Account/profile sheet
-- Loading states and empty states
-- Theme settings
-- Notification settings
-- Toast notifications
-
----
+- Responsive modern chat interface
+- Browser push notification support for real-time events
+- Sidebar-based conversation navigation
+- Conversation information panels and sheets
+- Toast-based feedback and notification system
+- Loading, skeleton, and empty state handling
+- Theme and appearance customization
+- Smooth animations with Framer Motion
+- Optimistic interactions for reduced perceived latency
 
 ## Tech Stack
 
@@ -90,6 +109,13 @@ This project was built as a portfolio application to demonstrate practical full-
 - Multer
 - Sharp
 - Cloudinary
+
+## Deployment
+
+- Frontend deployed on Vercel: https://talkiffy.vercel.app/
+- Backend deployed on Render
+- Media storage handled with Cloudinary
+- Database hosted on MongoDB Atlas
 
 ## Prerequisites
 
@@ -127,7 +153,6 @@ npm run dev
 Create a .env file in the backend folder and set these variables:
 
 MONGODB_URI=your_mongodb_connection_string
-PASSWORD=your_database_password
 PORT=5001
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
@@ -137,7 +162,7 @@ JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=7d
 NODE_ENV=development
 
-# folder structure
+## Project Structure
 
 TALKIFFY/
 ├── backend/
@@ -251,4 +276,8 @@ TALKIFFY/
 
 Make sure MongoDB is running locally or use a cloud database like MongoDB Atlas.
 Vite's hot module replacement (HMR) works well for a smooth development experience on the frontend.
-You can extend the app by adding more features like group chats, voice and video calls, adding more settings and optimizing UI/UX
+You can further extend the app with features such as voice/video calls, message pagination, and advanced UI/UX improvements.
+
+```
+
+```
